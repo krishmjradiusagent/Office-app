@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CDA Settings — Flow Map</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<style>
+* { box-sizing:border-box; }
+body { margin:0; background:#0a0a0a; color:#FAFAFA; font-family:var(--font, system-ui); padding:32px 28px 80px; }
+a { color:#8fa0ff; }
+a:hover { color:#aab4ff; }
+h1 { font:700 26px/1.25 var(--font-hubot, var(--font)); letter-spacing:-.02em; margin:0 0 6px; }
+.lede { font:400 14px/1.55 var(--font); color:#A1A1A6; max-width:760px; margin:0 0 20px; }
+.note { display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border:1px solid #2a2a2e; border-radius:10px; background:#131316; max-width:760px; margin-bottom:28px; font:400 13px/1.55 var(--font); color:#c7c7cc; }
+.note i { flex:none; font-size:16px; color:#8fa0ff; margin-top:1px; }
+.flowbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 40px; font:600 13px/1 var(--font); color:#d8d8dc; }
+.flowbar .step { padding:7px 12px; border-radius:999px; background:#1a1a1e; border:1px solid #2a2a2e; }
+.flowbar .arrow { color:#54545a; }
+section.grp { margin-bottom:52px; }
+section.grp h2 { font:700 18px/1.3 var(--font-hubot, var(--font)); letter-spacing:-.01em; margin:0 0 4px; display:flex; align-items:center; gap:10px; }
+section.grp h2 .idx { font:700 12px/1 var(--font); color:#0a0a0a; background:#8fa0ff; border-radius:999px; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; }
+section.grp .desc { font:400 13px/1.5 var(--font); color:#8a8a90; margin:0 0 16px; max-width:700px; }
+.grid { display:flex; flex-wrap:wrap; gap:22px; }
+.card { flex:none; }
+.card .lbl { font:600 13px/1.3 var(--font); color:#FAFAFA; margin-bottom:2px; }
+.card .lbl .tag { font:600 10px/1 var(--font); text-transform:uppercase; letter-spacing:.04em; padding:3px 6px; border-radius:5px; margin-left:6px; background:#26262A; color:#A1A1A6; }
+.card .lbl .tag.pop { background:rgba(234,88,12,.18); color:#ffab6b; }
+.card .lbl .tag.err { background:rgba(220,38,38,.2); color:#ff9d9d; }
+.card .sub { font:400 12px/1.4 var(--font); color:#75757b; margin-bottom:10px; max-width:220px; }
+.frame-wrap { width:230px; height:497px; overflow:hidden; border-radius:22px; border:1px solid #2a2a2e; background:#000; box-shadow:0 12px 30px rgba(0,0,0,.4); position:relative; }
+.frame-wrap iframe { width:390px; height:844px; border:0; transform:scale(0.5897); transform-origin:top left; pointer-events:none; }
+.dl { margin-top:8px; display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px; border:1px solid #2a2a2e; border-radius:999px; background:#161619; color:#c7c7cc; font:600 12px/1 var(--font); cursor:pointer; }
+.dl:hover { background:#1e1e22; color:#fff; }
+.dl:disabled { opacity:.5; cursor:default; }
+</style>
+</head>
+<body>
+
+<h1>CDA Settings — flow map</h1>
+<p class="lede">Every screen, role state, sheet and popup in the CDA Settings flow, laid out in order. Each card is the live prototype embedded and driven into that exact state — not a redrawn mock — so it always matches what's in <a href="CDA Settings.html">CDA Settings.html</a> and its sub-screens.</p>
+<div class="note"><i class="ph ph-info"></i>These screens confirm saves with an inline button morph (icon + label flip to a checkmark and "Saved"/"Assigned"), not a toast or modal. That's the actual success pattern here — see it live in the Add/Assign sheet cards below.</div>
+
+<div class="flowbar">
+  <span class="step">Settings</span><span class="arrow">→</span>
+  <span class="step">CDA Settings</span><span class="arrow">→</span>
+  <span class="step">Group Lead Plan Creation</span><span class="arrow">/</span>
+  <span class="step">Commission Plan</span><span class="arrow">/</span>
+  <span class="step">Fee Type</span><span class="arrow">/</span>
+  <span class="step">Post Cap Plan</span><span class="arrow">/</span>
+  <span class="step">Wiring Payment</span><span class="arrow">→</span>
+  <span class="step">Pending Sub-Plan Approval</span>
+</div>
+
+<section class="grp" id="s1">
+  <h2><span class="idx">1</span>CDA Settings — role gating</h2>
+  <p class="desc">The row list is role-scoped: Team Lead sees everything including Group Lead Plan Creation; Group Lead loses that row; Agent only sees Wiring Payment plus a note that plans/fees are managed by the Team Lead.</p>
+  <div class="grid" data-section></div>
+</section>
+
+<section class="grp" id="s2">
+  <h2><span class="idx">2</span>Group Lead Plan Creation</h2>
+  <p class="desc">Team Lead toggles which Group Leads may create their own commission plans.</p>
+  <div class="grid" data-section></div>
+</section>
+
+<section class="grp" id="s3">
+  <h2><span class="idx">3</span>Commission Plan</h2>
+  <p class="desc">List of standard/tiered plans, per-plan Assign Defaults, and the Add/Edit sheet with live split validation.</p>
+  <div class="grid" data-section></div>
+</section>
+
+<section class="grp" id="s4">
+  <h2><span class="idx">4</span>Fee Type</h2>
+  <p class="desc">Reusable CDA deductions — flat or percentage, pre/post-split, optional cap contribution and sliding scale tiers.</p>
+  <div class="grid" data-section></div>
+</section>
+
+<section class="grp" id="s5">
+  <h2><span class="idx">5</span>Post Cap Plan</h2>
+  <p class="desc">Fees that kick in once an agent hits cap. Includes the archive confirmation popup.</p>
+  <div class="grid" data-section></div>
+</section>
+
+<section class="grp" id="s6">
+  <h2><span class="idx">6</span>Wiring Payment</h2>
+  <p class="desc">Team Wire, My Wire and Private Recipients. Includes an incomplete recipient, the add/edit sheet, and the delete confirmation popup.</p>
+  <div class="grid" data-section></div>
+</section>
+
+<section class="grp" id="s7">
+  <h2><span class="idx">7</span>Pending Sub-Plan Approval</h2>
+  <p class="desc">Team Lead approves or rejects Group-Lead-authored sub-plans. Rejection requires a reason; approving/rejecting the last item shows the empty state.</p>
+  <div class="grid" data-section></div>
+</section>
+
+<script>
+function el(tag, attrs, children) {
+  var n = document.createElement(tag);
+  for (var k in attrs || {}) n.setAttribute(k, attrs[k]);
+  (children || []).forEach(function (c) { n.appendChild(c); });
+  return n;
+}
+function runSteps(win, doc, steps, i) {
+  i = i || 0;
+  if (!steps || i >= steps.length) return;
+  var s = steps[i];
+  try {
+    if (s.click) { var t = doc.querySelector(s.click); if (t) t.click(); }
+    else if (s.set) {
+      var f = doc.querySelector(s.set);
+      if (f) { f.value = s.value; f.dispatchEvent(new win.Event('input', { bubbles: true })); }
+    }
+  } catch (e) {}
+  setTimeout(function () { runSteps(win, doc, steps, i + 1); }, s.wait || 140);
+}
+function card(sectionId, spec) {
+  var wrap = el('div', { class: 'card' });
+  var lbl = el('div', { class: 'lbl' });
+  lbl.textContent = spec.label;
+  if (spec.tag) { var t = el('span', { class: 'tag ' + (spec.tagClass || '') }); t.textContent = spec.tag; lbl.appendChild(t); }
+  wrap.appendChild(lbl);
+  if (spec.sub) { var sb = el('div', { class: 'sub' }); sb.textContent = spec.sub; wrap.appendChild(sb); }
+  var fw = el('div', { class: 'frame-wrap' });
+  var ifr = el('iframe', { src: spec.src, loading: 'lazy' });
+  ifr.addEventListener('load', function () {
+    try { ifr.contentDocument.body.style.padding = '0'; } catch (e) {}
+    try { ifr.contentWindow.addEventListener('scroll', function () { ifr.contentWindow.scrollTo(0, 0); }); } catch (e) {}
+    try { runSteps(ifr.contentWindow, ifr.contentDocument, spec.steps); } catch (e) {}
+  });
+  fw.appendChild(ifr);
+  wrap.appendChild(fw);
+  var btn = el('button', { class: 'dl', type: 'button' });
+  btn.textContent = 'Download PNG';
+  btn.addEventListener('click', function () {
+    btn.disabled = true; btn.textContent = 'Capturing…';
+    var doc = ifr.contentDocument;
+    var target = (doc && (doc.querySelector('.phone') || doc.body));
+    if (!target) { btn.textContent = 'Not ready'; setTimeout(function () { btn.disabled = false; btn.textContent = 'Download PNG'; }, 1500); return; }
+    htmlToImage.toPng(target, { pixelRatio: 2 }).then(function (dataUrl) {
+      var a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = spec.label.replace(/[^a-z0-9]+/gi, '-') + '.png';
+      a.click();
+      btn.disabled = false; btn.textContent = 'Download PNG';
+    }).catch(function (e) {
+      btn.disabled = false; btn.textContent = 'Download failed';
+      setTimeout(function () { btn.textContent = 'Download PNG'; }, 1800);
+    });
+  });
+  wrap.appendChild(btn);
+  document.querySelector('#' + sectionId + ' [data-section]').appendChild(wrap);
+}
+
+/* 1 — role gating */
+card('s1', { label: 'Team Lead (default)', src: 'CDA Settings.html', steps: [] });
+card('s1', { label: 'Group Lead', sub: 'No Group Lead Plan Creation row.', src: 'CDA Settings.html', steps: [{ click: '[data-setrole="grouplead"]' }] });
+card('s1', { label: 'Agent', sub: 'Only Wiring Payment, plus a scope note.', src: 'CDA Settings.html', steps: [{ click: '[data-setrole="agent"]' }] });
+
+/* 2 — group lead plan creation */
+card('s2', { label: 'Default — no access', src: 'Group Lead Plan Creation.html', steps: [] });
+card('s2', { label: 'Access granted', sub: 'Toggle on for Emma Wilson.', src: 'Group Lead Plan Creation.html', steps: [{ click: '.st-sw' }] });
+
+/* 3 — commission plan */
+card('s3', { label: 'Plan list', src: 'Commission Plan.html', steps: [] });
+card('s3', { label: 'Add plan sheet', tag: 'sheet', src: 'Commission Plan.html', steps: [{ click: '#addPlanBtn' }] });
+card('s3', { label: 'Split ≠ 100% error', tag: 'edge case', tagClass: 'err', sub: 'Save stays disabled; helper text turns red.', src: 'Commission Plan.html',
+  steps: [{ click: '#addPlanBtn' }, { set: '#fName', value: 'Referral 65/35', wait: 100 }, { set: '#fSplitA', value: '65', wait: 100 }, { set: '#fSplitB', value: '30' }] });
+card('s3', { label: 'Assign Defaults sheet', tag: 'sheet', sub: 'Lease Referral Plan → Assign.', src: 'Commission Plan.html', steps: [{ click: '[data-assign="4"]' }] });
+
+/* 4 — fee type */
+card('s4', { label: 'Fee list', src: 'Fee Type.html', steps: [] });
+card('s4', { label: 'Add fee sheet — flat', tag: 'sheet', src: 'Fee Type.html', steps: [{ click: '#addFeeBtn' }] });
+card('s4', { label: 'Sliding scale tiers', tag: 'sheet', sub: 'Toggling sliding scale reveals tier rows.', src: 'Fee Type.html', steps: [{ click: '#addFeeBtn' }, { click: '#swSliding' }] });
+
+/* 5 — post cap plan */
+card('s5', { label: 'Plan list', src: 'Post Cap Plan.html', steps: [] });
+card('s5', { label: 'Add plan sheet', tag: 'sheet', src: 'Post Cap Plan.html', steps: [{ click: '#addPcBtn' }] });
+card('s5', { label: 'Assign plan sheet', tag: 'sheet', src: 'Post Cap Plan.html', steps: [{ click: '[data-assign="1"]' }] });
+card('s5', { label: 'Archive confirmation', tag: 'popup', tagClass: 'pop', sub: '"Archive post-cap plan?" — destructive confirm.', src: 'Post Cap Plan.html', steps: [{ click: '[data-archive="1"]' }] });
+
+/* 6 — wiring payment */
+card('s6', { label: 'Private recipients list', src: 'Wiring Payment.html', steps: [] });
+card('s6', { label: 'Edit — incomplete recipient', sub: 'Marcus Lee has no bank details on file.', src: 'Wiring Payment.html', steps: [{ click: '.wr-row[data-id="2"]' }] });
+card('s6', { label: 'Add recipient sheet', tag: 'sheet', sub: 'Empty — Save disabled until required fields fill.', src: 'Wiring Payment.html', steps: [{ click: '#addRecipientBtn' }] });
+card('s6', { label: 'Delete confirmation', tag: 'popup', tagClass: 'pop', sub: '"Delete payment instruction?" — destructive confirm.', src: 'Wiring Payment.html', steps: [{ click: '[data-del="1"]' }] });
+
+/* 7 — pending sub-plan approval */
+card('s7', { label: 'Pending item', src: 'Pending Sub-Plan Approval.html', steps: [] });
+card('s7', { label: 'Reject confirmation', tag: 'popup', tagClass: 'pop', sub: 'Reason required — Reject stays disabled until typed.', src: 'Pending Sub-Plan Approval.html', steps: [{ click: '.psa-reject' }] });
+card('s7', { label: 'Empty state', sub: '"All caught up" after the last item is resolved.', src: 'Pending Sub-Plan Approval.html', steps: [{ click: '.psa-approve' }] });
+</script>
+</body>
+</html>

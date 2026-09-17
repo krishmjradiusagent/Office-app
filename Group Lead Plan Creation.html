@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Group Lead Plan Creation — Radius</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<link rel="stylesheet" href="assets/list-page.css">
+<style>
+.scroll { padding-top:12px; }
+.pg-titlewrap { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.pg-subtitle { font:400 13px/1.4 var(--font); color:var(--muted-foreground); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gl-row { display:flex; align-items:center; gap:12px; padding:14px 4px; border-top:1px solid var(--border); }
+.gl-row:first-child { border-top:0; }
+.gl-ini { width:40px; height:40px; border-radius:999px; background:var(--muted); color:var(--foreground); font:600 14px/1 var(--font); display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.gl-body { flex:1; min-width:0; }
+.gl-name { font:600 15px/1.3 var(--font); }
+.gl-sub { font:400 13px/1.3 var(--font); color:var(--muted-foreground); margin-top:2px; }
+.gl-right { flex:none; display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+.gl-status { font:500 12px/1 var(--font); color:var(--muted-foreground); }
+.st-sw { position:relative; flex:none; width:44px; height:26px; border-radius:999px; background:var(--muted); border:0; cursor:pointer; transition:background 180ms ease; padding:0; }
+.st-sw i { position:absolute; top:2px; left:2px; width:22px; height:22px; border-radius:999px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.3); transition:transform 220ms cubic-bezier(0.23,1,0.32,1); }
+.st-sw[aria-checked="true"] { background:var(--success); }
+.st-sw[aria-checked="true"] i { transform:translateX(18px); }
+.st-sw:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen" data-screen-label="Group Lead Plan Creation">
+    <div class="statusbar"><span>9:41</span>
+      <div class="sb-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="5" width="3" height="7" rx="1"/><rect x="9" y="2.5" width="3" height="9.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity="0.7"/></svg>
+        <svg width="20" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor"><rect x="1" y="1" width="17" height="10" rx="3"/><rect x="3" y="3" width="11" height="6" rx="1.5" fill="currentColor" stroke="none"/><path d="M20 4v4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div class="pg-head">
+      <a href="CDA Settings.html" class="back-btn" aria-label="Back to CDA Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </a>
+      <div class="pg-titlewrap">
+        <h1>Group Lead Plan Creation</h1>
+        <div class="pg-subtitle">Choose which Group Leads can create plans.</div>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div class="gcard">
+        <div class="gl-row">
+          <span class="gl-ini">EW</span>
+          <div class="gl-body">
+            <div class="gl-name">Emma Wilson</div>
+            <div class="gl-sub">Group: West</div>
+          </div>
+          <div class="gl-right">
+            <span class="gl-status">No access</span>
+            <button class="st-sw" role="switch" aria-checked="false" aria-label="Emma Wilson plan creation"><i></i></button>
+          </div>
+        </div>
+        <div class="gl-row">
+          <span class="gl-ini">JM</span>
+          <div class="gl-body">
+            <div class="gl-name">James Miller</div>
+            <div class="gl-sub">Group: East</div>
+          </div>
+          <div class="gl-right">
+            <span class="gl-status">No access</span>
+            <button class="st-sw" role="switch" aria-checked="false" aria-label="James Miller plan creation"><i></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.st-sw').forEach(function(sw){
+  sw.addEventListener('click', function(){
+    this.setAttribute('aria-checked', this.getAttribute('aria-checked')==='true' ? 'false' : 'true');
+    var status = this.closest('.gl-right').querySelector('.gl-status');
+    status.textContent = this.getAttribute('aria-checked')==='true' ? 'Can create' : 'No access';
+  });
+});
+</script>
+</body>
+</html>
