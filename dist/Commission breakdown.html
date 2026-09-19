@@ -725,7 +725,7 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
    carries the closing and the status, and the money starts at the top of the
    scroller */
 
-.fin-card { position:relative; z-index:1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px; margin:0 -8px 8px; padding:12px 12px 2px; border:1px solid var(--border); border-radius:20px; background:var(--muted); box-shadow:var(--shadow-sm); }
+.fin-card { position:relative; z-index:1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px; margin:0 -8px 8px; padding:12px; border:1px solid var(--border); border-radius:20px; background:var(--muted); box-shadow:var(--shadow-sm); }
 .fin-card[data-count="1"] { grid-template-columns:minmax(0,1fr); }
 .fin-card[data-count="3"],.fin-card[data-count="4"] { grid-template-columns:repeat(2,minmax(0,1fr)); }
 .fin-row { min-width:0; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:5px; width:100%; min-height:68px; padding:10px 12px; border:1px solid color-mix(in srgb,var(--tint-indigo-fg) 24%,var(--border)); border-radius:12px; background:color-mix(in srgb,var(--tint-indigo-fg) 22%,var(--card)); box-shadow:var(--shadow-sm); color:var(--tint-indigo-fg); text-align:left; }
@@ -738,14 +738,6 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .fin-row .fin-badge::after { content:attr(data-mark); position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding-top:.5px; font:700 8px/1 var(--font); }
 .fin-row b { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; font:700 17px/1.1 var(--font-hubot); letter-spacing:-.01em; font-variant-numeric:tabular-nums; color:currentColor; white-space:nowrap; }
 .fin-row:nth-child(2) b { font-size:17px; font-weight:700; }
-.fin-actions { grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:28px; margin-top:1px; padding:0 2px; }
-.fin-action { position:relative; min-width:0; min-height:28px; padding:0 2px; border:0; border-radius:7px; background:transparent;
-  display:inline-flex; align-items:center; gap:5px; color:var(--tint-indigo-fg); font:600 12px/1.2 var(--font); cursor:pointer; }
-.fin-action i { flex:none; width:auto; height:auto; border:0; border-radius:0; display:inline-block; background:transparent;
-  color:currentColor; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; font-size:14px; }
-.fin-action span { white-space:nowrap; }
-.fin-action:active { opacity:.7; }
-.fin-action:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
 .ybd-card { position:relative; z-index:1; margin:0 -8px; padding:6px 16px 14px; border-radius:var(--radius-card);
   border:1px solid rgba(255,255,255,.08); background:rgba(18,18,20,.94);
   backdrop-filter:blur(10px) saturate(120%); -webkit-backdrop-filter:blur(10px) saturate(120%);
@@ -867,15 +859,14 @@ button.ybd-r:active { opacity:.7; }
 .ybd-fbh { min-height:44px;
   display:flex; align-items:center; gap:10px; margin:0 -16px; padding:0 16px; }
 /* the edit chip left the flow, so the title keeps its own clearance from it */
-.ybd-r.head { flex:1; min-width:0; padding-right:40px; }
+.ybd-r.head { flex:1; min-width:0; padding-right:72px; }
 .ybd-r.head .k b { font-weight:600; }
 /* collapse reads left of the title; Edit owns the right — two targets, one row */
 .ybd-r.head .chev { order:-1; margin-right:-4px; transition:none; }
 .ybd-r.head[disabled] { opacity:.38; cursor:default; }
-/* folded, the chain takes Net commission with it — so the header carries the number
-   while it is closed, and hands it back to the chain the moment it opens */
-.ybd-r.head .v { font:700 17px/1.3 var(--font-hubot); letter-spacing:-.01em; }
-.ybd-r.head[aria-expanded="true"] .v { display:none; }
+/* Net commission already has a persistent summary card below this section.
+   Repeating it in the collapsed header reads like an unlabelled stray value. */
+.ybd-r.head .v { display:none; }
 /* Edit is visually quieter than page chrome: compact 32px circle and 18px
    glyph, while its invisible 44px target preserves comfortable touch use.
    The values are literal, not the --glass-* tokens, because those self-resolve
@@ -898,6 +889,14 @@ button.ybd-r:active { opacity:.7; }
 .screen.light .fb-edit[aria-pressed="true"] { background:var(--primary); color:#fff; box-shadow:none; }
 .fb-edit:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
 .fb-edit:active { opacity:.72; }
+.ybd-add-anchor { position:absolute; top:16px; right:44px; z-index:8; width:24px; height:24px; }
+.ybd-add-anchor.open { z-index:16; }
+.fb-add { position:relative; top:auto; right:auto; }
+.add-drop { top:calc(100% + 8px); bottom:auto; right:-32px; width:220px; transform-origin:100% 0; }
+.add-drop .plan-drop-list { max-height:none; overflow:visible; padding-right:0; }
+.add-drop .plan-drop-list button { padding:0 10px; }
+.add-drop .plan-drop-list button + button { border-top:1px solid rgba(255,255,255,.07); border-radius:0; }
+.screen.light .add-drop .plan-drop-list button + button { border-top-color:rgba(10,10,10,.07); }
 /* edit mode: only rows holding a number someone actually sets become targets.
    Derived and formula rows stay read-only with one quiet disabled cue. */
 .ybd-card.editing .ybd-det .d:not(button), .ybd-card.editing .ybd-r.lock { opacity:.46; }
@@ -1281,10 +1280,6 @@ body { position:relative; gap:0; }
         <div class="fin-card" id="finCard" data-count="2">
           <div class="fin-row" data-editfinancial="price"><span><i class="ph ph-house-line fin-icon" aria-hidden="true"></i>Sale price</span><b id="finPrice">$1,150,000</b></div>
           <div class="fin-row" data-editfinancial="gross"><span><span class="fin-badge" data-mark="$" aria-hidden="true"><i class="ph ph-seal"></i></span>Gross commission</span><b id="finGross">$23,000</b></div>
-          <div class="fin-actions" aria-label="Add commission entry">
-            <button class="fin-action" type="button" aria-haspopup="dialog" data-addded="mine|presplit" data-dedtitle="Add deduction"><i class="ph ph-plus" aria-hidden="true"></i><span>Pre/post split deduction</span></button>
-            <button class="fin-action" type="button" aria-haspopup="dialog" data-addded="mine|credit" data-dedtitle="Add fee"><i class="ph ph-plus" aria-hidden="true"></i><span>Credit/referral fee</span></button>
-          </div>
         </div>
         <div class="ybd-card" id="ybdCard">
           <div class="ybd-lad" id="ybdLad"></div>
@@ -3137,7 +3132,32 @@ body { position:relative; gap:0; }
       var again = document.getElementById('ybdEditBtn');
       if (again) again.focus();
     });
-    head.appendChild(row); head.appendChild(ed);
+    var addAnchor = document.createElement('div');
+    addAnchor.className = 'ybd-add-anchor';
+    var addBtn = document.createElement('button');
+    addBtn.type = 'button'; addBtn.className = 'fb-edit fb-add'; addBtn.id = 'ybdAddBtn';
+    addBtn.setAttribute('aria-haspopup', 'menu'); addBtn.setAttribute('aria-expanded', 'false');
+    addBtn.setAttribute('aria-controls', 'ybdAddDrop'); addBtn.setAttribute('aria-label', 'Add to your breakdown');
+    addBtn.title = 'Add to breakdown';
+    var addIcon = document.createElement('i'); addIcon.className = 'ph ph-plus'; addIcon.setAttribute('aria-hidden', 'true');
+    addBtn.appendChild(addIcon);
+    var addMenu = document.createElement('div');
+    addMenu.className = 'plan-drop add-drop down'; addMenu.id = 'ybdAddDrop'; addMenu.hidden = true;
+    addMenu.setAttribute('role', 'menu'); addMenu.setAttribute('aria-label', 'Add to your breakdown');
+    var addList = document.createElement('div'); addList.className = 'plan-drop-list add-drop-list';
+    [
+      ['presplit', 'Pre-split deduction'],
+      ['post', 'Post-split deduction'],
+      ['credit', 'Credit'],
+      ['referral', 'Referral']
+    ].forEach(function (item) {
+      var option = document.createElement('button');
+      option.type = 'button'; option.setAttribute('role', 'menuitem');
+      option.setAttribute('data-breakdown-add', item[0]); option.textContent = item[1];
+      addList.appendChild(option);
+    });
+    addMenu.appendChild(addList); addAnchor.appendChild(addBtn); addAnchor.appendChild(addMenu);
+    head.appendChild(row); head.appendChild(addAnchor); head.appendChild(ed);
     wrap.appendChild(head); wrap.appendChild(det);
     return wrap;
   }
@@ -4002,7 +4022,7 @@ body { position:relative; gap:0; }
      Origin-aware reveal + scale + fade. A real spring owns the presentation
      value and velocity, so tapping again or pressing Escape mid-flight simply
      retargets the same object instead of restarting a keyframe sequence. */
-  var planDropMotion = null;
+  var planDropMotion = null, addDropMotion = null;
   function planDropParts() {
     var anchor = document.querySelector('.ybd-plan-anchor');
     return anchor ? {
@@ -4038,6 +4058,12 @@ body { position:relative; gap:0; }
     }
     return planDropMotion;
   }
+  function addMotionFor(p) {
+    if (!addDropMotion || addDropMotion.menu !== p.menu) {
+      addDropMotion = { menu: p.menu, x: .18, v: 0, target: .18, frame: 0, last: 0, after: null, reducedAnim: null };
+    }
+    return addDropMotion;
+  }
   function paintPlanDrop(m, p) {
     var raw = (m.x - .18) / .82,
         visible = Math.max(0, Math.min(1, raw * 1.2)),
@@ -4053,12 +4079,13 @@ body { position:relative; gap:0; }
     m.frame = 0; m.x = m.target; m.v = 0; paintPlanDrop(m, p);
     if (m.target === .18) {
       p.menu.hidden = true; p.menu.classList.remove('closing'); p.anchor.classList.remove('closing');
-      var card = p.anchor.closest('.ybd-card'); if (card) card.classList.remove('plan-menu-open');
+      var card = p.anchor.closest('.ybd-card');
+      if (card && !card.querySelector('.ybd-plan-anchor.open,.ybd-add-anchor.open')) card.classList.remove('plan-menu-open');
     }
     var done = m.after; m.after = null; if (done) done();
   }
-  function retargetPlanDrop(p, open, after) {
-    var m = planMotionFor(p), reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function retargetPlanDrop(p, open, after, motionFor) {
+    var m = (motionFor || planMotionFor)(p), reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     m.target = open ? 1 : .18; m.after = after || null;
     if (reduce) {
       if (m.frame) { cancelAnimationFrame(m.frame); m.frame = 0; }
@@ -4075,7 +4102,8 @@ body { position:relative; gap:0; }
         m.reducedAnim = null; p.menu.style.opacity = String(to); m.x = m.target; m.v = 0;
         if (!open) {
           p.menu.hidden = true; p.menu.classList.remove('closing'); p.anchor.classList.remove('closing');
-          var card = p.anchor.closest('.ybd-card'); if (card) card.classList.remove('plan-menu-open');
+          var card = p.anchor.closest('.ybd-card');
+          if (card && !card.querySelector('.ybd-plan-anchor.open,.ybd-add-anchor.open')) card.classList.remove('plan-menu-open');
         }
         var done = m.after; m.after = null; if (done) done();
       };
@@ -4110,6 +4138,7 @@ body { position:relative; gap:0; }
   }
   function openPlanDropdown(focusOption) {
     var p = planDropParts(); if (!p) return;
+    closeAddDropdown();
     p.anchor.classList.remove('closing'); p.menu.classList.remove('closing');
     p.menu.hidden = false;
     p.search.value = ''; filterPlanDropdown(p, '');
@@ -4121,6 +4150,42 @@ body { position:relative; gap:0; }
       var chosen = p.menu.querySelector('[aria-selected="true"]') || p.menu.querySelector('button');
       if (chosen) chosen.focus();
     }
+  }
+  function addDropParts() {
+    var anchor = document.querySelector('.ybd-add-anchor');
+    return anchor ? {
+      anchor: anchor, trigger: anchor.querySelector('#ybdAddBtn'), menu: anchor.querySelector('.add-drop')
+    } : null;
+  }
+  function closeAddDropdown(after) {
+    var p = addDropParts();
+    if (!p || p.menu.hidden) { if (after) after(); return; }
+    p.anchor.classList.remove('open'); p.anchor.classList.add('closing');
+    p.menu.classList.add('closing'); p.trigger.setAttribute('aria-expanded', 'false');
+    retargetPlanDrop(p, false, after, addMotionFor);
+  }
+  function openAddDropdown(focusOption) {
+    var p = addDropParts(); if (!p) return;
+    closePlanDropdown();
+    p.anchor.classList.remove('closing'); p.menu.classList.remove('closing');
+    p.menu.hidden = false; p.anchor.classList.add('open');
+    var card = p.anchor.closest('.ybd-card'); if (card) card.classList.add('plan-menu-open');
+    p.trigger.setAttribute('aria-expanded', 'true');
+    retargetPlanDrop(p, true, null, addMotionFor);
+    if (focusOption) {
+      var first = p.menu.querySelector('[data-breakdown-add]'); if (first) first.focus();
+    }
+  }
+  function chooseBreakdownAdd(kind) {
+    var parts = addDropParts(), trigger = parts && parts.trigger;
+    closeAddDropdown(function () {
+      if (!trigger) return;
+      if (kind === 'post') { openPost('post', null, trigger, 'Add post-split deduction'); return; }
+      if (kind === 'presplit') { openDed('mine', null, true, 'presplit', trigger); return; }
+      openDed('mine', null, true, 'credit', trigger);
+      setDedType(kind);
+      document.getElementById('dedSheetT').firstChild.textContent = kind === 'referral' ? 'Add referral' : 'Add credit';
+    });
   }
   function chooseDropdownPlan(name) {
     var p = null, i, s = SCHED['Mark Perez'];
@@ -4141,7 +4206,14 @@ body { position:relative; gap:0; }
     });
   }
   document.addEventListener('click', function (e) {
-    var trigger = e.target.closest('[data-plan-dropdown]'), option = e.target.closest('[data-plan-option]'), parts = planDropParts();
+    var addTrigger = e.target.closest('#ybdAddBtn'), addOption = e.target.closest('[data-breakdown-add]'), addParts = addDropParts(),
+        trigger = e.target.closest('[data-plan-dropdown]'), option = e.target.closest('[data-plan-option]'), parts = planDropParts();
+    if (addOption) { chooseBreakdownAdd(addOption.getAttribute('data-breakdown-add')); return; }
+    if (addTrigger) {
+      if (addTrigger.getAttribute('aria-expanded') === 'true') closeAddDropdown();
+      else openAddDropdown(false);
+      return;
+    }
     if (option) { chooseDropdownPlan(option.getAttribute('data-plan-option')); return; }
     if (trigger) {
       if (trigger.getAttribute('aria-expanded') === 'true') closePlanDropdown();
@@ -4149,6 +4221,7 @@ body { position:relative; gap:0; }
       return;
     }
     if (parts && !parts.menu.hidden && !e.target.closest('.ybd-plan-anchor')) closePlanDropdown();
+    if (addParts && !addParts.menu.hidden && !e.target.closest('.ybd-add-anchor')) closeAddDropdown();
   });
   document.addEventListener('input', function (e) {
     if (!e.target.matches('.plan-drop-search input')) return;
@@ -4159,6 +4232,20 @@ body { position:relative; gap:0; }
     updatePlanScrollbar(planDropParts());
   }, true);
   document.addEventListener('keydown', function (e) {
+    var addParts = addDropParts();
+    if (addParts && e.key === 'Escape' && !addParts.menu.hidden) { e.preventDefault(); closeAddDropdown(); addParts.trigger.focus(); return; }
+    if (addParts && e.target === addParts.trigger && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      e.preventDefault(); openAddDropdown(true); return;
+    }
+    if (addParts && e.target.closest && e.target.closest('.add-drop')) {
+      var addOpts = [].slice.call(addParts.menu.querySelectorAll('[data-breakdown-add]')), addAt = addOpts.indexOf(e.target);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault(); addOpts[(addAt + (e.key === 'ArrowDown' ? 1 : -1) + addOpts.length) % addOpts.length].focus(); return;
+      }
+      if (e.key === 'Home' || e.key === 'End') {
+        e.preventDefault(); addOpts[e.key === 'Home' ? 0 : addOpts.length - 1].focus(); return;
+      }
+    }
     var parts = planDropParts(); if (!parts) return;
     if (e.key === 'Escape' && !parts.menu.hidden) { e.preventDefault(); closePlanDropdown(); parts.trigger.focus(); return; }
     if (e.target === parts.trigger && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
