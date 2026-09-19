@@ -3148,8 +3148,7 @@ body { position:relative; gap:0; }
     [
       ['presplit', 'Pre-split deduction'],
       ['post', 'Post-split deduction'],
-      ['credit', 'Credit'],
-      ['referral', 'Referral']
+      ['fee', 'Add fee']
     ].forEach(function (item) {
       var option = document.createElement('button');
       option.type = 'button'; option.setAttribute('role', 'menuitem');
@@ -4180,11 +4179,11 @@ body { position:relative; gap:0; }
     var parts = addDropParts(), trigger = parts && parts.trigger;
     closeAddDropdown(function () {
       if (!trigger) return;
-      if (kind === 'post') { openPost('post', null, trigger, 'Add post-split deduction'); return; }
       if (kind === 'presplit') { openDed('mine', null, true, 'presplit', trigger); return; }
+      if (kind === 'post') { openPost('post', null, trigger, 'Add post-split deduction'); return; }
       openDed('mine', null, true, 'credit', trigger);
-      setDedType(kind);
-      document.getElementById('dedSheetT').firstChild.textContent = kind === 'referral' ? 'Add referral' : 'Add credit';
+      setDedType('credit');
+      document.getElementById('dedSheetT').firstChild.textContent = 'Add fee';
     });
   }
   function chooseDropdownPlan(name) {
@@ -4600,7 +4599,7 @@ body { position:relative; gap:0; }
   /* post-split deductions: same sheet, name + amount only (paid-by is fixed by the fee) */
   var LISTS = { post: function () { return POSTDEDS; }, radius: function () { return PAYRADIUS; } };
   function actor() { return role === 'team_lead' || role === 'group_lead' ? ['Andy Martin', 'lead'] : ['Mark Perez', 'ag']; }
-  function openPost(list, d, trigger, titleTxt) {
+  function openPost(list, d, trigger, titleTxt, keepOpen) {
     var isR = list === 'radius';
     dedCtx = { k: list, id: d ? d.id : null, isNew: !d, kind: 'post', type: null,
                payTo: d ? (d.payTo || 'radius') : 'radius', p: d ? (d.p || 'Agent') : 'Agent' };
@@ -4633,8 +4632,10 @@ body { position:relative; gap:0; }
     setFeePayer(dedCtx.p);
     document.getElementById('dedRemove').hidden = !d;
     document.getElementById('dedSave').textContent = d ? 'Save' : 'Add';
-    open(document.getElementById('dedSheet'), trigger);
-    document.getElementById(d ? 'dedAmt' : 'dedName').focus();
+    if (!keepOpen) {
+      open(document.getElementById('dedSheet'), trigger);
+      document.getElementById(d ? 'dedAmt' : 'dedName').focus();
+    }
   }
   function removePost(list, id) {
     var gone = '', arr = LISTS[list]().filter(function (x) { if (x.id === id) { gone = x.n; return false; } return true; });
@@ -4690,7 +4691,7 @@ body { position:relative; gap:0; }
       Array.prototype.forEach.call(document.querySelectorAll('.prow.swipe.open'), function (o) { o.classList.remove('open'); });
     });
   })();
-  function openDed(k, d, isNew, kind, trigger) {
+  function openDed(k, d, isNew, kind, trigger, keepOpen) {
     kind = d ? d.kind : kind;
     document.getElementById('fPayTo').hidden = false;
     dedCtx = { k: k, id: d ? d.id : null, isNew: !!isNew, kind: kind,
@@ -4721,9 +4722,11 @@ body { position:relative; gap:0; }
     setDedPayTo(dedCtx.payTo);
     document.getElementById('dedRemove').hidden = !!isNew;
     document.getElementById('dedSave').textContent = isNew ? 'Add' : 'Save';
-    open(document.getElementById('dedSheet'), trigger);
-    if (!isNew) document.getElementById('dedAmt').focus();
-    else if (!isCr) document.getElementById('dedName').focus();
+    if (!keepOpen) {
+      open(document.getElementById('dedSheet'), trigger);
+      if (!isNew) document.getElementById('dedAmt').focus();
+      else if (!isCr) document.getElementById('dedName').focus();
+    }
   }
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-editded]'); if (!b) return;
