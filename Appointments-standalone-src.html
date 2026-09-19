@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointments — Radius</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<link rel="stylesheet" href="assets/list-page.css">
+<template id="__bundler_thumbnail" data-bg-color="#0A0A0A">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#0A0A0A"/>
+    <rect x="420" y="200" width="360" height="400" rx="40" fill="none" stroke="#5A5FF2" stroke-width="16"/>
+    <path d="M500 180v60M700 180v60" stroke="#5A5FF2" stroke-width="16" stroke-linecap="round"/>
+    <rect x="420" y="300" width="360" height="16" fill="#5A5FF2"/>
+    <circle cx="520" cy="410" r="26" fill="#F08068"/>
+    <rect x="580" y="396" width="150" height="28" rx="14" fill="#3A3A42"/>
+    <circle cx="520" cy="510" r="26" fill="#3A3A42"/>
+    <rect x="580" y="496" width="110" height="28" rx="14" fill="#3A3A42"/>
+  </svg>
+</template>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen" data-screen-label="Appointments — all">
+    <div class="statusbar"><span>9:41</span>
+      <div class="sb-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="5" width="3" height="7" rx="1"/><rect x="9" y="2.5" width="3" height="9.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity="0.7"/></svg>
+        <svg width="20" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor"><rect x="1" y="1" width="17" height="10" rx="3"/><rect x="3" y="3" width="11" height="6" rx="1.5" fill="currentColor" stroke="none"/><path d="M20 4v4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div class="pg-head">
+      <a href="Implemented Home.html" class="back-btn" aria-label="Back to home">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </a>
+      <h1>Appointments</h1>
+      <span class="count" id="count">9</span>
+    </div>
+
+    <div class="sh-tabs" data-filter="when" role="tablist" aria-label="Filter appointments by day">
+      <button class="sh-tab" role="tab" data-val="all" aria-selected="true">All</button>
+      <button class="sh-tab" role="tab" data-val="today" aria-selected="false">Today</button>
+      <button class="sh-tab" role="tab" data-val="tomorrow" aria-selected="false">Tomorrow</button>
+      <button class="sh-tab" role="tab" data-val="week" aria-selected="false">This week</button>
+    </div>
+
+    <div class="chip-row" data-filter="kind" aria-label="Filter appointments by type">
+      <button class="fchip" data-val="all" aria-pressed="true">All types</button>
+      <button class="fchip" data-val="tour" aria-pressed="false"><i class="ph ph-house-line"></i>Tours</button>
+      <button class="fchip" data-val="consult" aria-pressed="false"><i class="ph ph-users"></i>Consults</button>
+      <button class="fchip" data-val="call" aria-pressed="false"><i class="ph ph-phone"></i>Calls</button>
+      <button class="fchip" data-val="closing" aria-pressed="false"><i class="ph ph-signature"></i>Closings</button>
+    </div>
+
+    <div class="scroll">
+
+      <div class="grp">
+        <div class="sec-head"><h2>Today · Mon Aug 31</h2><span class="n">4</span></div>
+        <div class="gcard">
+          <div class="ap-row" data-row data-when="today" data-kind="consult">
+            <div class="ap-bar"></div>
+            <div class="ap-body">
+              <div class="ap-top"><span class="ap-when">11:00 AM<i>in 48m</i></span><span class="cat"><i class="ph ph-users"></i></span></div>
+              <div class="ap-title">Listing consultation</div>
+              <div class="ap-meta"><span class="ini">CB</span><span class="meta-name">Carla Boyd</span><span class="mdot">·</span><span class="meta-loc"><i class="ph ph-map-pin"></i>640 Alma St</span></div>
+            </div>
+          </div>
+          <div class="ap-row" data-row data-when="today" data-kind="tour">
+            <div class="ap-bar"></div>
+            <div class="ap-body">
+              <div class="ap-top"><span class="ap-when">2:30 PM</span><span class="mdot">·</span><span class="mel-badge"><span class="txt">Mel</span></span><span class="cat"><i class="ph ph-house-line"></i></span></div>
+              <div class="ap-title">Buyer tour — three homes</div>
+              <div class="ap-meta"><span class="ini">DR</span><span class="meta-name">Daniel Ruiz</span><span class="mdot">·</span><span class="meta-loc"><i class="ph ph-map-pin"></i>275 Miramar Ave</span></div>
+            </div>
+          </div>
+          <div class="ap-row" data-row data-when="today" data-kind="call">
+            <div class="ap-bar"></div>
+            <div class="ap-body">
+              <div class="ap-top"><span class="ap-when">4:00 PM</span><span class="cat"><i class="ph ph-phone"></i></span></div>
+              <div class="ap-title">Lender call — pre-approval</div>
+              <div class="ap-meta"><span class="ini">PN</span><span class="meta-name">Priya Nair</span><span class="mdot">·</span><span class="meta-loc"><i class="ph ph-video-camera"></i>Virtual</span></div>
+            </div>
+          </div>
+          <div class="ap-row" data-row data-when="today" data-kind="call">
+            <div class="ap-bar"></div>
+            <div class="ap-body">
+              <div class="ap-top"><span class="ap-when">5:30 PM</span><span class="cat"><i class="ph ph-phone"></i></span></div>
+              <div class="ap-title">Offer review call — 42 Oak Ln</div>
+              <div class="ap-meta"><span class="ini">AM</span><span class="meta-name">Anita Muñoz</span><span class="mdot">·</span><span class="meta-loc"><i class="ph ph-video-camera"></i>Virtual</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grp">
+        <div class="sec-head"><h2>Tomorrow · Tue Sep 1</h2><span class="n">2</span></div>
+        <div class="gcard">
+          <div class="ap-row" data-row data-when="tomorrow" data-kind="consult">
+            <div class="ap-bar"></div>
+            <div class="ap-body">
+              <div class="ap-top"><span class="ap-when">9:30 AM</span><span class="cat"><i class="ph ph-camera"></i></span></div>
+              <div class="ap-title">Photo shoot walkthrough</div>
+              <div class="ap-meta"><span class="ini">CB</span><span class="meta-name">Carla Boyd</span><span class="mdot">·</span><span class="meta-loc"><i class="ph ph-map-pin"></i>640 Alma St</span></div>
+            </div>
+          </div>
+          <div class="ap-row" data-row data-when="tomorrow" data-kind="consult">
+            <div class="ap-bar"></div>
+            <div class="ap-body">
+              <div class="ap-top"><span class="ap-when">1:00 PM</span><span class="cat"><i class="ph ph-users"></i></span></div>
+              <div class="ap-title">Open house prep — 88 King St</div>
+              <div class="ap-meta"><span class="ini">JW</span><span class="meta-name">Jenna Woods</span><span class="mdot">·</span><span class="meta-loc"><i class="ph ph-map-pin"></i>88 King St</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grp">
+        <div class="sec-head"><h2>Later this week</h2><span class="n">3</span></div>
+        <div class="gcard">
+          <div class="ap-row" data-row data-when="week" data-kind="tour">
+            <div class="ap-bar"></div>
+            <div class="ap-body">
+              <div class="ap-top"><span class="ap-when">Thu · 10:00 AM</span><span class="cat"><i class="ph ph-house-line"></i></span></div>
+              <div class="ap-title">Buyer tour — two Miramar homes</div>
+              <div class="ap-meta"><span class="ini">MM</span><span class="meta-name">Mason Martinez</span><span class="mdot">·</span><span class="meta-loc"><i class="ph ph-map-pin"></i>Miramar Ave</span></div>
+            </div>
+          </div>
+          <div class="ap-row" data-row data-when="week" data-kind="closing">
+            <div class="ap-bar"></div>
+            <div class="ap-body">
+              <div class="ap-top"><span class="ap-when">Fri · 3:00 PM</span><span class="cat"><i class="ph ph-clipboard-text"></i></span></div>
+              <div class="ap-title">Final walkthrough — 118 Maple St</div>
+              <div class="ap-meta"><span class="ini">SR</span><span class="meta-name">Sarah Reynolds</span><span class="mdot">·</span><span class="meta-loc"><i class="ph ph-map-pin"></i>118 Maple St</span></div>
+            </div>
+          </div>
+          <div class="ap-row" data-row data-when="week" data-kind="closing">
+            <div class="ap-bar"></div>
+            <div class="ap-body">
+              <div class="ap-top"><span class="ap-when">Sat · 11:00 AM</span><span class="cat"><i class="ph ph-signature"></i></span></div>
+              <div class="ap-title">Signing — 118 Maple St closing</div>
+              <div class="ap-meta"><span class="ini">SR</span><span class="meta-name">Sarah Reynolds</span><span class="mdot">·</span><span class="meta-loc"><i class="ph ph-map-pin"></i>Title office, Fremont</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty" id="empty" hidden>
+        <span class="e-ic"><i class="ph ph-calendar-blank"></i></span>
+        <span class="e-t">Nothing scheduled</span>
+        <span class="e-d">No appointments match this filter. Clear it to see the rest of your week.</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/list-page.js"></script>
+</body>
+</html>

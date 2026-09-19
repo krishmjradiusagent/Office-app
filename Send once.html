@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Send once — Radius</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<link rel="stylesheet" href="assets/list-page.css">
+<style>
+/* ── prototype state switcher (outside the device, not part of the design) ── */
+body { display:flex; flex-direction:column; align-items:center; gap:18px; padding:20px 12px 40px; background:#08080A; }
+.controls { display:flex; flex-wrap:wrap; align-items:center; gap:10px; justify-content:center; max-width:760px; }
+.controls .lab { font:500 12px/1 var(--font); color:#6E6E76; }
+.seg { display:inline-flex; gap:2px; padding:3px; border-radius:999px; background:#17171A; box-shadow:inset 0 0 0 1px #26262A; }
+.seg button { min-height:30px; padding:0 12px; border:0; border-radius:999px; background:transparent; color:#8E8E96; font:500 12px/1 var(--font); cursor:pointer; }
+.seg button[aria-pressed="true"] { background:#2E2E34; color:#F5F5F7; font-weight:600; }
+.seg button:focus-visible { outline:2px solid #5A5FF2; outline-offset:2px; }
+
+.screen { position:relative; --tint-indigo-bg:rgba(90,95,242,.18); --tint-indigo-fg:#aab0ff; --tint-green-bg:rgba(109,165,68,.18); --tint-green-fg:#a9cf80; --tint-amber-bg:rgba(234,88,12,.16); --tint-amber-fg:#f2a678; --tint-red-bg:rgba(220,38,38,.18); --tint-red-fg:#f0a0a0; }
+.statusbar { position:absolute; top:0; left:0; right:0; z-index:14; }
+.pg-head { position:absolute; top:0; left:0; right:0; z-index:13; display:flex; align-items:flex-start; gap:10px; padding:calc(44px + env(safe-area-inset-top)) 14px 12px; background:linear-gradient(to bottom, rgba(10,10,10,.9), rgba(10,10,10,.66)); backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%); box-shadow:inset 0 -1px 0 rgba(255,255,255,.07); }
+.pg-head .back-btn { position:relative; flex:none; width:36px; height:36px; margin:1px 0 0; border-radius:999px; background:rgba(255,255,255,.08); box-shadow:inset 0 0 0 1px rgba(255,255,255,.10), inset 0 1px 0 rgba(255,255,255,.14); }
+.pg-head .back-btn::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.htxt { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+.hrow1 { display:flex; align-items:center; gap:8px; min-width:0; }
+.htxt h1 { margin:0; font:700 20px/1.2 var(--font-hubot); letter-spacing:-.02em; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.badge { flex:none; height:22px; padding:0 9px; border-radius:var(--radius-sm); font:600 12px/22px var(--font); background:var(--muted); color:var(--muted-foreground); }
+.badge.sent { background:var(--tint-green-bg); color:var(--tint-green-fg); }
+.hsub { display:inline-flex; align-items:center; gap:7px; min-height:24px; padding:0; border:0; background:transparent; color:var(--muted-foreground); font:500 13px/1.3 var(--font); font-variant-numeric:tabular-nums; text-align:left; cursor:pointer; }
+.hsub b { color:var(--foreground); }
+.hsub .warn { display:inline-flex; align-items:center; gap:4px; color:var(--tint-amber-fg); }
+.hsub .warn i { font-size:14px; }
+.hsub .okx { display:inline-flex; align-items:center; gap:4px; color:var(--tint-green-fg); }
+.hsub .okx i { font-size:14px; }
+.hsub:focus-visible { outline:2px solid var(--ring); outline-offset:2px; border-radius:var(--radius-sm); }
+
+.scroll { padding-top:calc(44px + env(safe-area-inset-top) + 66px); padding-bottom:calc(104px + env(safe-area-inset-bottom)); scrollbar-width:none; }
+.scroll::-webkit-scrollbar { display:none; }
+
+.card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-card); box-shadow:var(--shadow-sm); margin-top:14px; overflow:hidden; }
+.card:first-child { margin-top:4px; }
+.ch { display:flex; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid var(--border); }
+.ch .tile { flex:none; width:28px; height:28px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; font-size:16px; background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); }
+.ch .tile.b { background:var(--tint-green-bg); color:var(--tint-green-fg); }
+.ch h2 { margin:0; font:600 16px/1.2 var(--font-hubot); letter-spacing:-.015em; }
+.ch .lnk { margin-left:auto; flex:none; min-height:34px; padding:0 4px; border:0; background:transparent; color:var(--primary); font:600 13px/1 var(--font); cursor:pointer; white-space:nowrap; }
+.ch .lnk:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.cb { padding:14px 16px; display:flex; flex-direction:column; gap:12px; }
+
+/* filters */
+.filters { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.filters .lbl { font:500 13px/1 var(--font); color:var(--muted-foreground); }
+.fchip2 { display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 8px 0 12px; border-radius:999px; background:var(--tint-indigo-bg); color:#c9ccff; font:600 13px/1 var(--font); }
+.fchip2.mut { background:var(--muted); color:var(--muted-foreground); padding-right:12px; }
+.fchip2 button { width:22px; height:22px; position:relative; border:0; border-radius:999px; background:rgba(255,255,255,.08); color:inherit; font-size:12px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+.fchip2 button::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.fchip2 button:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.addf { display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 14px 0 11px; border-radius:999px; border:1px dashed var(--input); background:transparent; color:var(--foreground); font:600 13px/1 var(--font); cursor:pointer; }
+.addf i { font-size:15px; }
+.addf:active { background:var(--muted); }
+.addf:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+
+/* funnel */
+.fun { display:flex; flex-direction:column; padding-top:12px; border-top:1px solid var(--border); }
+.fstep { display:flex; align-items:baseline; gap:9px; padding:7px 0; }
+.fstep b { min-width:62px; font:700 20px/1 var(--font-hubot); letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.fstep span { font:500 13px/1.35 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.fstep.mid b { color:var(--tint-amber-fg); }
+.fstep.cut b { color:var(--muted-foreground); }
+.fcar { padding-left:22px; color:var(--muted-foreground); font-size:13px; opacity:.6; }
+
+/* callout */
+.callout { display:flex; flex-direction:column; gap:10px; padding:13px; border-radius:var(--radius-lg); background:var(--tint-amber-bg); box-shadow:inset 0 0 0 1px rgba(234,88,12,.24); }
+.callout.done { background:var(--tint-green-bg); box-shadow:inset 0 0 0 1px rgba(109,165,68,.24); }
+.callout .ct { display:flex; gap:9px; font:400 13px/1.5 var(--font); color:var(--foreground); text-wrap:pretty; }
+.callout .ct i { flex:none; margin-top:2px; font-size:15px; color:var(--tint-amber-fg); }
+.callout.done .ct i { color:var(--tint-green-fg); }
+.callout .ct b { font-weight:700; }
+.callout .btn { align-self:flex-start; height:38px; background:var(--card); }
+
+/* going to / results */
+.goes { display:flex; flex-direction:column; gap:3px; padding-top:12px; border-top:1px solid var(--border); }
+.goes .gk { font:500 13px/1 var(--font); color:var(--muted-foreground); }
+.goes .gv { font:700 26px/1.1 var(--font-hubot); letter-spacing:-.025em; font-variant-numeric:tabular-nums; }
+.goes .gd { font:500 13px/1.3 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.stats { display:flex; flex-direction:column; }
+.srow { display:flex; align-items:center; gap:10px; padding:11px 0; border-top:1px solid var(--border); font:500 14px/1.2 var(--font); }
+.srow:first-child { border-top:0; }
+.srow .sv { margin-left:auto; font:600 14px/1 var(--font); font-variant-numeric:tabular-nums; }
+.srow .sp { flex:none; font:500 13px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+
+/* Mel */
+.melrow { display:flex; flex-direction:column; gap:8px; }
+.melrow .mk { font:500 13px/1.3 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.melsugchip { display:flex; align-items:center; gap:8px; width:100%; min-height:44px; padding:10px 13px; border:1px solid rgba(240,128,104,.28); border-radius:var(--radius-lg); background:rgba(240,128,104,.08); text-align:left; cursor:pointer; transition:transform 160ms cubic-bezier(.23,1,.32,1); }
+.melsugchip svg { flex:none; color:#F0A468; }
+.melsugchip .mlab { font:500 13px/1.35 var(--font); background:linear-gradient(90deg,#F08068 0%,#F0A468 100%); -webkit-background-clip:text; background-clip:text; color:transparent; text-wrap:pretty; }
+.melsugchip:active { transform:scale(.985); }
+.melsugchip:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+
+/* connect bar */
+.connbar { display:flex; flex-direction:column; gap:10px; padding:13px; border-radius:var(--radius-lg); background:var(--tint-amber-bg); box-shadow:inset 0 0 0 1px rgba(234,88,12,.24); }
+.connbar .ct { display:flex; gap:9px; font:400 13px/1.5 var(--font); text-wrap:pretty; }
+.connbar .ct i { flex:none; margin-top:2px; font-size:15px; color:var(--tint-amber-fg); }
+
+/* headers */
+.hdrs { display:flex; flex-direction:column; }
+.hd2 { display:flex; align-items:center; gap:10px; min-height:46px; padding:9px 0; border-top:1px solid var(--border); }
+.hd2:first-child { border-top:0; }
+.hd2 .k { flex:none; width:58px; font:500 13px/1 var(--font); color:var(--muted-foreground); }
+.hd2 .v { flex:1; min-width:0; font:500 15px/1.3 var(--font); overflow:hidden; text-overflow:ellipsis; }
+.hd2 .v.plc { color:var(--muted-foreground); }
+.hd2 .chev { flex:none; width:32px; height:32px; position:relative; border:0; border-radius:999px; background:transparent; color:var(--muted-foreground); font-size:15px; cursor:pointer; }
+.hd2 .chev::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.hd2 .chev:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.gm { flex:none; height:22px; padding:0 8px; border-radius:var(--radius-sm); background:var(--muted); color:var(--muted-foreground); font:600 11px/22px var(--font); }
+.gm.bad { background:var(--tint-amber-bg); color:var(--tint-amber-fg); }
+.tocount { display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 10px; border-radius:999px; background:var(--tint-indigo-bg); color:#c9ccff; font:600 13px/1 var(--font); font-variant-numeric:tabular-nums; }
+.tocount i { font-size:14px; }
+
+/* body */
+.bodybox { padding-top:12px; border-top:1px solid var(--border); font:400 15px/1.55 var(--font); color:var(--foreground); display:flex; flex-direction:column; gap:12px; text-wrap:pretty; }
+.bodybox .tok { padding:1px 5px; border-radius:var(--radius-sm); background:var(--tint-indigo-bg); color:#c9ccff; font-weight:600; }
+.bodybox .sig { font:500 13px/1.5 var(--font); color:var(--muted-foreground); }
+.bodybox .sig a { color:var(--primary); }
+.bodybox.plc { color:var(--muted-foreground); }
+.cfoot { display:flex; align-items:center; gap:10px; padding-top:12px; border-top:1px solid var(--border); font:500 12px/1.3 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.chseg { margin-left:auto; display:inline-flex; gap:2px; padding:3px; border-radius:999px; background:var(--muted); }
+.chseg button { min-height:30px; padding:0 12px; border:0; border-radius:999px; background:transparent; color:var(--muted-foreground); font:500 13px/1 var(--font); cursor:pointer; }
+.chseg button[aria-pressed="true"] { background:var(--card); color:var(--foreground); font-weight:600; box-shadow:var(--shadow-xs); }
+.chseg button:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+
+/* recipients */
+.rcp { display:flex; gap:11px; align-items:flex-start; width:100%; padding:12px 0; border-top:1px solid var(--border); border-left:0; border-right:0; border-bottom:0; background:transparent; color:var(--foreground); text-align:left; font-family:var(--font); cursor:pointer; }
+.rcp:first-child { border-top:0; }
+.rcp .ini { flex:none; width:32px; height:32px; border-radius:999px; background:var(--muted); color:var(--foreground); font:600 11px/1 var(--font); display:inline-flex; align-items:center; justify-content:center; }
+.rcp .rbd { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.rcp .rnm { font:600 15px/1.2 var(--font); }
+.rcp .rct { font:400 13px/1.35 var(--font); color:var(--muted-foreground); }
+.rcp .prv { flex:none; height:22px; padding:0 8px; border-radius:var(--radius-sm); background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); font:600 11px/22px var(--font); visibility:hidden; }
+.rcp[aria-pressed="true"] { background:rgba(90,95,242,.08); border-radius:var(--radius-md); }
+.rcp[aria-pressed="true"] .prv { visibility:visible; }
+.rcp:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; border-radius:var(--radius-md); }
+.lfoot { display:flex; align-items:center; gap:10px; padding-top:12px; border-top:1px solid var(--border); font:500 13px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.lfoot b { color:var(--foreground); }
+.lfoot .more { margin-left:auto; min-height:34px; padding:0 4px; border:0; background:transparent; color:var(--primary); font:600 13px/1 var(--font); cursor:pointer; }
+.lfoot .more:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.tk-empty { display:flex; flex-direction:column; align-items:center; text-align:center; gap:4px; padding:24px 12px 20px; }
+.tk-empty .e-ic { width:40px; height:40px; border-radius:999px; background:var(--muted); color:var(--muted-foreground); display:inline-flex; align-items:center; justify-content:center; font-size:19px; }
+.tk-empty .e-t { font:600 15px/1.3 var(--font); }
+.tk-empty .e-d { font:400 13px/1.45 var(--font); color:var(--muted-foreground); max-width:30ch; text-wrap:pretty; }
+
+/* dock */
+.dock { position:absolute; left:0; right:0; bottom:0; z-index:13; display:flex; align-items:center; gap:10px; padding:14px 16px calc(14px + env(safe-area-inset-bottom)); background:linear-gradient(to top, rgba(10,10,10,.94) 55%, rgba(10,10,10,0)); }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:40px; padding:0 15px; border-radius:var(--radius-md); border:1px solid var(--input); background:transparent; color:var(--foreground); font:600 14px/1 var(--font); cursor:pointer; transition:transform 140ms cubic-bezier(.23,1,.32,1); }
+.btn i { font-size:16px; }
+.btn.pri { background:var(--primary); border-color:transparent; color:#fff; }
+.btn:active { transform:scale(.98); }
+.btn[disabled] { opacity:.45; cursor:default; }
+.btn:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.dock .btn { height:46px; border-radius:999px; }
+.dock .btn.pri { flex:1; box-shadow:0 10px 30px rgba(90,95,242,.35); }
+.dock .btn.pri[disabled] { box-shadow:none; }
+
+/* sheets */
+.scrim { position:absolute; inset:0; background:rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity 240ms ease; z-index:20; }
+.scrim.on { opacity:1; pointer-events:auto; }
+.sheet { position:absolute; left:0; right:0; bottom:0; z-index:21; background:var(--card); border:1px solid var(--border); border-bottom:0; border-radius:22px 22px 0 0; padding:8px 12px calc(20px + env(safe-area-inset-bottom)); transform:translateY(103%); transition:transform 300ms cubic-bezier(.32,.72,0,1); box-shadow:0 -12px 40px rgba(0,0,0,.45); }
+.sheet.on { transform:none; }
+.sheet .grab { width:38px; height:4px; border-radius:999px; background:var(--muted-foreground); opacity:.4; margin:0 auto 10px; }
+.sheet .sh-name { font:700 17px/1.2 var(--font-hubot); letter-spacing:-.01em; padding:6px 10px 12px; border-bottom:1px solid var(--border); margin-bottom:6px; }
+.sheet .act { display:flex; align-items:center; gap:12px; width:100%; min-height:50px; padding:0 10px; border:0; background:transparent; color:var(--foreground); font:500 15px/1.3 var(--font); text-align:left; border-radius:var(--radius-lg); cursor:pointer; }
+.sheet .act i { flex:none; width:24px; text-align:center; font-size:20px; color:var(--muted-foreground); }
+.sheet .act .n { margin-left:auto; flex:none; font:500 13px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.sheet .act:active { background:var(--muted); }
+.sheet .act:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
+.sheet .act[data-picked="true"] { background:var(--muted); }
+.sheet .sep { height:1px; background:var(--border); margin:6px 10px; }
+
+/* toast with a 60s drain */
+.toast { position:absolute; left:16px; right:16px; bottom:calc(86px + env(safe-area-inset-bottom)); z-index:30; overflow:hidden; border-radius:var(--radius-lg); background:#26262A; box-shadow:0 6px 24px rgba(0,0,0,.45); opacity:0; transform:translateY(10px); transition:opacity 160ms ease, transform 160ms ease; pointer-events:none; }
+.toast.on { opacity:1; transform:none; pointer-events:auto; }
+.toast .tbd { display:flex; align-items:center; gap:10px; padding:12px 14px; font:500 13px/1.3 var(--font); color:var(--foreground); }
+.toast .tbd .tx { flex:1; min-width:0; font-variant-numeric:tabular-nums; }
+.toast .tbd .undo { flex:none; min-height:34px; padding:0 6px; border:0; background:transparent; color:#aab0ff; font:600 13px/1 var(--font); cursor:pointer; }
+.toast .tbd .undo:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.toast .drain { height:2px; background:var(--primary); clip-path:inset(0 0 0 0); }
+.toast.run .drain { clip-path:inset(0 100% 0 0); transition:clip-path 60s linear; }
+[hidden] { display:none !important; }
+
+/* state visibility */
+.msf, .mse, .msr { display:none; }
+.screen[data-state="filled"] .msf { display:var(--d,flex); }
+.screen[data-state="empty"] .mse { display:var(--d,flex); }
+.screen[data-state="report"] .msr { display:var(--d,flex); }
+.screen[data-state="filled"] span.msf, .screen[data-state="empty"] span.mse, .screen[data-state="report"] span.msr { display:inline-flex; }
+.screen[data-conn="on"] .conn-off { display:none !important; }
+.screen[data-conn="off"] .conn-on { display:none !important; }
+.screen[data-ch="text"] .email-only { display:none !important; }
+.screen[data-ch="email"] .text-only { display:none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet, .scrim, .toast, .btn, .melsugchip, .rcp { transition:none; }
+  .toast.run .drain { transition:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <span class="lab">State</span>
+  <div class="seg" id="segState" role="group" aria-label="Composer state">
+    <button type="button" data-v="filled" aria-pressed="true">Filled</button>
+    <button type="button" data-v="empty" aria-pressed="false">Empty</button>
+    <button type="button" data-v="report" aria-pressed="false">Sent report</button>
+  </div>
+  <span class="lab">Email</span>
+  <div class="seg" id="segConn" role="group" aria-label="Email connected">
+    <button type="button" data-v="on" aria-pressed="true">Connected</button>
+    <button type="button" data-v="off" aria-pressed="false">Not connected</button>
+  </div>
+  <span class="lab">Channel</span>
+  <div class="seg" id="segCh" role="group" aria-label="Channel">
+    <button type="button" data-v="email" aria-pressed="true">Email</button>
+    <button type="button" data-v="text" aria-pressed="false">Text</button>
+  </div>
+  <span class="lab">Undo</span>
+  <div class="seg" id="segUndo" role="group" aria-label="Undo window">
+    <button type="button" data-v="on" aria-pressed="true">60s window</button>
+    <button type="button" data-v="off" aria-pressed="false">Send now</button>
+  </div>
+</div>
+
+<div class="phone">
+  <div class="screen" id="screen" data-state="filled" data-conn="on" data-ch="email" data-screen-label="Send once">
+    <div class="statusbar"><span>9:41</span>
+      <div class="sb-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="5" width="3" height="7" rx="1"/><rect x="9" y="2.5" width="3" height="9.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity="0.7"/></svg>
+        <svg width="20" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor"><rect x="1" y="1" width="17" height="10" rx="3"/><rect x="3" y="3" width="11" height="6" rx="1.5" fill="currentColor" stroke="none"/><path d="M20 4v4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div class="pg-head">
+      <a href="Campaigns.html" class="back-btn" aria-label="Back to campaigns">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </a>
+      <div class="htxt">
+        <div class="hrow1">
+          <h1 id="h1">Send once</h1>
+          <span class="badge" id="badge">Draft</span>
+        </div>
+        <button class="hsub" type="button" id="hsub" aria-label="Recipients">
+          <span id="hsubTx"><b>318</b> recipients</span>
+          <span class="warn" id="hsubWarn"><i class="ph ph-warning" aria-hidden="true"></i>41 mid-conversation</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <!-- ── who gets it ───────────────────────────────── -->
+      <section class="card">
+        <div class="ch">
+          <span class="tile" aria-hidden="true"><i class="ph ph-users-three"></i></span>
+          <h2 id="whoTitle">Who gets it</h2>
+          <button class="lnk" type="button" id="smartBtn">Start from a smart list</button>
+        </div>
+        <div class="cb">
+          <div class="filters" id="filters">
+            <span class="lbl" id="fLbl">Filters</span>
+            <button class="addf" type="button" id="addFilter"><i class="ph ph-plus" aria-hidden="true"></i>Add filter</button>
+          </div>
+
+          <div class="fun" id="fun">
+            <div class="fstep" id="fs1"><b id="f1n">359</b><span id="f1t">match these filters</span></div>
+            <div class="fcar" id="fc1" aria-hidden="true"><i class="ph ph-caret-down"></i></div>
+            <div class="fstep mid" id="fs2"><b id="f2n">41</b><span id="f2t">mid-conversation, still included</span></div>
+            <div class="fcar" id="fc2" aria-hidden="true"><i class="ph ph-caret-down"></i></div>
+            <div class="fstep" id="fs3"><b id="f3n">318</b><span id="f3t">get this message</span></div>
+          </div>
+
+          <div class="callout" id="conflict">
+            <span class="ct"><i class="ph ph-warning" aria-hidden="true"></i><span id="conflictTx"><b>41</b> of these are mid-conversation in <b>Follow up to initial contact</b>.</span></span>
+            <button class="btn" type="button" id="excludeBtn">Exclude these 41</button>
+          </div>
+
+          <div class="goes">
+            <span class="gk" id="goK">Going to</span>
+            <span class="gv" id="goV">318</span>
+            <span class="gd" id="goD">of your 4,109 clients</span>
+          </div>
+
+          <div class="stats msr" style="--d:flex" id="results">
+            <div class="srow">Delivered<span class="sv">277</span></div>
+            <div class="srow">Opened<span class="sv">164</span><span class="sp">59%</span></div>
+            <div class="srow">Replied<span class="sv">11</span><span class="sp">4.0%</span></div>
+            <div class="srow">Opted out<span class="sv">2</span><span class="sp">0.7%</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── what it says ──────────────────────────────── -->
+      <section class="card">
+        <div class="ch">
+          <span class="tile b" aria-hidden="true"><i class="ph ph-pen-nib"></i></span>
+          <h2>What it says</h2>
+        </div>
+        <div class="cb">
+          <div class="connbar conn-off">
+            <span class="ct"><i class="ph ph-warning" aria-hidden="true"></i><span>No sending account connected. Connect the inbox you send from — nothing goes out until you do.</span></span>
+            <button class="btn pri" type="button" id="connectBtn" style="align-self:flex-start">Connect Google</button>
+          </div>
+
+          <div class="melrow">
+            <span class="mk" id="melK">Mel read the 318 — three ways in</span>
+            <div id="melChips">
+              <button class="melsugchip" type="button" data-sub="An off-market listing in Bel Air Crest">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 5 4 8.4 9 9-5 .6-8.4 4-9 9-.6-5-4-8.4-9-9 5-.6 8.4-4 9-9z"></path></svg>
+                <span class="mlab">An off-market listing in Bel Air Crest</span>
+              </button>
+              <button class="melsugchip" type="button" data-sub="A quiet sale, before it lists" style="margin-top:8px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 5 4 8.4 9 9-5 .6-8.4 4-9 9-.6-5-4-8.4-9-9 5-.6 8.4-4 9-9z"></path></svg>
+                <span class="mlab">A quiet sale, before it lists</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="hdrs">
+            <div class="hd2">
+              <span class="k">From</span>
+              <span class="v conn-on" id="fromV">Ashutosh &lt;ashutosh@radiusagent.com&gt;</span>
+              <span class="v plc conn-off">No account connected</span>
+              <button class="chev conn-on" type="button" id="fromBtn" aria-label="Change sending account"><i class="ph ph-caret-down" aria-hidden="true"></i></button>
+              <span class="gm conn-on">Gmail</span>
+              <span class="gm bad conn-off">Not connected</span>
+            </div>
+            <div class="hd2">
+              <span class="k">To</span>
+              <span class="v"><span class="tocount" id="toCount"><i class="ph ph-users-three" aria-hidden="true"></i><span id="toN">318</span> clients</span></span>
+            </div>
+            <div class="hd2 email-only">
+              <span class="k">Subject</span>
+              <span class="v" id="subjV">An off-market listing in Bel Air Crest</span>
+            </div>
+          </div>
+
+          <div class="bodybox" id="body">
+            <span>Hi <span class="tok" id="tok">Priya</span>,</span>
+            <span>Something came up in Bel Air Crest that hasn’t hit the market yet — four bedrooms, canyon side, and the sellers are open to a quiet sale.</span>
+            <span>Worth a look before it’s listed?</span>
+            <span class="sig">Ashutosh iOSacc · Radius Agent Realty<br><a href="#" class="email-only" id="unsub">Unsubscribe</a><span class="text-only">Reply STOP to opt out</span></span>
+          </div>
+
+          <div class="cfoot">
+            <span class="text-only">142 of 160 characters · 1 message</span>
+            <span class="msr" style="--d:inline" id="sentFrom">Sent from your Gmail · today, 4:12 PM</span>
+            <div class="chseg" id="chSeg" role="group" aria-label="Channel">
+              <button type="button" data-ch="email" aria-pressed="true">Email</button>
+              <button type="button" data-ch="text" aria-pressed="false">Text</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── recipients / replies ──────────────────────── -->
+      <section class="card">
+        <div class="ch">
+          <span class="tile" aria-hidden="true"><i class="ph ph-user-list"></i></span>
+          <h2 id="listTitle">Who is previewing</h2>
+        </div>
+        <div class="cb">
+          <div id="rcpList">
+            <button class="rcp" type="button" aria-pressed="true" data-first="Priya"><span class="ini" aria-hidden="true">PR</span><span class="rbd"><span class="rnm">Priya Raman</span><span class="rct">Buyer · replied 2d ago</span></span><span class="prv">Previewing</span></button>
+            <button class="rcp" type="button" aria-pressed="false" data-first="Marcus"><span class="ini" aria-hidden="true">MT</span><span class="rbd"><span class="rnm">Marcus Tan</span><span class="rct">Buyer · 3 saved searches</span></span><span class="prv">Previewing</span></button>
+            <button class="rcp" type="button" aria-pressed="false" data-first="Lena"><span class="ini" aria-hidden="true">LO</span><span class="rbd"><span class="rnm">Lena Osei</span><span class="rct">Seller · asked for a valuation</span></span><span class="prv">Previewing</span></button>
+            <button class="rcp" type="button" aria-pressed="false" data-first="Dev"><span class="ini" aria-hidden="true">DK</span><span class="rbd"><span class="rnm">Dev Kapoor</span><span class="rct">Buyer and seller</span></span><span class="prv">Previewing</span></button>
+          </div>
+          <div id="rcpMore" class="lfoot">Showing <b id="rcpShown">4</b> of <b id="rcpTotal">318</b><button class="more" type="button" id="showMore">Show more</button></div>
+
+          <div id="replyList" hidden>
+            <button class="rcp" type="button"><span class="ini" aria-hidden="true">PR</span><span class="rbd"><span class="rnm">Priya Raman</span><span class="rct">“Is it still available?”</span></span></button>
+            <button class="rcp" type="button"><span class="ini" aria-hidden="true">LO</span><span class="rbd"><span class="rnm">Lena Osei</span><span class="rct">“Send me the address”</span></span></button>
+            <button class="rcp" type="button"><span class="ini" aria-hidden="true">MT</span><span class="rbd"><span class="rnm">Marcus Tan</span><span class="rct">“Can we see it Saturday?”</span></span></button>
+            <div class="lfoot">Showing <b>3</b> of <b>11</b><button class="more" type="button" data-toast="Opens all 11 replies">View all</button></div>
+            <button class="melsugchip" type="button" style="margin-top:12px" data-toast="Mel is drafting follow-ups to the 11 who replied">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 5 4 8.4 9 9-5 .6-8.4 4-9 9-.6-5-4-8.4-9-9 5-.6 8.4-4 9-9z"></path></svg>
+              <span class="mlab">Draft follow-ups to the 11 who replied</span>
+            </button>
+          </div>
+
+          <div class="tk-empty" id="rcpEmpty" hidden>
+            <span class="e-ic" aria-hidden="true"><i class="ph ph-user-list"></i></span>
+            <span class="e-t">Nobody picked yet</span>
+            <span class="e-d">Add a filter and the people who’d get this show up here.</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="dock">
+      <button class="btn" type="button" id="testBtn"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i><span id="testLbl">Test send</span></button>
+      <button class="btn pri" type="button" id="sendBtn">Send to 318</button>
+    </div>
+
+    <div class="scrim" id="scrim"></div>
+
+    <div class="sheet" id="fSheet" role="dialog" aria-modal="true" aria-labelledby="fSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="sh-name" id="fSheetT">Who gets it</div>
+      <button class="act" type="button" data-f="Tags is “luxury”" data-n="532"><i class="ph ph-tag" aria-hidden="true"></i>Tags is “luxury”<span class="n">532</span></button>
+      <button class="act" type="button" data-f="Last contact more than 30 days ago" data-n="1204"><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>Last contact more than 30 days ago<span class="n">1,204</span></button>
+      <button class="act" type="button" data-f="Source is open_house" data-n="214"><i class="ph ph-house-line" aria-hidden="true"></i>Source is open_house<span class="n">214</span></button>
+      <button class="act" type="button" data-f="Client type is buyer" data-n="1876"><i class="ph ph-user" aria-hidden="true"></i>Client type is buyer<span class="n">1,876</span></button>
+      <div class="sep" aria-hidden="true"></div>
+      <button class="act" type="button" id="browseAll"><i class="ph ph-sliders-horizontal" aria-hidden="true"></i>Browse all fields</button>
+    </div>
+
+    <div class="sheet" id="aSheet" role="dialog" aria-modal="true" aria-labelledby="aSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="sh-name" id="aSheetT">Send from</div>
+      <button class="act" type="button" data-acc="ashutosh@radiusagent.com" data-picked="true"><i class="ph ph-envelope-simple" aria-hidden="true"></i>ashutosh@radiusagent.com</button>
+      <button class="act" type="button" data-acc="team@caliberrealty.com"><i class="ph ph-envelope-simple" aria-hidden="true"></i>team@caliberrealty.com</button>
+      <div class="sep" aria-hidden="true"></div>
+      <button class="act" type="button" data-toast="Opens Google to connect another account"><i class="ph ph-plus" aria-hidden="true"></i>Connect another account</button>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <div class="tbd"><span class="tx" id="toastTx"></span><button class="undo" type="button" id="undoBtn" hidden>Undo</button></div>
+      <div class="drain" id="drain" hidden></div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/filter-builder.js" defer></script>
+<script>
+(function(){
+  var $=function(id){ return document.getElementById(id); };
+  var screenEl=$('screen'), scrim=$('scrim');
+  var toastEl=$('toast'), toastTx=$('toastTx'), undoBtn=$('undoBtn'), drain=$('drain'), tt, sendTimer;
+  var UNDO=true, excluded=false, shown=4, openSh=null, lastFocus=null;
+  var MATCH=359, MID=41, BASE=318;
+  function fmt(n){ return n.toLocaleString('en-US'); }
+
+  function toast(msg,opts){
+    opts=opts||{};
+    clearTimeout(tt); clearTimeout(sendTimer);
+    toastTx.textContent=msg;
+    undoBtn.hidden=!opts.undo;
+    drain.hidden=!opts.undo;
+    toastEl.classList.remove('run');
+    toastEl.classList.add('on');
+    if(opts.undo){
+      void drain.offsetWidth;
+      requestAnimationFrame(function(){ toastEl.classList.add('run'); });
+      sendTimer=setTimeout(function(){ commitSend(); },60000);
+    } else {
+      tt=setTimeout(function(){ toastEl.classList.remove('on'); },2600);
+    }
+  }
+  function hideToast(){ toastEl.classList.remove('on','run'); clearTimeout(tt); clearTimeout(sendTimer); }
+  document.addEventListener('click',function(e){ var b=e.target.closest('[data-toast]'); if(b) toast(b.getAttribute('data-toast')); });
+
+  /* ── sheets ── */
+  function openSheet(el,trigger){ openSh=el; lastFocus=trigger||document.activeElement; el.hidden=false; requestAnimationFrame(function(){ el.classList.add('on'); scrim.classList.add('on'); }); var f=el.querySelector('.act'); if(f) f.focus(); }
+  function closeSheet(){ if(!openSh) return; var el=openSh; openSh=null; el.classList.remove('on'); scrim.classList.remove('on'); setTimeout(function(){ el.hidden=true; },300); if(lastFocus) lastFocus.focus(); }
+  scrim.addEventListener('click',closeSheet);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeSheet(); });
+  window.soCloseSheet=closeSheet;
+
+  /* ── filters ── */
+  var picked=[{f:'Tags is “luxury”',n:532},{f:'Last contact more than 30 days ago',n:1204}];
+  function drawFilters(){
+    var wrap=$('filters'), add=$('addFilter');
+    [].forEach.call(wrap.querySelectorAll('.fchip2'),function(c){ c.remove(); });
+    $('fLbl').textContent = picked.length ? 'Filters' : 'No filters yet';
+    picked.forEach(function(p){
+      var c=document.createElement('span'); c.className='fchip2';
+      c.appendChild(document.createTextNode(p.f));
+      if(state()!=='report'){
+        var x=document.createElement('button'); x.type='button'; x.setAttribute('aria-label','Remove filter '+p.f);
+        x.innerHTML='<i class="ph ph-x" aria-hidden="true"></i>';
+        x.addEventListener('click',function(){ picked=picked.filter(function(q){ return q!==p; }); drawFilters(); paint(); });
+        c.appendChild(x);
+      }
+      wrap.insertBefore(c,add);
+    });
+    if(state()==='report' && excluded){
+      var m=document.createElement('span'); m.className='fchip2 mut';
+      m.textContent='Excluded — 41 mid-conversation';
+      wrap.insertBefore(m,add);
+    }
+    add.hidden = state()==='report';
+  }
+  $('addFilter').addEventListener('click',function(){ openSheet($('fSheet'),this); });
+  $('fSheet').addEventListener('click',function(e){
+    var a=e.target.closest('.act[data-f]'); if(!a) return;
+    var f=a.getAttribute('data-f');
+    if(picked.some(function(p){ return p.f===f; })){ console.warn('[filters] one filter per family: '+f); toast('That filter is already on'); closeSheet(); return; }
+    picked.push({f:f,n:+a.getAttribute('data-n')});
+    closeSheet(); drawFilters(); paint();
+  });
+  $('browseAll').addEventListener('click',function(){
+    closeSheet();
+    if(window.openFilterBuilder) setTimeout(function(){ window.openFilterBuilder(function(res){ picked.push({f:res.label,n:res.n}); drawFilters(); paint(); }); },260);
+    else { console.warn('[filters] builder not loaded'); toast('The field browser is still loading'); }
+  });
+
+  /* ── state ── */
+  function state(){ return screenEl.getAttribute('data-state'); }
+  function conn(){ return screenEl.getAttribute('data-conn'); }
+  function ch(){ return screenEl.getAttribute('data-ch'); }
+
+  function paint(){
+    var st=state(), going=excluded?BASE-MID:BASE;
+
+    /* head */
+    $('h1').textContent = st==='report' ? 'Bel Air Crest — off-market listing' : 'Send once';
+    $('badge').textContent = st==='report' ? 'Sent' : 'Draft';
+    $('badge').classList.toggle('sent', st==='report');
+    if(st==='empty'){
+      $('hsubTx').textContent='Pick who gets it to see the count here';
+      $('hsubWarn').hidden=true;
+      $('hsub').disabled=true;
+    } else if(st==='report'){
+      $('hsubTx').innerHTML='Sent to <b>277</b> · today, 4:12 PM';
+      $('hsubWarn').hidden=true;
+      $('hsub').disabled=true;
+    } else {
+      $('hsubTx').innerHTML='<b>'+fmt(going)+'</b> recipients';
+      $('hsub').disabled=false;
+      $('hsubWarn').hidden=false;
+      $('hsubWarn').innerHTML = excluded
+        ? '<i class="ph ph-check" aria-hidden="true"></i>41 excluded'
+        : '<i class="ph ph-warning" aria-hidden="true"></i>41 mid-conversation';
+      $('hsubWarn').className = excluded ? 'okx' : 'warn';
+    }
+    if(conn()==='off' && st!=='report'){
+      $('hsubWarn').hidden=false;
+      $('hsubWarn').className='warn';
+      $('hsubWarn').innerHTML='<i class="ph ph-warning" aria-hidden="true"></i>No email connected';
+    }
+
+    /* who gets it */
+    $('whoTitle').textContent = st==='report' ? 'Who got it' : 'Who gets it';
+    $('smartBtn').textContent = picked.length ? 'Save as a smart list' : 'Start from a smart list';
+    $('smartBtn').hidden = st==='report';
+
+    var has1=!(st==='empty');
+    $('fs2').hidden=!has1; $('fc1').hidden=!has1; $('fc2').hidden=!has1; $('fs3').hidden=!has1;
+    if(st==='empty'){
+      $('f1n').textContent=fmt(4109); $('f1t').textContent='everyone — narrow it down';
+    } else if(st==='report'){
+      $('f1n').textContent=fmt(BASE); $('f1t').textContent='matched';
+      $('f2n').textContent=fmt(MID);  $('f2t').textContent='excluded, mid-conversation';
+      $('fs2').className='fstep cut';
+      $('f3n').textContent=fmt(277);  $('f3t').textContent='got this';
+    } else {
+      $('f1n').textContent=fmt(MATCH); $('f1t').textContent='match these filters';
+      $('fs2').className = excluded ? 'fstep cut' : 'fstep mid';
+      $('f2n').textContent=fmt(MID);
+      $('f2t').textContent = excluded ? 'excluded, mid-conversation' : 'mid-conversation, still included';
+      $('f3n').textContent=fmt(going); $('f3t').textContent='get this message';
+    }
+
+    var cf=$('conflict');
+    cf.hidden = st!=='filled';
+    cf.classList.toggle('done',excluded);
+    if(st==='filled'){
+      cf.querySelector('i').className = excluded ? 'ph ph-check-circle' : 'ph ph-warning';
+      $('conflictTx').innerHTML = excluded
+        ? '<b>41</b> excluded — they stay with <b>Follow up to initial contact</b>.'
+        : '<b>41</b> of these are mid-conversation in <b>Follow up to initial contact</b>.';
+      $('excludeBtn').textContent = excluded ? 'Undo' : 'Exclude these 41';
+    }
+
+    if(st==='empty'){
+      $('goK').textContent='Going to'; $('goV').textContent='No one yet'; $('goD').textContent='Add a filter to pick who gets it';
+    } else if(st==='report'){
+      $('goK').textContent='Results'; $('goV').textContent='11'; $('goD').textContent='replies from 277 sent';
+    } else {
+      $('goK').textContent='Going to'; $('goV').textContent=fmt(going); $('goD').textContent='of your 4,109 clients';
+    }
+
+    /* what it says */
+    $('melK').textContent = st==='empty' ? 'Add a filter and Mel will draft from who is in it' : 'Mel read the '+fmt(going)+' — three ways in';
+    $('melChips').hidden = st!=='filled';
+    $('toN').textContent = st==='report' ? '277' : fmt(going);
+    $('toCount').hidden = st==='empty';
+    if(st==='empty'){
+      $('subjV').textContent='What is this about?'; $('subjV').className='v plc';
+      $('body').className='bodybox plc';
+      $('body').innerHTML='<span>Write your message. Type <span class="tok">{{</span> for a merge field — your signature and an opt-out are added for you.</span>';
+    } else {
+      $('subjV').textContent='An off-market listing in Bel Air Crest'; $('subjV').className='v';
+      $('body').className='bodybox';
+      $('body').innerHTML='<span>Hi <span class="tok" id="tok">'+curFirst+'</span>,</span>'+
+        '<span>Something came up in Bel Air Crest that hasn’t hit the market yet — four bedrooms, canyon side, and the sellers are open to a quiet sale.</span>'+
+        '<span>Worth a look before it’s listed?</span>'+
+        '<span class="sig">Ashutosh iOSacc · Radius Agent Realty<br>'+
+        (ch()==='email' ? '<a href="#">Unsubscribe</a>' : 'Reply STOP to opt out')+'</span>';
+    }
+    $('chSeg').hidden = st==='report';
+
+    /* recipients / replies */
+    $('listTitle').textContent = st==='report' ? 'Replies' : 'Who is previewing';
+    $('rcpList').hidden = st!=='filled';
+    $('rcpMore').hidden = st!=='filled';
+    $('replyList').hidden = st!=='report';
+    $('rcpEmpty').hidden = st!=='empty';
+    $('rcpShown').textContent=shown;
+    $('rcpTotal').textContent=fmt(going);
+    $('showMore').textContent = shown>=8 ? 'Show fewer' : 'Show more';
+
+    /* dock */
+    var sb=$('sendBtn');
+    if(st==='report'){
+      $('testLbl').textContent='Duplicate';
+      $('testBtn').querySelector('i').className='ph ph-copy';
+      $('testBtn').disabled=false;
+      sb.textContent='Close'; sb.disabled=false; sb.setAttribute('data-act','close');
+    } else if(conn()==='off'){
+      $('testLbl').textContent='Test send';
+      $('testBtn').querySelector('i').className='ph ph-paper-plane-tilt';
+      $('testBtn').disabled=true;
+      sb.textContent='Connect Google to send'; sb.disabled=false; sb.setAttribute('data-act','connect');
+    } else if(st==='empty'){
+      $('testLbl').textContent='Test send';
+      $('testBtn').querySelector('i').className='ph ph-paper-plane-tilt';
+      $('testBtn').disabled=true;
+      sb.textContent='Send'; sb.disabled=true; sb.setAttribute('data-act','send');
+    } else {
+      $('testLbl').textContent='Test send';
+      $('testBtn').querySelector('i').className='ph ph-paper-plane-tilt';
+      $('testBtn').disabled=false;
+      sb.textContent='Send to '+fmt(going); sb.disabled=false; sb.setAttribute('data-act','send');
+    }
+  }
+
+  /* ── merge token preview ── */
+  var curFirst='Priya';
+  $('rcpList').addEventListener('click',function(e){
+    var r=e.target.closest('.rcp'); if(!r) return;
+    [].forEach.call($('rcpList').querySelectorAll('.rcp'),function(x){ x.setAttribute('aria-pressed',String(x===r)); });
+    curFirst=r.getAttribute('data-first')||'there';
+    var t=$('tok'); if(t) t.textContent=curFirst; else console.warn('[preview] no merge token in body');
+  });
+  $('showMore').addEventListener('click',function(){
+    shown = shown>=8 ? 4 : 8;
+    paint();
+    toast(shown>=8?'Showing 8 of '+fmt(excluded?BASE-MID:BASE):'Showing 4 of '+fmt(excluded?BASE-MID:BASE));
+  });
+
+  /* ── exclude / undo ── */
+  $('excludeBtn').addEventListener('click',function(){
+    excluded=!excluded;
+    paint(); drawFilters();
+    toast(excluded?'41 excluded — they stay with Follow up to initial contact':'41 mid-conversation clients are back in');
+  });
+  $('hsub').addEventListener('click',function(){ if(state()==='filled') $('excludeBtn').focus(); });
+
+  /* ── Mel subjects ── */
+  $('melChips').addEventListener('click',function(e){
+    var b=e.target.closest('.melsugchip'); if(!b) return;
+    $('subjV').textContent=b.getAttribute('data-sub');
+    toast('Subject set from Mel’s suggestion');
+  });
+
+  /* ── from account ── */
+  $('fromBtn').addEventListener('click',function(){ openSheet($('aSheet'),this); });
+  $('aSheet').addEventListener('click',function(e){
+    var a=e.target.closest('[data-acc]'); if(!a) return;
+    [].forEach.call($('aSheet').querySelectorAll('[data-acc]'),function(x){ x.setAttribute('data-picked',String(x===a)); });
+    $('fromV').innerHTML='Ashutosh &lt;'+a.getAttribute('data-acc')+'&gt;';
+    closeSheet(); toast('Sending from '+a.getAttribute('data-acc'));
+  });
+  $('connectBtn').addEventListener('click',function(){ screenEl.setAttribute('data-conn','on'); syncSeg('segConn','on'); paint(); toast('Gmail connected'); });
+
+  /* ── channel ── */
+  $('chSeg').addEventListener('click',function(e){
+    var b=e.target.closest('[data-ch]'); if(!b) return;
+    screenEl.setAttribute('data-ch',b.getAttribute('data-ch'));
+    [].forEach.call($('chSeg').querySelectorAll('[data-ch]'),function(x){ x.setAttribute('aria-pressed',String(x===b)); });
+    syncSeg('segCh',b.getAttribute('data-ch'));
+    paint();
+  });
+
+  /* ── send ── */
+  function commitSend(){
+    hideToast();
+    screenEl.setAttribute('data-state','report');
+    syncSeg('segState','report');
+    excluded=true;
+    drawFilters(); paint();
+    document.querySelector('.scroll').scrollTop=0;
+    toast('Sent to 277 clients');
+  }
+  $('sendBtn').addEventListener('click',function(){
+    var act=this.getAttribute('data-act');
+    if(act==='close'){ location.href='Campaigns.html'; return; }
+    if(act==='connect'){ screenEl.setAttribute('data-conn','on'); syncSeg('segConn','on'); paint(); toast('Gmail connected'); return; }
+    var going=excluded?BASE-MID:BASE;
+    if(UNDO) toast('Sending to '+fmt(going)+' clients',{undo:true});
+    else { commitSend(); }
+  });
+  undoBtn.addEventListener('click',function(){ hideToast(); toast('Send cancelled — the draft is still here'); });
+  $('testBtn').addEventListener('click',function(){
+    if(state()==='report') toast('Duplicated as a draft you can edit and send again');
+    else toast('Sent to you first — check your inbox');
+  });
+  $('smartBtn').addEventListener('click',function(){ toast(picked.length?'Saved as a smart list':'Opens your smart lists'); });
+
+  /* ── prototype switches ── */
+  function syncSeg(id,val){
+    var s=$(id); if(!s) return;
+    [].forEach.call(s.querySelectorAll('button'),function(b){ b.setAttribute('aria-pressed',String(b.getAttribute('data-v')===val)); });
+  }
+  $('segState').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    var v=b.getAttribute('data-v');
+    screenEl.setAttribute('data-state',v);
+    excluded = v==='report';
+    if(v==='empty') picked=[];
+    else if(!picked.length) picked=[{f:'Tags is “luxury”',n:532},{f:'Last contact more than 30 days ago',n:1204}];
+    syncSeg('segState',v); hideToast(); drawFilters(); paint();
+  });
+  $('segConn').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    screenEl.setAttribute('data-conn',b.getAttribute('data-v'));
+    syncSeg('segConn',b.getAttribute('data-v')); paint();
+  });
+  $('segCh').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    var v=b.getAttribute('data-v');
+    screenEl.setAttribute('data-ch',v);
+    [].forEach.call($('chSeg').querySelectorAll('[data-ch]'),function(x){ x.setAttribute('aria-pressed',String(x.getAttribute('data-ch')===v)); });
+    syncSeg('segCh',v); paint();
+  });
+  $('segUndo').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    UNDO = b.getAttribute('data-v')==='on';
+    syncSeg('segUndo',b.getAttribute('data-v'));
+  });
+
+  var q=new URLSearchParams(location.search);
+  if(q.get('state')){ screenEl.setAttribute('data-state',q.get('state')); syncSeg('segState',q.get('state')); }
+  drawFilters(); paint();
+})();
+</script>
+</body>
+</html>

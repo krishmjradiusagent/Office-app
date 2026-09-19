@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+<title>New campaign — Radius</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<link rel="stylesheet" href="assets/list-page.css">
+<style>
+.screen { position:relative; --tint-indigo-bg:rgba(90,95,242,.18); --tint-indigo-fg:#aab0ff; --tint-green-bg:rgba(109,165,68,.18); --tint-green-fg:#a9cf80; --tint-amber-bg:rgba(234,88,12,.16); --tint-amber-fg:#f2a678; }
+.statusbar { position:absolute; top:0; left:0; right:0; z-index:14; }
+.num { font-variant-numeric:tabular-nums; font-family:var(--font); }
+
+/* ── nav bar: real title, never an input ─────────────────── */
+.pg-head { position:absolute; top:0; left:0; right:0; z-index:13; display:block; padding:calc(44px + env(safe-area-inset-top)) 16px 10px; background:linear-gradient(to bottom, rgba(10,10,10,.92), rgba(10,10,10,.70)); backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%); box-shadow:inset 0 -1px 0 rgba(255,255,255,.07); }
+.hrow { position:relative; display:flex; align-items:center; gap:8px; min-height:44px; }
+.back-btn { flex:none; margin-left:0; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; border:0; border-radius:999px; background:rgba(255,255,255,.10); box-shadow:inset 0 0 0 .5px rgba(255,255,255,.18), inset 0 1px 0 rgba(255,255,255,.16); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); color:var(--foreground); cursor:pointer; position:relative; }
+.back-btn::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.back-btn:active { background:rgba(255,255,255,.18); }
+.back-btn:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+/* title is absolutely centred in the nav row, so it stays centred in every mode
+   (new / edit / dirty) regardless of what sits on either side */
+.htitle { position:absolute; left:52px; right:52px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:2px; text-align:center; }
+.hrow:has(.dirty:not([hidden])) .htitle { left:96px; right:96px; }
+.htitle h1 { margin:0; font:600 17px/1.25 var(--font-hubot); letter-spacing:-.015em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.estate { display:flex; min-width:0; align-items:center; justify-content:center; gap:6px; white-space:nowrap; overflow:hidden; font:500 13px/1.2 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.estate .sd { width:7px; height:7px; flex:none; border-radius:999px; background:var(--tint-green-fg); }
+.estate .sd.off { background:var(--muted-foreground); }
+.estate b { color:var(--foreground); font-family:var(--font); }
+.dirty { flex:none; margin-left:auto; height:24px; padding:0 9px; border-radius:var(--radius-sm); background:var(--tint-amber-bg); color:var(--tint-amber-fg); font:600 12px/24px var(--font); }
+.hspacer { flex:none; width:36px; margin-left:auto; }
+
+/* tabs: the canonical Radius UI segmented control from list-page.css — no local variant */
+.pg-head .sh-tabs { margin:10px 0 0; }
+
+.scroll { padding-top:calc(44px + env(safe-area-inset-top) + 66px); padding-bottom:calc(96px + env(safe-area-inset-bottom)); scrollbar-width:none; }
+.scroll.tabbed { padding-top:calc(44px + env(safe-area-inset-top) + 112px); }
+.scroll::-webkit-scrollbar { display:none; }
+
+/* ── cards ───────────────────────────────────────────────── */
+.card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-card); box-shadow:var(--shadow-sm); margin-top:16px; overflow:hidden; }
+.pane:first-of-type .card:first-child { margin-top:4px; }
+.ch { display:flex; align-items:center; gap:12px; padding:16px; border-bottom:1px solid var(--border); }
+.ch .tile { width:28px; height:28px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; font-size:16px; flex:none; }
+.ch .tile.a { background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); }
+.ch .tile.b { background:var(--tint-green-bg); color:var(--tint-green-fg); }
+.ch .tile.c { background:var(--tint-amber-bg); color:var(--tint-amber-fg); }
+.ch .htxt { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:3px; }
+.ch h2 { margin:0; font:600 16px/1.2 var(--font-hubot); letter-spacing:-.015em; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.ch h2 .req { font:600 15px/1 var(--font); letter-spacing:0; color:var(--destructive); transform:translateY(1px); }
+.ch h2 .opt { font:500 11px/1 var(--font); letter-spacing:0; color:var(--muted-foreground); background:var(--muted); border:1px solid var(--border); border-radius:6px; padding:4px 7px; transform:translateY(1px); }
+.ch .sub { font:400 13px/1.4 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.ch .info { flex:none; width:44px; height:44px; margin:-7px -8px -7px 0; border:0; background:transparent; color:var(--muted-foreground); border-radius:999px; font-size:17px; cursor:pointer; }
+.ch .info[aria-expanded="true"] { color:var(--foreground); background:var(--muted); }
+.ch .info:focus-visible { outline:2px solid var(--ring); outline-offset:-4px; }
+.help { margin:0; padding:12px 16px; border-bottom:1px solid var(--border); background:var(--muted); font:400 13px/1.5 var(--font); color:var(--foreground); text-wrap:pretty; }
+.cb { padding:16px; display:flex; flex-direction:column; gap:12px; }
+
+/* ── name field, in the body where a field belongs ───────── */
+.fieldrow { position:relative; display:flex; flex-direction:column; gap:7px; }
+#nameCard, #nameCard .cb { overflow:visible; }
+.pop { position:absolute; top:26px; right:-4px; z-index:22; width:214px; padding:11px 13px; border-radius:14px; border:.5px solid rgba(255,255,255,.12); background:rgba(46,46,51,.96); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); box-shadow:0 12px 34px rgba(0,0,0,.55); font:400 13px/1.45 var(--font); color:var(--foreground); text-wrap:pretty; transform-origin:top right; animation:popin 180ms cubic-bezier(.23,1,.32,1); }
+.pop::before { content:''; position:absolute; top:-5px; right:22px; width:10px; height:10px; background:rgba(46,46,51,.96); border-left:.5px solid rgba(255,255,255,.12); border-top:.5px solid rgba(255,255,255,.12); transform:rotate(45deg); }
+@keyframes popin { from { opacity:0; transform:scale(.94); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { .pop { animation:none; } }
+.flab { display:flex; align-items:center; gap:4px; font:600 13px/1 var(--font); color:var(--foreground); }
+.flab .req { color:#F87171; font-size:14px; line-height:1; }
+.flab .fi2 { height:32px; margin:-6px -8px -6px auto; display:inline-flex; align-items:center; white-space:nowrap; gap:5px; padding:0 8px; border:0; background:transparent; color:var(--muted-foreground); font:500 12px/1 var(--font); cursor:pointer; }
+.flab .fi2 i { font-size:14px; }
+.flab .fi2[aria-expanded="true"] { color:var(--foreground); }
+.flab .fi2:focus-visible { outline:2px solid var(--ring); outline-offset:-4px; }
+#name { width:100%; height:46px; padding:0 13px; border-radius:var(--radius-md); border:1px solid var(--input); background:var(--muted); color:var(--foreground); font:500 16px/1 var(--font); }
+#name::placeholder { color:var(--muted-foreground); }
+#name:focus { outline:2px solid var(--ring); outline-offset:1px; border-color:transparent; }
+#name[aria-invalid="true"] { border-color:rgba(234,88,12,.55); }
+.fhint { font:400 12px/1.4 var(--font); color:var(--muted-foreground); }
+
+/* ── who joins ───────────────────────────────────────────── */
+.filters { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.filters .lbl { width:100%; font:600 13px/1 var(--font); color:var(--foreground); }
+.fchip2 { display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:0 6px 0 13px; border-radius:999px; background:var(--tint-indigo-bg); color:#ccceff; font:600 14px/1.2 var(--font); }
+.fchip2 button { position:relative; width:32px; height:32px; flex:none; border:0; border-radius:999px; background:rgba(255,255,255,.10); color:inherit; font-size:14px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+.fchip2 button::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.fchip2 button:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.addf { display:inline-flex; align-items:center; gap:7px; min-height:44px; padding:0 15px 0 12px; border-radius:999px; border:0; background:var(--muted); color:var(--foreground); font:600 14px/1 var(--font); cursor:pointer; }
+.addf i { font-size:16px; color:var(--muted-foreground); }
+.addf:active { background:#2A2A2E; }
+.addf:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.audience { display:flex; flex-direction:column; gap:4px; padding-top:12px; border-top:1px solid var(--border); }
+.audience .al { font:600 15px/1.35 var(--font); color:var(--foreground); text-wrap:pretty; }
+.audience .al b { font-weight:700; font-variant-numeric:tabular-nums; }
+.audience .ah { font:400 13px/1.45 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+
+/* ── playbook ────────────────────────────────────────────── */
+.drop { display:flex; flex-direction:column; gap:10px; }
+.drop .dd { font:400 13px/1.45 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.drop .btns { display:flex; gap:8px; flex-wrap:wrap; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:44px; padding:0 15px; border-radius:var(--radius-md); border:1px solid var(--input); background:transparent; color:var(--foreground); font:600 15px/1 var(--font); cursor:pointer; transition:filter 140ms ease, transform 140ms ease; }
+.btn i { font-size:17px; }
+.btn.pri { background:var(--primary); border-color:transparent; color:#fff; }
+.btn:active { transform:scale(.98); }
+.btn:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.btn[disabled] { background:var(--muted); border-color:var(--border); color:#8A8A90; box-shadow:none; cursor:default; transform:none; }
+.pbsrc { display:flex; flex-direction:column; gap:8px; }
+.pbfile { display:flex; align-items:center; gap:11px; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--muted); }
+.pbfile .fi { width:32px; height:32px; border-radius:9px; background:var(--tint-green-bg); color:var(--tint-green-fg); display:inline-flex; align-items:center; justify-content:center; font-size:17px; flex:none; }
+.pbfile .fb { min-width:0; flex:1; display:flex; flex-direction:column; gap:3px; }
+.pbfile .fn { font:600 15px/1.25 var(--font); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pbfile .fm { font:400 13px/1.3 var(--font); color:var(--muted-foreground); }
+.pbfile .rm { width:44px; height:44px; flex:none; margin-right:-8px; border:0; border-radius:999px; background:transparent; color:var(--muted-foreground); font-size:17px; cursor:pointer; }
+.pbfile .rm:focus-visible { outline:2px solid var(--ring); outline-offset:-4px; }
+.viewall { display:flex; align-items:center; gap:8px; width:100%; min-height:46px; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-lg); background:transparent; color:#aab0ff; font:600 14px/1 var(--font); cursor:pointer; }
+.viewall .vn { margin-left:auto; color:var(--muted-foreground); font-weight:500; font-variant-numeric:tabular-nums; }
+.viewall:active { background:var(--muted); }
+.viewall:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.srclist { display:flex; flex-direction:column; gap:8px; padding:4px 10px 12px; max-height:46vh; overflow-y:auto; scrollbar-width:none; }
+.srclist::-webkit-scrollbar { display:none; }
+
+/* ── channels + pace ─────────────────────────────────────── */
+.rowlbl { font:600 13px/1 var(--font); color:var(--foreground); }
+.chans { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.chan { position:relative; display:grid; grid-template-columns:1fr auto; grid-template-rows:20px auto; align-items:center; row-gap:10px; width:100%; min-height:72px; padding:10px 10px 11px; border:1px solid var(--border); border-radius:var(--radius-md); background:transparent; color:var(--foreground); font:600 15px/1 var(--font); text-align:left; cursor:pointer; transition:background 140ms ease, border-color 140ms ease; }
+.chan .box { position:relative; grid-column:2; grid-row:1; width:20px; height:20px; border-radius:6px; border:1.5px solid var(--input); }
+.chan .gl { grid-column:1; grid-row:1; display:inline-flex; align-items:center; height:20px; color:var(--muted-foreground); font-size:20px; }
+.chan .gl svg { width:20px; height:20px; display:block; }
+.chan[aria-pressed="true"] { background:rgba(90,95,242,.10); border-color:rgba(90,95,242,.45); }
+.chan[aria-pressed="true"] .box { background:var(--primary); border-color:var(--primary); }
+.chan[aria-pressed="true"] .box::after { content:''; position:absolute; left:6px; top:3px; width:4px; height:8px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg); }
+.chan .cn { grid-column:1 / -1; grid-row:2; display:inline-flex; align-items:baseline; gap:4px; font:600 15px/1 var(--font); color:var(--foreground); font-variant-numeric:tabular-nums; }
+.chan .cn i { font-size:13px; }
+.chan:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.paceset { display:flex; flex-direction:column; gap:0; padding-top:4px; border-top:1px solid var(--border); }
+.prow { display:flex; align-items:center; gap:12px; min-height:56px; padding:8px 0; border-bottom:1px solid var(--border); }
+.prow:last-child { border-bottom:0; }
+.prow .pk { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.prow .pk span { font:600 15px/1.25 var(--font); }
+.prow .pk small { font:400 12px/1.35 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+select { height:44px; padding:0 34px 0 13px; border-radius:var(--radius-md); border:1px solid var(--input); background:var(--muted) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23A1A1A6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 11px center; color:var(--foreground); font:600 15px/1 var(--font); appearance:none; -webkit-appearance:none; cursor:pointer; }
+select:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+
+/* ── commit block: sits where you press start ────────────── */
+.commit { margin-top:16px; }
+.commit .rt { font:600 13px/1 var(--font); color:var(--muted-foreground); padding:0 2px 8px; }
+.rrow { display:flex; align-items:center; gap:12px; padding:16px; border-top:1px solid var(--border); font:500 15px/1.25 var(--font); }
+.rrow:first-of-type { border-top:0; }
+.rrow .tile { width:26px; height:26px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:15px; flex:none; }
+.rrow .rv { margin-left:auto; font:600 15px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.rrow .rv.set { color:var(--foreground); }
+.melnote { display:flex; gap:9px; padding:12px 4px 0; font:400 13px/1.5 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.melnote i { font-size:16px; color:var(--tint-indigo-fg); margin-top:1px; }
+
+/* ── dock ────────────────────────────────────────────────── */
+.dock { position:absolute; left:12px; right:12px; bottom:calc(10px + env(safe-area-inset-bottom)); z-index:13; display:flex; align-items:center; gap:12px; padding:10px 10px 10px 16px; border-radius:28px; border:.5px solid rgba(255,255,255,.10); background:rgba(28,28,30,.72); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); }
+.dock .who { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.dock .who .k { font:500 12px/1.2 var(--font); color:var(--muted-foreground); }
+.dock .who .v { display:flex; align-items:center; gap:6px; font:600 15px/1.25 var(--font); font-variant-numeric:tabular-nums; text-wrap:pretty; }
+.dock .who .v i { flex:none; font-size:15px; color:var(--tint-green-fg); }
+.dock .btn { flex:none; height:44px; padding:0 18px; border-radius:999px; font-size:15px; box-shadow:none; }
+.dock .btn[disabled] { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.10); color:#8A8A90; }
+.dock .row { display:flex; flex:1; gap:8px; }
+.dock .row .btn { flex:1; }
+.dock .btn.gh { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.12); color:var(--foreground); }
+
+/* ── panes (edit mode) ───────────────────────────────────── */
+.pane[hidden] { display:none; }
+
+/* ── audience ledger ─────────────────────────────────────── */
+.fun { display:flex; flex-direction:column; border-top:1px solid var(--border); }
+.fstep { position:relative; display:flex; align-items:center; gap:12px; width:100%; min-height:50px; padding:0; border:0; border-bottom:1px solid var(--border); background:transparent; color:inherit; text-align:left; font:inherit; }
+.fstep:last-child { border-bottom:0; }
+.fstep b { flex:none; min-width:72px; font:600 17px/1 var(--font); letter-spacing:-.01em; color:var(--foreground); font-variant-numeric:tabular-nums; }
+.fstep span { flex:1; min-width:0; font:500 14px/1.35 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.fstep.held { cursor:pointer; }
+.fstep.held b { color:var(--tint-amber-fg); }
+.fstep.held i { flex:none; font-size:14px; color:var(--muted-foreground); }
+.fstep.held:active { background:var(--muted); }
+.fstep.held:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; border-radius:var(--radius-sm); }
+.fstep.tot b { font:700 22px/1 var(--font); }
+.fstep.tot span { color:var(--foreground); font-weight:600; }
+
+/* ── callout ─────────────────────────────────────────────── */
+.callout { display:flex; flex-direction:column; gap:10px; padding:13px; border-radius:var(--radius-lg); background:var(--tint-amber-bg); box-shadow:inset 0 0 0 1px rgba(234,88,12,.24); }
+.callout .ct { display:flex; align-items:flex-start; gap:9px; font:400 13px/1.5 var(--font); color:var(--foreground); text-wrap:pretty; }
+.callout .ct .info { position:relative; flex:none; width:26px; height:26px; margin:-4px -4px -4px auto; display:inline-flex; align-items:center; justify-content:center; border:0; border-radius:999px; background:transparent; color:var(--muted-foreground); font-size:15px; cursor:pointer; }
+.callout .ct .info::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.callout .ct .info[aria-expanded="true"] { color:var(--foreground); background:rgba(255,255,255,.10); }
+.callout .ct .info:focus-visible { outline:2px solid var(--ring); outline-offset:1px; }
+.callout .ct .info i { margin-top:0; color:inherit; font-size:15px; }
+.callout .help { margin:0; padding:0; border:0; background:transparent; font:400 12px/1.5 var(--font); color:var(--muted-foreground); }
+.callout .ct i { flex:none; margin-top:2px; font-size:15px; color:var(--tint-amber-fg); }
+.callout .ct b { font-weight:700; font-variant-numeric:tabular-nums; }
+.callout .cfoot { font:500 12px/1.45 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.callout .cfoot b { color:var(--foreground); font-weight:600; }
+.callout .btn { align-self:flex-start; background:var(--card); }
+
+.melsugchip { display:flex; align-items:center; gap:8px; width:100%; min-height:48px; margin-top:16px; padding:10px 13px; border:1px solid rgba(240,128,104,.28); border-radius:var(--radius-lg); background:rgba(240,128,104,.08); text-align:left; cursor:pointer; transition:transform 160ms cubic-bezier(.23,1,.32,1); }
+.melsugchip svg { flex:none; color:#F0A468; }
+.melsugchip .mlab { font:500 14px/1.35 var(--font); color:#F5B58F; text-wrap:pretty; }
+.melsugchip:active { transform:scale(.985); }
+.melsugchip:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+
+.whint { margin:0 0 2px; font:500 12px/1.4 var(--font); color:var(--muted-foreground); }
+.wtr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.wrow { position:relative; display:grid; grid-template-rows:auto auto auto; align-content:start; gap:6px; width:100%; margin:0; padding:12px 13px 11px; border:1px solid var(--border); border-radius:var(--radius-lg); background:transparent; color:inherit; font:inherit; text-align:left; cursor:pointer; }
+.wrow:last-child { grid-column:1 / -1; }
+.wrow[aria-pressed="true"] { background:var(--muted); border-color:rgba(255,255,255,.18); }
+.wrow[aria-pressed="true"] .wk { color:var(--foreground); }
+.wrow:active { transform:scale(.99); }
+.wrow:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.wrow:focus:not(:focus-visible) { outline:none; }
+.wrow .wc { position:absolute; top:11px; right:11px; font-size:16px; line-height:1; color:var(--muted-foreground); opacity:.55; }
+.wrow .wc i:last-child { display:none; }
+.wrow[aria-pressed="true"] .wc { opacity:1; color:#aab0ff; }
+.wrow[aria-pressed="true"] .wc i:first-child { display:none; }
+.wrow[aria-pressed="true"] .wc i:last-child { display:inline; }
+.wrow .wk { font:600 13px/1.25 var(--font); color:var(--muted-foreground); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-right:20px; }
+.wrow .wv { display:flex; align-items:baseline; gap:6px; font:600 22px/1 var(--font); letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
+.wrow .wp { font:500 12px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.wrow .wb { height:3px; border-radius:999px; background:var(--muted); overflow:hidden; }
+.wrow[aria-pressed="true"] .wb { background:rgba(255,255,255,.12); }
+.wrow .wb i { display:block; height:100%; width:var(--p); border-radius:999px; background:var(--muted-foreground); }
+.wrow.pri .wb i { background:var(--primary); }
+.wrow.suc .wb i { background:var(--tint-green-fg); }
+.wrow.bad .wb i { background:#f0a0a0; }
+
+.clblock { margin-top:6px; padding-top:12px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:10px; }
+.clhead { display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
+.clhead .cl-t { flex:none; font:600 15px/1 var(--font); }
+.scopechip { position:relative; flex:0 1 auto; min-width:0; display:inline-flex; align-items:center; gap:6px; min-height:32px; padding:0 10px; border:0; border-radius:999px; background:var(--tint-indigo-bg); color:#ccceff; font:600 13px/1 var(--font); cursor:pointer; }
+.scopechip span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.scopechip::before { content:''; position:absolute; left:0; right:0; top:50%; height:44px; transform:translateY(-50%); }
+.scopechip i { flex:none; font-size:13px; }
+.scopechip:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.clempty { padding:6px 0 2px; font:400 13px/1.45 var(--font); color:var(--muted-foreground); }
+.sortbtn { position:relative; flex:none; margin-left:auto; display:inline-flex; align-items:center; gap:5px; min-height:32px; padding:0 11px; border:1px solid var(--input); border-radius:999px; background:transparent; color:var(--foreground); font:600 13px/1 var(--font); cursor:pointer; white-space:nowrap; }
+.sortbtn::before { content:''; position:absolute; left:0; right:0; top:50%; height:44px; transform:translateY(-50%); }
+.sortbtn i { font-size:14px; color:var(--muted-foreground); }
+.sortbtn:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.clrow { display:flex; gap:11px; align-items:flex-start; width:100%; min-height:48px; padding:12px 0; border-top:1px solid var(--border); background:transparent; border-left:0; border-right:0; border-bottom:0; color:var(--foreground); text-align:left; font-family:var(--font); cursor:pointer; }
+.clrow:first-of-type { border-top:0; }
+.clrow .ini { flex:none; width:34px; height:34px; border-radius:999px; background:var(--muted); color:var(--foreground); font:600 12px/1 var(--font); display:inline-flex; align-items:center; justify-content:center; }
+.clrow .cbd { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+.clrow .ctop { display:flex; align-items:center; gap:7px; }
+.clrow .cnm { font:600 15px/1.2 var(--font); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.clrow .cwhen { margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:5px; font:500 13px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.clrow .cwhen i { font-size:14px; }
+.clrow .cmsg { font:400 13px/1.4 var(--font); color:var(--muted-foreground); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.clfoot { display:flex; align-items:center; gap:10px; padding-top:8px; border-top:1px solid var(--border); font:500 13px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.clfoot b { color:var(--foreground); }
+.clfoot .va { margin-left:auto; min-height:44px; padding:0 4px; border:0; background:transparent; color:#aab0ff; font:600 14px/1 var(--font); cursor:pointer; }
+.clfoot .va:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+
+.pbrow { display:flex; align-items:center; gap:11px; }
+.mtook { display:flex; align-items:center; gap:12px; min-height:60px; padding:10px 12px; border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.055); backdrop-filter:blur(22px) saturate(1.5); -webkit-backdrop-filter:blur(22px) saturate(1.5); color:var(--foreground); text-decoration:none; transition:background 140ms ease, transform 140ms ease; }
+.mtook:active { transform:scale(.98); background:rgba(255,255,255,.085); }
+.mtook:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.mtook .mi { flex:none; width:32px; height:32px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:17px; color:#fff; background:linear-gradient(135deg,#7B7FF5,#5A5FF2 42%,#F08068 82%,#F0A468); }
+.mtook .mt { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.mtook .mtt { font:600 15px/1.25 var(--font); }
+.mtook .mts { font:400 13px/1.4 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.mtook .mc { flex:none; font-size:17px; color:var(--muted-foreground); }
+.pbrow .seek { margin-left:auto; flex:none; display:inline-flex; align-items:center; min-height:44px; padding:0 4px; border:0; background:transparent; color:#aab0ff; font:600 14px/1 var(--font); text-decoration:none; cursor:pointer; white-space:nowrap; }
+.tiles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.tile2 { display:flex; align-items:center; gap:9px; min-height:48px; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:transparent; color:var(--foreground); font:600 14px/1.2 var(--font); text-align:left; text-decoration:none; cursor:pointer; transition:background 140ms ease; }
+.tile2 i { flex:none; font-size:17px; color:var(--muted-foreground); }
+.tile2:active { background:var(--muted); }
+.tile2:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.legend { display:flex; flex-wrap:wrap; gap:14px; font:500 13px/1 var(--font); color:var(--muted-foreground); }
+.legend span { display:inline-flex; align-items:center; gap:6px; }
+.legend i { font-size:15px; }
+.addmore { display:flex; flex-direction:column; gap:8px; padding:13px; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--muted); }
+.addmore .at { font:600 15px/1.3 var(--font); }
+.addmore .ad { font:400 13px/1.45 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.addmore .btns { display:flex; gap:8px; flex-wrap:wrap; }
+.addmore .btn { background:var(--card); }
+
+/* ── sheets ──────────────────────────────────────────────── */
+.scrim { position:absolute; inset:0; background:rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity 240ms ease; z-index:20; }
+.scrim.on { opacity:1; pointer-events:auto; }
+.sheet { position:absolute; left:0; right:0; bottom:0; z-index:21; background:var(--card); border:1px solid var(--border); border-bottom:0; border-radius:22px 22px 0 0; padding:8px 10px calc(16px + env(safe-area-inset-bottom)); transform:translateY(103%); transition:transform 300ms cubic-bezier(.32,.72,0,1); box-shadow:0 -12px 40px rgba(0,0,0,.45); }
+.sheet.on { transform:none; }
+.sheet .grab { width:38px; height:4px; border-radius:999px; background:var(--muted-foreground); opacity:.4; margin:0 auto 6px; }
+.shead { display:flex; align-items:center; gap:8px; padding:2px 2px 10px 10px; border-bottom:1px solid var(--border); margin-bottom:6px; }
+.shead .sh-name { flex:1; min-width:0; font:700 17px/1.25 var(--font-hubot); letter-spacing:-.01em; }
+.shclose { flex:none; width:44px; height:44px; border:0; border-radius:999px; background:var(--muted); color:var(--muted-foreground); font-size:17px; cursor:pointer; }
+.shclose:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.sheet .act { display:flex; align-items:center; gap:12px; width:100%; min-height:52px; padding:0 10px; border:0; background:transparent; color:var(--foreground); font:500 15px/1.3 var(--font); text-align:left; border-radius:var(--radius-lg); cursor:pointer; }
+.sheet .act i { font-size:20px; color:var(--muted-foreground); width:24px; text-align:center; flex:none; }
+.sheet .act .n { margin-left:auto; flex:none; font:500 13px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.sheet .act:active { background:var(--muted); }
+.sheet .act:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
+.sheet .act[data-picked="true"] { background:var(--muted); }
+.sheet textarea { width:100%; min-height:120px; margin:6px 0 12px; padding:12px; border-radius:var(--radius-lg); border:1px solid var(--input); background:var(--muted); color:var(--foreground); font:400 15px/1.5 var(--font); resize:none; }
+.sheet textarea:focus { outline:2px solid var(--ring); outline-offset:1px; }
+.sheet .srow { display:flex; gap:10px; padding:0 10px; }
+.sheet .srow .btn { flex:1; }
+.sheet .sbody { padding:0 10px; }
+.sheet .sbody p { margin:2px 0 14px; font:400 14px/1.5 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.btn.dstr { background:#DC2626; border-color:transparent; color:#fff; }
+
+.osheet { padding-bottom:0; max-height:88%; display:flex; flex-direction:column; }
+.osheet .ohead { padding:2px 2px 12px 10px; border-bottom:1px solid var(--border); }
+.osheet .ohead .hr2 { display:flex; align-items:center; gap:8px; }
+.osheet .ohead h2 { flex:1; min-width:0; margin:0; font:700 17px/1.25 var(--font-hubot); letter-spacing:-.01em; }
+.osheet .ohead h2 span { font-family:var(--font); font-variant-numeric:tabular-nums; }
+.osheet .ohead p { margin:6px 0 0; font:400 13px/1.45 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.osheet .obody { flex:1; min-height:0; overflow-y:auto; padding:4px 10px 12px; scrollbar-width:none; }
+.osheet .obody::-webkit-scrollbar { display:none; }
+.ogrp { padding:14px 0; border-bottom:1px solid var(--border); }
+.ogrp:last-child { border-bottom:0; }
+.ogrp .gt { font:600 15px/1.25 var(--font); }
+.ogrp .gm { margin-top:4px; font:500 13px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.ogrp .gb { display:flex; gap:8px; margin-top:11px; }
+.ogrp .gb .btn { flex:1; }
+.ogrp .gdone { display:flex; align-items:center; gap:8px; margin-top:11px; font:500 13px/1.3 var(--font); color:var(--tint-green-fg); }
+.ogrp .gdone button { margin-left:auto; min-height:44px; padding:0 4px; border:0; background:transparent; color:#aab0ff; font:600 14px/1 var(--font); cursor:pointer; }
+.osheet .ofoot { display:flex; align-items:center; gap:12px; padding:12px 10px calc(14px + env(safe-area-inset-bottom)); border-top:1px solid var(--border); background:var(--card); }
+.osheet .ofoot .os { flex:1; min-width:0; font:600 14px/1.3 var(--font); font-variant-numeric:tabular-nums; }
+.osheet .ofoot .btn { padding:0 22px; }
+
+.flash { animation:fl 320ms cubic-bezier(.23,1,.32,1); }
+@keyframes fl { from { opacity:.35; transform:translateY(2px); } to { opacity:1; transform:none; } }
+
+.toast { position:absolute; left:16px; right:16px; bottom:calc(112px + env(safe-area-inset-bottom)); z-index:30; background:#2E2E33; color:var(--foreground); border-radius:var(--radius-lg); padding:12px 14px; font:500 14px/1.35 var(--font); box-shadow:0 6px 24px rgba(0,0,0,.45); opacity:0; transform:translateY(10px); transition:opacity 160ms ease, transform 160ms ease; pointer-events:none; }
+.toast.on { opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce) {
+  .sheet, .scrim, .toast, .btn, .melsugchip, .clrow, .tile2 { transition:none; }
+  .flash { animation:none; }
+}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="screen" data-screen-label="New campaign">
+    <div class="statusbar"><span>9:41</span>
+      <div class="sb-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="5" width="3" height="7" rx="1"/><rect x="9" y="2.5" width="3" height="9.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity="0.7"/></svg>
+        <svg width="20" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor"><rect x="1" y="1" width="17" height="10" rx="3"/><rect x="3" y="3" width="11" height="6" rx="1.5" fill="currentColor" stroke="none"/><path d="M20 4v4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div class="pg-head">
+      <div class="hrow">
+        <button class="back-btn" type="button" id="backBtn" aria-label="Back to campaigns">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="htitle">
+          <h1 id="pgTitle">New campaign</h1>
+          <span class="estate" id="estate" hidden><span class="sd" id="stDot" aria-hidden="true"></span><span id="stText">Running · started 14 Aug · </span><span><b id="stIn">1,532</b> in</span></span>
+        </div>
+        <span class="dirty" id="dirty" hidden>Unsaved</span>
+        <span class="hspacer" id="hspacer" aria-hidden="true"></span>
+      </div>
+      <div class="sh-tabs" id="tabbar" role="tablist" aria-label="Campaign sections" hidden>
+        <button class="sh-tab" role="tab" data-pane="who" aria-selected="true">Who joins</button>
+        <button class="sh-tab" role="tab" data-pane="play" aria-selected="false">Playbook</button>
+        <button class="sh-tab" role="tab" data-pane="pace" aria-selected="false">Pace</button>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div class="pane" data-pane="who">
+
+      <section class="card" id="nameCard">
+        <div class="cb">
+          <div class="fieldrow">
+            <span class="flab"><label for="name">Campaign name</label><span class="req" aria-hidden="true">*</span><button class="fi2" type="button" id="nameInfo" aria-expanded="false" aria-controls="nameHint" aria-label="Who can see this name"><i class="ph ph-lock-simple" aria-hidden="true"></i>Private</button></span>
+            <input id="name" type="text" placeholder="e.g. Spring sellers — Inland Empire" autocomplete="off" required aria-required="true" aria-describedby="nameHint">
+            <span class="pop" id="nameHint" role="tooltip" hidden>Only you see this name. Clients never do — it never appears in a message.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="ch">
+          <span class="tile a"><i class="ph ph-users-three" aria-hidden="true"></i></span>
+          <span class="htxt"><h2>Who joins <span class="req" role="img" aria-label="Required" title="Required">*</span></h2></span>
+          <button class="info" type="button" id="whoInfo" aria-expanded="false" aria-controls="whoHelp" aria-label="About who joins"><i class="ph ph-info" aria-hidden="true"></i></button>
+        </div>
+        <p class="help" id="whoHelp" hidden>Anyone matching these filters joins automatically — including clients you add later. A client only ever hears from one campaign at a time, so anyone held by another campaign stays there until you move them.</p>
+        <div class="cb">
+          <div class="filters" id="filters">
+            <span class="lbl">Filters</span>
+            <button class="addf" type="button" id="addFilter"><i class="ph ph-plus" aria-hidden="true"></i>Add filter</button>
+          </div>
+          <div class="audience" id="audBox">
+            <span class="al" id="audL"><b class="num" id="audN">4,109</b> clients would join</span>
+            <span class="ah" id="audT">Everyone in your book — add a filter to narrow it.</span>
+          </div>
+          <div class="fun" id="fun" hidden>
+            <div class="fstep"><b id="fMatch">1,844</b><span>match these filters</span></div>
+            <button class="fstep held" type="button" id="heldRow" aria-label="Review the 312 held by another campaign"><b id="fHeld">312</b><span>held by another campaign</span><i class="ph ph-caret-right" aria-hidden="true"></i></button>
+            <div class="fstep tot"><b id="fIn">1,532</b><span>in this campaign</span></div>
+          </div>
+        </div>
+      </section>
+
+
+      <section class="card" id="whereCard" hidden>
+        <div class="ch"><span class="tile a"><i class="ph ph-flow-arrow" aria-hidden="true"></i></span><span class="htxt"><h2>Where they are</h2></span>
+          <button class="info" type="button" id="whereInfo" aria-expanded="false" aria-controls="whereHelp" aria-label="About where they are"><i class="ph ph-info" aria-hidden="true"></i></button>
+        </div>
+        <p class="help" id="whereHelp" hidden>Where the 1,532 clients in this campaign stand right now. Tap a stage to see just those clients. “Client opened” is a subset of “Mel reached out”, so the shares don’t add to 100%.</p>
+        <div class="cb">
+          <p class="whint" id="wHint" hidden>Tap a stage to filter the clients below</p>
+          <div class="wtr" id="wtr">
+            <button class="wrow" type="button" data-stage="none" aria-pressed="false"><span class="wk">Not contacted yet</span><span class="wv">388<span class="wp">25%</span></span><span class="wb" aria-hidden="true"><i style="--p:25%"></i></span><span class="wc" aria-hidden="true"><i class="ph ph-circle"></i><i class="ph-fill ph-check-circle"></i></span></button>
+            <button class="wrow pri" type="button" data-stage="sent" aria-pressed="true"><span class="wk">Mel reached out</span><span class="wv">1,004<span class="wp">66%</span></span><span class="wb" aria-hidden="true"><i style="--p:66%"></i></span><span class="wc" aria-hidden="true"><i class="ph ph-circle"></i><i class="ph-fill ph-check-circle"></i></span></button>
+            <button class="wrow pri" type="button" data-stage="opened" aria-pressed="false"><span class="wk">Client opened</span><span class="wv">612<span class="wp">40%</span></span><span class="wb" aria-hidden="true"><i style="--p:40%"></i></span><span class="wc" aria-hidden="true"><i class="ph ph-circle"></i><i class="ph-fill ph-check-circle"></i></span></button>
+            <button class="wrow suc" type="button" data-stage="replied" aria-pressed="false"><span class="wk">Replied</span><span class="wv">96<span class="wp">6%</span></span><span class="wb" aria-hidden="true"><i style="--p:6%"></i></span><span class="wc" aria-hidden="true"><i class="ph ph-circle"></i><i class="ph-fill ph-check-circle"></i></span></button>
+            <button class="wrow bad" type="button" data-stage="out" aria-pressed="false"><span class="wk">Opted out</span><span class="wv">44<span class="wp">3%</span></span><span class="wb" aria-hidden="true"><i style="--p:3%"></i></span><span class="wc" aria-hidden="true"><i class="ph ph-circle"></i><i class="ph-fill ph-check-circle"></i></span></button>
+          </div>
+
+          <div class="clblock">
+            <div class="clhead">
+              <span class="cl-t">Clients</span>
+              <button class="scopechip" type="button" id="scopeChip"><span id="scopeLab">Mel reached out</span><i class="ph ph-x" aria-hidden="true"></i></button>
+              <button class="sortbtn" type="button" id="sortBtn" aria-haspopup="dialog"><span id="sortLab">Newest first</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
+            </div>
+            <div id="clist">
+              <button class="clrow" type="button" data-stage="replied" data-cl="Lena Osei"><span class="ini" aria-hidden="true">LO</span><span class="cbd"><span class="ctop"><span class="cnm">Lena Osei</span><span class="cwhen"><i class="ph ph-envelope-simple" aria-hidden="true"></i>2h ago</span></span><span class="cmsg">Comps for Ridgeline before Saturday</span></span></button>
+              <button class="clrow" type="button" data-stage="opened" data-cl="Marcus Tan"><span class="ini" aria-hidden="true">MT</span><span class="cbd"><span class="ctop"><span class="cnm">Marcus Tan</span><span class="cwhen"><i class="ph ph-chat-circle" aria-hidden="true"></i>5h ago</span></span><span class="cmsg">Saw you saved two homes on Ridgeline. Free for a tour Saturday?</span></span></button>
+              <button class="clrow" type="button" data-stage="replied" data-cl="Sofia Nunes"><span class="ini" aria-hidden="true">SN</span><span class="cbd"><span class="ctop"><span class="cnm">Sofia Nunes</span><span class="cwhen"><i class="ph ph-chat-circle" aria-hidden="true"></i>yesterday</span></span><span class="cmsg">Quick one — are you still looking in Redlands, or has that changed?</span></span></button>
+              <button class="clrow" type="button" data-stage="opened" data-cl="Dev Kapoor"><span class="ini" aria-hidden="true">DK</span><span class="cbd"><span class="ctop"><span class="cnm">Dev Kapoor</span><span class="cwhen"><i class="ph ph-envelope-simple" aria-hidden="true"></i>yesterday</span></span><span class="cmsg">Your home valuation is ready</span></span></button>
+              <button class="clrow" type="button" data-stage="sent" data-cl="Ravi Chandra"><span class="ini" aria-hidden="true">RC</span><span class="cbd"><span class="ctop"><span class="cnm">Ravi Chandra</span><span class="cwhen"><i class="ph ph-envelope-simple" aria-hidden="true"></i>2d ago</span></span><span class="cmsg">What March did to prices in 92373</span></span></button>
+              <button class="clrow" type="button" data-stage="sent" data-cl="Ana Villanueva"><span class="ini" aria-hidden="true">AV</span><span class="cbd"><span class="ctop"><span class="cnm">Ana Villanueva</span><span class="cwhen"><i class="ph ph-chat-circle" aria-hidden="true"></i>3d ago</span></span><span class="cmsg">Three new listings match your search. Want the addresses?</span></span></button>
+              <button class="clrow" type="button" data-stage="none" data-cl="Priya Raman"><span class="ini" aria-hidden="true">PR</span><span class="cbd"><span class="ctop"><span class="cnm">Priya Raman</span><span class="cwhen">queued</span></span><span class="cmsg">Mel writes on the next send</span></span></button>
+              <button class="clrow" type="button" data-stage="none" data-cl="Tomás Vega"><span class="ini" aria-hidden="true">TV</span><span class="cbd"><span class="ctop"><span class="cnm">Tomás Vega</span><span class="cwhen">queued</span></span><span class="cmsg">Mel writes on the next send</span></span></button>
+              <button class="clrow" type="button" data-stage="out" data-cl="Grant Wu"><span class="ini" aria-hidden="true">GW</span><span class="cbd"><span class="ctop"><span class="cnm">Grant Wu</span><span class="cwhen"><i class="ph ph-envelope-simple" aria-hidden="true"></i>1w ago</span></span><span class="cmsg">Asked to stop hearing from this campaign</span></span></button>
+            </div>
+            <p class="clempty" id="clEmpty" hidden>No one at this stage yet.</p>
+            <div class="clfoot">Showing <b id="clShown">6</b> of <b id="clTotal">1,532</b><button class="va" type="button" id="clViewAll">View all</button></div>
+          </div>
+        </div>
+      </section>
+
+      </div>
+
+      <div class="pane" data-pane="play">
+      <section class="card">
+        <div class="ch">
+          <span class="tile b"><i class="ph ph-book-open-text" aria-hidden="true"></i></span>
+          <span class="htxt"><h2>Your playbook <span class="opt">Optional</span></h2></span>
+          <button class="info" type="button" id="playInfo" aria-expanded="false" aria-controls="playHelp" aria-label="About your playbook"><i class="ph ph-info" aria-hidden="true"></i></button>
+        </div>
+        <p class="help" id="playHelp" hidden>Mel reads your playbook and leads with it in every message. Without one, Mel works from your past messages to clients like these.</p>
+        <div class="cb">
+          <div class="drop" id="drop">
+            <span class="dd">Add a script, listing sheet, or your notes.</span>
+            <span class="btns">
+              <button class="btn" type="button" id="addFile"><i class="ph ph-upload-simple" aria-hidden="true"></i>Add a file</button>
+              <button class="btn" type="button" id="addNotes"><i class="ph ph-note-pencil" aria-hidden="true"></i>Add instructions</button>
+            </span>
+          </div>
+          <div class="pbsrc" id="pbSrc" hidden></div>
+          <div id="pbTakes" hidden>
+            <a class="mtook" href="Playbook.html">
+              <span class="mi" aria-hidden="true"><i class="ph ph-sparkle"></i></span>
+              <span class="mt"><span class="mtt">What Mel took</span><span class="mts">16 takes · 3 openers · 5 questions · 4 tone rules · 4 handoffs</span></span>
+              <i class="ph ph-caret-right mc" aria-hidden="true"></i>
+            </a>
+            <div class="addmore" style="margin-top:12px">
+              <span class="at">Add another source</span>
+              <span class="btns">
+                <button class="btn" type="button" id="addFile2"><i class="ph ph-upload-simple" aria-hidden="true"></i>Add a file</button>
+                <button class="btn" type="button" id="addNotes2"><i class="ph ph-note-pencil" aria-hidden="true"></i>Instructions</button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <div class="pane" data-pane="pace">
+      <section class="card">
+        <div class="ch">
+          <span class="tile c"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i></span>
+          <span class="htxt"><h2>Pace and channels <span class="req" role="img" aria-label="Required" title="Required">*</span></h2></span>
+          <button class="info" type="button" id="paceInfo" aria-expanded="false" aria-controls="paceHelp" aria-label="About pace and channels"><i class="ph ph-info" aria-hidden="true"></i></button>
+        </div>
+        <p class="help" id="paceHelp" hidden>Mel sends at most one message per person inside the gap you set, and stops at the cap — then hands back to you. Pick at least one channel; Mel uses the best one it has for each client.</p>
+        <div class="cb">
+          <span class="rowlbl">Channels</span>
+          <div class="chans" id="chans">
+            <button class="chan" type="button" data-ch="Email" aria-pressed="true" aria-label="Email — 1,489 clients"><span class="box" aria-hidden="true"></span><span class="gl" aria-hidden="true"><svg viewBox="0 0 48 48"><path fill="#4CAF50" d="M45 16.2l-5 2.75-5 4.75V40h7a3 3 0 003-3V16.2z"/><path fill="#1E88E5" d="M3 16.2l3.614 1.71L13 23.7V40H6a3 3 0 01-3-3V16.2z"/><path fill="#E53935" d="M35 11.2L24 19.45 13 11.2l-1 5.7 1 6.8 11 8.25 11-8.25 1-6.8z"/><path fill="#C62828" d="M3 12.298V16.2l10 7.5V11.2L9.876 8.859A4.298 4.298 0 003 12.298z"/><path fill="#FBC02D" d="M45 12.298V16.2l-10 7.5V11.2l3.124-2.341A4.298 4.298 0 0145 12.298z"/></svg></span><span class="cn">1,489</span></button>
+            <button class="chan" type="button" data-ch="Text" aria-pressed="true" aria-label="Text — 1,341 clients"><span class="box" aria-hidden="true"></span><span class="gl" aria-hidden="true"><i class="ph ph-chat-circle"></i></span><span class="cn">1,341</span></button>
+            <button class="chan" type="button" data-ch="In the app" aria-pressed="false" aria-label="In the app — 203 clients"><span class="box" aria-hidden="true"></span><span class="gl" aria-hidden="true"><i class="ph ph-device-mobile"></i></span><span class="cn">203</span></button>
+          </div>
+          <div class="paceset">
+            <div class="prow">
+              <span class="pk"><span>Gap between messages</span></span>
+              <select id="every" aria-label="Minimum gap between messages">
+                <option>2 days</option><option selected>4 days</option><option>7 days</option><option>14 days</option>
+              </select>
+            </div>
+            <div class="prow">
+              <span class="pk"><span>Total per person</span></span>
+              <select id="cap" aria-label="Total messages per person">
+                <option>3 messages</option><option selected>6 messages</option><option>9 messages</option><option>No cap</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <section class="commit" id="commit">
+        <div class="rt">Ready to start</div>
+        <div class="card" style="margin-top:0">
+          <div class="rrow"><span class="tile" style="background:var(--tint-indigo-bg);color:var(--tint-indigo-fg)"><i class="ph ph-users-three" aria-hidden="true"></i></span>Who joins<span class="rv" id="rWho">Everyone</span></div>
+          <div class="rrow"><span class="tile" style="background:var(--tint-green-bg);color:var(--tint-green-fg)"><i class="ph ph-book-open-text" aria-hidden="true"></i></span>Playbook<span class="rv" id="rPb">None yet</span></div>
+          <div class="rrow"><span class="tile" style="background:var(--tint-amber-bg);color:var(--tint-amber-fg)"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i></span>Channels<span class="rv set" id="rCh">2</span></div>
+        </div>
+        <p class="melnote"><i class="ph ph-sparkle" aria-hidden="true"></i>Nothing sends until you press start.</p>
+      </section>
+    </div>
+
+    <div class="dock" id="dockNew">
+      <span class="who todo" id="todo"><span class="k" id="todoK">To start</span><span class="v" id="todoTxt">Name it and pick a channel</span></span>
+      <button class="btn pri" type="button" id="start" disabled>Start campaign</button>
+    </div>
+
+    <div class="dock" id="dockEdit" hidden>
+      <div class="row">
+        <button class="btn gh" type="button" id="pauseBtn"><i class="ph ph-pause" aria-hidden="true"></i><span id="pauseLbl">Pause</span></button>
+        <button class="btn pri" type="button" id="saveBtn" disabled>Save changes</button>
+      </div>
+    </div>
+
+    <div class="scrim" id="scrim"></div>
+
+    <div class="sheet" id="fSheet" role="dialog" aria-modal="true" aria-labelledby="fSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="shead"><span class="sh-name" id="fSheetT">Add a filter</span><button class="shclose" type="button" data-close aria-label="Close"><i class="ph ph-x" aria-hidden="true"></i></button></div>
+      <button class="act" type="button" data-f="Status is New Client" data-n="1378"><i class="ph ph-user-circle-plus" aria-hidden="true"></i>Status is New Client<span class="n">1,378</span></button>
+      <button class="act" type="button" data-f="Owns property" data-n="2140"><i class="ph ph-house-line" aria-hidden="true"></i>Owns property<span class="n">2,140</span></button>
+      <button class="act" type="button" data-f="Tags is “farm-2026”" data-n="1532"><i class="ph ph-tag" aria-hidden="true"></i>Tags is “farm-2026”<span class="n">1,532</span></button>
+      <button class="act" type="button" data-f="Source is zillow" data-n="892"><i class="ph ph-arrow-square-in" aria-hidden="true"></i>Source is zillow<span class="n">892</span></button>
+      <button class="act" type="button" data-f="No contact 14d+" data-n="631"><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>No contact 14d+<span class="n">631</span></button>
+      <div class="sep" aria-hidden="true" style="height:1px;background:var(--border);margin:6px 10px"></div>
+      <button class="act" type="button" id="browseAll"><i class="ph ph-sliders-horizontal" aria-hidden="true"></i>Browse all fields</button>
+    </div>
+
+    <div class="sheet" id="nSheet" role="dialog" aria-modal="true" aria-labelledby="nSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="shead"><span class="sh-name" id="nSheetT">Instructions for Mel</span><button class="shclose" type="button" data-close aria-label="Close"><i class="ph ph-x" aria-hidden="true"></i></button></div>
+      <div class="sbody"><textarea id="notes" placeholder="Lead with the March comps, keep it to three sentences, always offer a call."></textarea></div>
+      <div class="srow"><button class="btn" type="button" data-close>Cancel</button><button class="btn pri" type="button" id="saveNotes">Save</button></div>
+    </div>
+
+    <div class="sheet" id="srcSheet" role="dialog" aria-modal="true" aria-labelledby="srcSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="shead"><span class="sh-name" id="srcSheetT">In your playbook</span><button class="shclose" type="button" data-close aria-label="Close"><i class="ph ph-x" aria-hidden="true"></i></button></div>
+      <div class="srclist" id="srcList"></div>
+      <div class="srow"><button class="btn" type="button" id="addFile3"><i class="ph ph-upload-simple" aria-hidden="true"></i>Add a file</button><button class="btn" type="button" id="addNotes3"><i class="ph ph-note-pencil" aria-hidden="true"></i>Instructions</button></div>
+    </div>
+
+    <div class="sheet" id="dSheet" role="dialog" aria-modal="true" aria-labelledby="dSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="shead"><span class="sh-name" id="dSheetT">Discard this draft?</span><button class="shclose" type="button" data-close aria-label="Close"><i class="ph ph-x" aria-hidden="true"></i></button></div>
+      <div class="sbody"><p>The name, filters, and playbook you set will be lost. Nothing has been sent.</p></div>
+      <div class="srow"><button class="btn" type="button" data-close>Keep editing</button><button class="btn dstr" type="button" id="discardBtn">Discard</button></div>
+    </div>
+
+    <div class="sheet osheet" id="oSheet" role="dialog" aria-modal="true" aria-labelledby="oTitle" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="ohead">
+        <div class="hr2"><h2 id="oTitle"><span id="oHeldN">312</span> held by another campaign</h2><button class="shclose" type="button" data-close aria-label="Close"><i class="ph ph-x" aria-hidden="true"></i></button></div>
+        <p>Move them here and their other campaign stops for them. Leave them and they join when it finishes.</p>
+      </div>
+      <div class="obody">
+        <div class="ogrp" data-grp="a" data-n="287">
+          <div class="gt">Follow up to initial contact</div>
+          <div class="gm">287 clients · mid-conversation</div>
+          <div class="gb">
+            <button class="btn" type="button" data-o="leave">Leave</button>
+            <button class="btn pri" type="button" data-o="move">Move 287 here</button>
+          </div>
+          <div class="gdone" hidden><i class="ph ph-check-circle" aria-hidden="true"></i><span>287 moving here</span><button type="button" data-o="undo">Undo</button></div>
+          <button class="clrow" type="button" data-cl="Priya Raman" style="margin-top:6px"><span class="ini" aria-hidden="true">PR</span><span class="cbd"><span class="ctop"><span class="cnm">Priya Raman</span></span><span class="cmsg">Mel wrote 2 days ago · no reply</span></span></button>
+          <button class="clrow" type="button" data-cl="Marcus Tan"><span class="ini" aria-hidden="true">MT</span><span class="cbd"><span class="ctop"><span class="cnm">Marcus Tan</span></span><span class="cmsg">Replied last week</span></span></button>
+          <button class="clrow" type="button" data-cl="Sofia Nunes"><span class="ini" aria-hidden="true">SN</span><span class="cbd"><span class="ctop"><span class="cnm">Sofia Nunes</span></span><span class="cmsg">Joined 3 days ago</span></span></button>
+        </div>
+        <div class="ogrp" data-grp="b" data-n="25">
+          <div class="gt">Post-close, 12-month check-in</div>
+          <div class="gm">25 clients · check-in due</div>
+          <div class="gb">
+            <button class="btn" type="button" data-o="leave">Leave</button>
+            <button class="btn pri" type="button" data-o="move">Move 25 here</button>
+          </div>
+          <div class="gdone" hidden><i class="ph ph-check-circle" aria-hidden="true"></i><span>25 moving here</span><button type="button" data-o="undo">Undo</button></div>
+          <button class="clrow" type="button" data-cl="Tom Brar" style="margin-top:6px"><span class="ini" aria-hidden="true">TB</span><span class="cbd"><span class="ctop"><span class="cnm">Tom Brar</span></span><span class="cmsg">Closed 13 months ago</span></span></button>
+          <button class="clrow" type="button" data-cl="Ines Marchetti"><span class="ini" aria-hidden="true">IM</span><span class="cbd"><span class="ctop"><span class="cnm">Ines Marchetti</span></span><span class="cmsg">Closed 12 months ago</span></span></button>
+        </div>
+      </div>
+      <div class="ofoot">
+        <span class="os"><b id="oJoin">1,532</b> will join · <b id="oStay">312</b> stay put</span>
+        <button class="btn pri" type="button" id="oDone">Done</button>
+      </div>
+    </div>
+
+    <div class="sheet" id="sSheet" role="dialog" aria-modal="true" aria-labelledby="sSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="shead"><span class="sh-name" id="sSheetT">Sort and filter</span><button class="shclose" type="button" data-close aria-label="Close"><i class="ph ph-x" aria-hidden="true"></i></button></div>
+      <button class="act" type="button" data-sort="Newest first" data-picked="true"><i class="ph ph-arrow-down" aria-hidden="true"></i>Newest first</button>
+      <button class="act" type="button" data-sort="Oldest first"><i class="ph ph-arrow-up" aria-hidden="true"></i>Oldest first</button>
+      <div class="sep" aria-hidden="true" style="height:1px;background:var(--border);margin:6px 10px"></div>
+      <button class="act" type="button" data-sort="Email only"><i class="ph ph-envelope-simple" aria-hidden="true"></i>Email only</button>
+      <button class="act" type="button" data-sort="Text only"><i class="ph ph-chat-circle" aria-hidden="true"></i>Text only</button>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="assets/filter-builder.js" defer></script>
+<script>
+(function(){
+  var $=function(id){ return document.getElementById(id); };
+  var toastEl=$('toast'), tt;
+  function toast(m){ toastEl.textContent=m; toastEl.classList.add('on'); clearTimeout(tt); tt=setTimeout(function(){ toastEl.classList.remove('on'); },2600); }
+  document.addEventListener('click',function(e){ var b=e.target.closest('[data-toast]'); if(b) toast(b.getAttribute('data-toast')); });
+
+  var picked=[], playbook=null, scrim=$('scrim'), open=null, lastFocus=null;
+  function fmt(n){ return n.toLocaleString('en-US'); }
+
+  function openSheet(el,trigger){ open=el; lastFocus=trigger||document.activeElement; el.hidden=false; requestAnimationFrame(function(){ el.classList.add('on'); scrim.classList.add('on'); }); var f=el.querySelector('.act,textarea,.btn'); if(f) f.focus(); }
+  function closeSheet(){ if(!open) return; var el=open; open=null; el.classList.remove('on'); scrim.classList.remove('on'); setTimeout(function(){ el.hidden=true; },300); if(lastFocus) lastFocus.focus(); }
+  scrim.addEventListener('click',closeSheet);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeSheet(); });
+  document.addEventListener('click',function(e){ if(e.target.closest('[data-close]')) closeSheet(); });
+
+  /* inline help, not a toast */
+  [['whoInfo','whoHelp'],['playInfo','playHelp'],['paceInfo','paceHelp'],['whereInfo','whereHelp']].forEach(function(p){
+    var b=$(p[0]); if(!b) return;
+    b.addEventListener('click',function(){
+      var on=this.getAttribute('aria-expanded')==='true';
+      this.setAttribute('aria-expanded',String(!on));
+      $(p[1]).hidden=on;
+    });
+  });
+  $('nameInfo').addEventListener('click',function(e){
+    e.stopPropagation();
+    var on=this.getAttribute('aria-expanded')==='true';
+    this.setAttribute('aria-expanded',String(!on));
+    $('nameHint').hidden=on;
+  });
+  function closePop(){ var b=$('nameInfo'); if(b.getAttribute('aria-expanded')==='true'){ b.setAttribute('aria-expanded','false'); $('nameHint').hidden=true; } }
+  document.addEventListener('click',closePop);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePop(); });
+  document.querySelector('.scroll').addEventListener('scroll',closePop,{passive:true});
+
+  var EDIT=false;
+  function audienceCount(){
+    if(!picked.length) return 4109;
+    var n=Math.min.apply(null,picked.map(function(p){ return p.n; }));
+    return picked.length>1? Math.round(n*0.72) : n;
+  }
+  function sync(){
+    if(EDIT){ syncEdit(); return; }
+    var n=audienceCount(), named=!!$('name').value.trim();
+    var chOn=[].slice.call(document.querySelectorAll('.chan[aria-pressed="true"]'));
+
+    $('audN').textContent=fmt(n);
+    $('audT').textContent = picked.length
+      ? (picked.length===1? 'Matching one filter. Add another to narrow it.' : 'Matching all '+picked.length+' filters.')
+      : 'Everyone in your book — add a filter to narrow it.';
+
+    var rw=$('rWho'); rw.textContent = picked.length? fmt(n)+' clients' : 'Everyone ('+fmt(n)+')'; rw.classList.add('set');
+    var rp=$('rPb'); rp.textContent = playbook || 'None yet'; rp.classList.toggle('set',!!playbook);
+    $('rCh').textContent=chOn.length;
+    $('rCh').classList.toggle('set',chOn.length>0);
+
+    var missing=[];
+    if(!named) missing.push('name the campaign');
+    if(!chOn.length) missing.push('pick a channel');
+    var td=$('todo');
+    if(missing.length){
+      td.classList.add('todo');
+      $('todoK').textContent='To start';
+      $('todoTxt').innerHTML='';
+      $('todoTxt').appendChild(document.createTextNode(missing.join(' and ').replace(/^n/,'N')));
+    } else {
+      td.classList.remove('todo');
+      $('todoK').textContent='In this campaign';
+      $('todoTxt').innerHTML='<i class="ph ph-check-circle" aria-hidden="true"></i>';
+      $('todoTxt').appendChild(document.createTextNode(fmt(n)+(picked.length?' clients':' — everyone')));
+    }
+    $('start').disabled = missing.length>0;
+  }
+
+  function drawFilters(){
+    var wrap=$('filters');
+    [].forEach.call(wrap.querySelectorAll('.fchip2'),function(c){ c.remove(); });
+    var addBtn=$('addFilter');
+    picked.forEach(function(p){
+      var c=document.createElement('span'); c.className='fchip2';
+      c.appendChild(document.createTextNode(p.f));
+      var x=document.createElement('button'); x.type='button'; x.setAttribute('aria-label','Remove filter '+p.f);
+      x.innerHTML='<i class="ph ph-x" aria-hidden="true"></i>';
+      x.addEventListener('click',function(){ picked=picked.filter(function(q){ return q!==p; }); drawFilters(); sync(); toast('Filter removed'); });
+      c.appendChild(x);
+      wrap.insertBefore(c,addBtn);
+    });
+    addBtn.hidden=false;
+  }
+
+  $('addFilter').addEventListener('click',function(){ openSheet($('fSheet'),this); });
+  $('browseAll').addEventListener('click',function(){
+    closeSheet();
+    if(window.openFilterBuilder){
+      setTimeout(function(){
+        window.openFilterBuilder(function(res){
+          if(picked.some(function(p){ return p.f===res.label; })){ toast('That filter is already on'); return; }
+          picked.push({f:res.label,n:res.n}); drawFilters(); sync(); markDirty();
+          toast(res.n.toLocaleString('en-US')+' clients match '+res.label.toLowerCase());
+        });
+      },260);
+    } else { console.warn('[filters] builder not loaded'); toast('The field browser is still loading'); }
+  });
+  $('fSheet').addEventListener('click',function(e){
+    var a=e.target.closest('.act[data-f]'); if(!a) return;
+    var f=a.getAttribute('data-f');
+    if(picked.some(function(p){ return p.f===f; })){ toast('Already added'); closeSheet(); return; }
+    picked.push({f:f,n:+a.getAttribute('data-n')});
+    closeSheet(); drawFilters(); sync(); markDirty();
+  });
+
+  var sources=[];
+  var SRC_MAX=2;
+  function srcRow(s,i,inSheet){
+    return '<div class="pbfile">'+
+      '<span class="fi"><i class="ph '+(s.t==='note'?'ph-note-pencil':'ph-file-text')+'" aria-hidden="true"></i></span>'+
+      '<span class="fb"><span class="fn">'+s.n+'</span><span class="fm">'+s.m+'</span></span>'+
+      '<button class="rm" type="button" data-rm="'+i+'"'+(inSheet?' data-insheet="1"':'')+' aria-label="Remove '+s.n+'"><i class="ph ph-x" aria-hidden="true"></i></button>'+
+    '</div>';
+  }
+  function drawSources(){
+    var box=$('pbSrc'), has=sources.length>0;
+    box.hidden=!has; $('drop').hidden=has; $('pbTakes').hidden=!has;
+    playbook=has? sources[0].n : null;
+    if(!has){ box.innerHTML=''; sync(); return; }
+    var html=sources.slice(0,SRC_MAX).map(function(s,i){ return srcRow(s,i,false); }).join('');
+    if(sources.length>SRC_MAX){
+      html+='<button class="viewall" type="button" id="viewAll">View all<span class="vn">'+sources.length+'</span></button>';
+    }
+    box.innerHTML=html;
+    sync();
+  }
+  function addSource(s){ sources.push(s); drawSources(); }
+  $('pbSrc').addEventListener('click',function(e){
+    if(e.target.closest('#viewAll')){ drawSrcSheet(); openSheet($('srcSheet'),e.target.closest('#viewAll')); return; }
+    var r=e.target.closest('[data-rm]'); if(!r) return;
+    var s=sources.splice(+r.getAttribute('data-rm'),1)[0];
+    drawSources(); toast(s.n+' removed');
+  });
+  function drawSrcSheet(){
+    $('srcList').innerHTML=sources.map(function(s,i){ return srcRow(s,i,true); }).join('');
+    $('srcSheetT').textContent='In your playbook ('+sources.length+')';
+  }
+  $('srcList').addEventListener('click',function(e){
+    var r=e.target.closest('[data-rm]'); if(!r) return;
+    var s=sources.splice(+r.getAttribute('data-rm'),1)[0];
+    drawSources(); toast(s.n+' removed');
+    if(sources.length<=SRC_MAX){ closeSheet(); return; }
+    drawSrcSheet();
+  });
+
+  function setPlaybook(label,meta){
+    addSource({n:label,m:meta,t:label==='Your instructions'?'note':'file'});
+  }
+  function unusedSetPlaybook(label,meta){
+    playbook=label;
+    $('pbTakes').hidden=false;
+    sync();
+  }
+  var FILES=['Spring seller script.pdf|2 pages','Open-house sheet.pdf|3 pages','Farm letter v2.pdf|1 page','Listing presentation.pdf|11 pages','Seller FAQ.pdf|4 pages'];
+  function nextFile(){ var f=FILES[sources.filter(function(s){return s.t==='file';}).length % FILES.length].split('|'); return {n:f[0],m:f[1]+' · read just now',t:'file'}; }
+  $('addFile').addEventListener('click',function(){ var f=nextFile(); addSource(f); toast('Mel will lead with '+f.n); });
+  $('addNotes').addEventListener('click',function(){ openSheet($('nSheet'),this); });
+  $('saveNotes').addEventListener('click',function(){
+    var v=$('notes').value.trim();
+    if(!v){ toast('Write what Mel should lead with'); return; }
+    closeSheet(); setPlaybook('Your instructions', v.length>44? v.slice(0,44)+'…' : v);
+  });
+
+  $('chans').addEventListener('click',function(e){
+    var b=e.target.closest('.chan'); if(!b) return;
+    var on=b.getAttribute('aria-pressed')==='true';
+    if(on && document.querySelectorAll('.chan[aria-pressed="true"]').length===1){ toast('Keep at least one channel'); return; }
+    b.setAttribute('aria-pressed',String(!on)); sync();
+  });
+
+  $('name').addEventListener('input',function(){ this.removeAttribute('aria-invalid'); sync(); });
+  $('start').addEventListener('click',function(){
+    toast('Campaign started — Mel writes the first messages now');
+    setTimeout(function(){ location.href='Campaigns.html'; },1400);
+  });
+  $('every').addEventListener('change',function(){ toast('At most one message every '+this.value); });
+  $('cap').addEventListener('change',function(){ toast(this.value==='No cap'? 'No cap on messages per person' : 'Up to '+this.value+' per person'); });
+
+  /* ── back: confirm before discarding ── */
+  function isDirty(){ return EDIT ? !$('dirty').hidden : (!!$('name').value.trim() || picked.length>0 || !!playbook); }
+  $('backBtn').addEventListener('click',function(){
+    if(isDirty()){ openSheet($('dSheet'),this); return; }
+    location.href='Campaigns.html';
+  });
+  $('discardBtn').addEventListener('click',function(){ location.href='Campaigns.html'; });
+
+  /* ── section tabs (edit mode only) ── */
+  (function(){
+    var bar=$('tabbar');
+    function go(val){
+      [].forEach.call(bar.querySelectorAll('.sh-tab'),function(b){ b.setAttribute('aria-selected',String(b.getAttribute('data-pane')===val)); });
+      [].forEach.call(document.querySelectorAll('.pane'),function(p){ p.hidden=p.getAttribute('data-pane')!==val; });
+      document.querySelector('.scroll').scrollTop=0;
+    }
+    bar.addEventListener('click',function(e){ var b=e.target.closest('.sh-tab'); if(b) go(b.getAttribute('data-pane')); });
+    bar.addEventListener('keydown',function(e){
+      if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return;
+      var bs=[].slice.call(bar.querySelectorAll('.sh-tab')), i=bs.indexOf(document.activeElement);
+      if(i<0) return; e.preventDefault();
+      var nx=bs[(i+(e.key==='ArrowRight'?1:bs.length-1))%bs.length]; nx.focus(); nx.click();
+    });
+    window.goPane=go;
+  })();
+
+  /* ── edit mode ── */
+  var MOVED={a:false,b:false}, GRP={a:287,b:25}, BASE_IN=1532, BASE_HELD=312, MATCH=1844, paused=false;
+  function heldNow(){ return BASE_HELD-(MOVED.a?GRP.a:0)-(MOVED.b?GRP.b:0); }
+  function joinNow(){ return BASE_IN+(MOVED.a?GRP.a:0)+(MOVED.b?GRP.b:0); }
+  function flash(el){ if(!el) return; el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+
+  function syncEdit(){
+    var held=heldNow(), join=joinNow();
+    $('fMatch').textContent=fmt(MATCH);
+    $('fHeld').textContent=fmt(held);
+    $('fIn').textContent=fmt(join);
+    $('stIn').textContent=fmt(join);
+    $('oJoin').textContent=fmt(join);
+    $('oStay').textContent=fmt(held);
+    $('oHeldN').textContent=fmt(held);
+    var heldStep=$('heldRow');
+    if(heldStep){
+      heldStep.hidden=held===0;
+      heldStep.setAttribute('aria-label','Review the '+fmt(held)+' held by another campaign');
+    }
+    [$('fIn'),$('stIn'),$('fHeld'),$('oJoin'),$('oStay')].forEach(flash);
+  }
+
+  function markDirty(){
+    if(!EDIT) return;
+    $('dirty').hidden=false;
+    $('saveBtn').disabled=false;
+  }
+
+  (function(){
+    var q=new URLSearchParams(location.search), name=q.get('c');
+    if(!name){
+      /* new campaign: one scroll, no tabs, every section visible */
+      [].forEach.call(document.querySelectorAll('.pane'),function(p){ p.hidden=false; });
+      return;
+    }
+    EDIT=true;
+    $('nameCard').hidden=true;
+    $('commit').hidden=true;
+    $('hspacer').hidden=true;
+    $('tabbar').hidden=false;
+    document.querySelector('.scroll').classList.add('tabbed');
+    [].forEach.call(document.querySelectorAll('.pane'),function(p){ p.hidden=p.getAttribute('data-pane')!=='who'; });
+    $('pgTitle').textContent=name;
+    $('pgTitle').setAttribute('title',name);
+    $('estate').hidden=false;
+    document.querySelector('.screen').setAttribute('data-screen-label','Campaign editor');
+    document.title=name+' — Radius';
+
+    picked=[{f:'Tags is “farm-2026”',n:3020},{f:'Owns property is yes',n:1844}];
+    drawFilters();
+    $('audBox').hidden=true;
+    $('fun').hidden=false;
+    $('whereCard').hidden=false;
+    drawClients();
+
+    $('drop').hidden=true;
+    sources=[
+      {n:'Inland Empire seller script.pdf',m:'6 pages · read 14 Aug',t:'file'},
+      {n:'Spring open-house sheet.pdf',m:'2 pages · read 14 Aug',t:'file'},
+      {n:'Your instructions',m:'Lead with March comps, keep it short',t:'note'},
+      {n:'Listing presentation.pdf',m:'11 pages · read 2 Sep',t:'file'}
+    ];
+    drawSources();
+    $('pbTakes').hidden=false;
+    playbook='Inland Empire seller script.pdf';
+
+    $('dockNew').hidden=true;
+    $('dockEdit').hidden=false;
+    syncEdit();
+  })();
+
+  /* ── overlap sheet ── */
+  $('heldRow').addEventListener('click',function(){ openSheet($('oSheet'),this); });
+  $('oDone').addEventListener('click',closeSheet);
+  $('oSheet').addEventListener('click',function(e){
+    var b=e.target.closest('[data-o]'); if(!b) return;
+    var grp=b.closest('.ogrp'), k=grp.getAttribute('data-grp'), n=+grp.getAttribute('data-n'), act=b.getAttribute('data-o');
+    if(act==='move'){ MOVED[k]=true; grp.querySelector('.gb').hidden=true; grp.querySelector('.gdone').hidden=false; toast(fmt(n)+' moving here — their other campaign stops for them'); }
+    else if(act==='undo'){ MOVED[k]=false; grp.querySelector('.gb').hidden=false; grp.querySelector('.gdone').hidden=true; }
+    else if(act==='leave'){ toast(fmt(n)+' stay put — they join when the other campaign finishes'); return; }
+    syncEdit(); markDirty();
+  });
+
+  /* ── stage rows scope the clients list: one linked block ── */
+  var STAGE_N={none:388,sent:1004,opened:612,replied:96,out:44},
+      STAGE_LAB={none:'Not contacted yet',sent:'Mel reached out',opened:'Client opened',replied:'Replied',out:'Opted out'},
+      stage='sent';
+  function drawClients(){
+    var shown=0;
+    [].forEach.call(document.querySelectorAll('#clist .clrow'),function(r){
+      var on=!stage||r.getAttribute('data-stage')===stage;
+      r.hidden=!on; if(on) shown++;
+    });
+    var total=stage?STAGE_N[stage]:joinNow();
+    $('clShown').textContent=fmt(shown);
+    $('clTotal').textContent=fmt(total);
+    $('clEmpty').hidden=shown>0;
+    $('wHint').hidden=!!stage;
+    $('scopeChip').hidden=!stage;
+    if(stage){ $('scopeLab').textContent=STAGE_LAB[stage]; $('scopeChip').setAttribute('aria-label','Clear filter: '+STAGE_LAB[stage]); }
+    [].forEach.call(document.querySelectorAll('.wrow'),function(w){
+      w.setAttribute('aria-pressed',String(w.getAttribute('data-stage')===stage));
+    });
+  }
+  $('wtr').addEventListener('click',function(e){
+    var w=e.target.closest('.wrow'); if(!w) return;
+    var s=w.getAttribute('data-stage');
+    stage = stage===s ? null : s;
+    drawClients();
+    if(stage){
+      var sc=document.querySelector('.scroll'), blk=document.querySelector('.clblock');
+      sc.scrollTo({ top: sc.scrollTop + blk.getBoundingClientRect().top - 190, behavior:'smooth' });
+      flash($('clShown'));
+    }
+  });
+  $('scopeChip').addEventListener('click',function(){ stage=null; drawClients(); });
+  if(!$('whereCard').hidden) drawClients();
+  $('clViewAll').addEventListener('click',function(){
+    toast('Opens all '+$('clTotal').textContent+(stage?' · '+STAGE_LAB[stage].toLowerCase():'')+' in this campaign');
+  });
+
+  /* ── clients sort ── */
+  $('sortBtn').addEventListener('click',function(){ openSheet($('sSheet'),this); });
+  $('sSheet').addEventListener('click',function(e){
+    var a=e.target.closest('[data-sort]'); if(!a) return;
+    var v=a.getAttribute('data-sort');
+    [].forEach.call($('sSheet').querySelectorAll('[data-sort]'),function(x){ x.setAttribute('data-picked',String(x===a)); });
+    $('sortLab').textContent=v;
+    closeSheet(); toast('Clients sorted: '+v.toLowerCase());
+  });
+  document.addEventListener('click',function(e){
+    var c=e.target.closest('.clrow'); if(!c) return;
+    toast('Opening '+c.getAttribute('data-cl'));
+  });
+
+  /* ── edit dock ── */
+  $('pauseBtn').addEventListener('click',function(){
+    paused=!paused;
+    $('pauseLbl').textContent=paused?'Resume':'Pause';
+    $('pauseBtn').querySelector('i').className='ph '+(paused?'ph-play':'ph-pause');
+    $('stDot').classList.toggle('off',paused);
+    $('stText').textContent=(paused?'Paused':'Running')+' · started 14 Aug · ';
+    toast(paused?'Paused — nothing sends until you resume':'Campaign resumed');
+  });
+  $('saveBtn').addEventListener('click',function(){
+    $('dirty').hidden=true; $('saveBtn').disabled=true; toast('Changes saved');
+  });
+
+  ['every','cap'].forEach(function(id){ var el=$(id); if(el) el.addEventListener('change',markDirty); });
+  $('chans').addEventListener('click',markDirty);
+  $('addFile2').addEventListener('click',function(){ var f=nextFile(); addSource(f); toast('Mel will read '+f.n+' and report what it took'); markDirty(); });
+  $('addFile3').addEventListener('click',function(){ var f=nextFile(); addSource(f); drawSrcSheet(); toast('Mel will read '+f.n); markDirty(); });
+  $('addNotes3').addEventListener('click',function(){ closeSheet(); setTimeout(function(){ openSheet($('nSheet')); },260); });
+  $('addNotes2').addEventListener('click',function(){ openSheet($('nSheet'),this); });
+
+  sync();
+})();
+</script>
+</body>
+</html>

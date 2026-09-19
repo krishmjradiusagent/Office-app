@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wire instructions — Radius</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<link rel="stylesheet" href="assets/list-page.css">
+<style>
+/* Wire instructions — moved off the breakdown. Same glass head + grouped cards. */
+.phone { overflow:hidden; max-height:calc(100vh - 48px); max-height:calc(100dvh - 48px); }
+.screen { position:relative; overflow:hidden;
+  --tint-amber-bg:rgba(234,88,12,.16); --tint-amber-fg:#f2a678;
+  --tint-red-bg:rgba(220,38,38,.18); --tint-red-fg:#f0a0a0;
+  --tint-indigo-bg:rgba(90,95,242,.18); --tint-indigo-fg:#aab0ff;
+  --tint-green-bg:rgba(109,165,68,.18); --tint-green-fg:#a9cf80;
+  --tint-violet-bg:rgba(107,75,171,.24); --tint-violet-fg:#c9b3f5;
+  --tint-gold-bg:rgba(217,165,20,.18); --tint-gold-fg:#f0cf6a; }
+.statusbar { position:absolute; top:0; left:0; right:0; z-index:14; }
+
+.pg-head { position:absolute; top:0; left:0; right:0; z-index:13; display:block; padding:calc(44px + env(safe-area-inset-top)) 16px 10px; background:linear-gradient(to bottom, rgba(10,10,10,.86), rgba(10,10,10,.62)); backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%); box-shadow:inset 0 -1px 0 rgba(255,255,255,.07); }
+@supports not (backdrop-filter: blur(1px)) { .pg-head { background:rgba(14,14,16,.97); } }
+.pg-head .hrow { display:flex; align-items:center; gap:4px; }
+.pg-head h1 { font:700 17px/1.2 var(--font-hubot); letter-spacing:-.02em; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.back-btn { position:relative; flex:none; width:34px; height:34px; margin-left:-2px; border-radius:999px; background:rgba(255,255,255,.08); box-shadow:inset 0 0 0 1px rgba(255,255,255,.10), inset 0 1px 0 rgba(255,255,255,.14); display:inline-flex; align-items:center; justify-content:center; color:var(--foreground); transition:background 140ms ease; }
+.back-btn::before, .hd-btn::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.back-btn:hover { background:rgba(255,255,255,.14); }
+.hd-btn { position:relative; flex:none; margin-left:auto; width:38px; height:38px; border:0; border-radius:999px; background:transparent; color:var(--foreground); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+.hd-btn i { font-size:20px; }
+.hd-btn:active { transform:scale(.94); }
+.hd-btn:focus-visible, .back-btn:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.subrow { display:flex; align-items:center; gap:10px; margin-top:4px; }
+.subrow .prop { min-width:0; flex:1; font:500 13px/1.35 var(--font); color:var(--muted-foreground); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.scroll { padding-top:calc(44px + env(safe-area-inset-top) + 66px); padding-bottom:calc(32px + env(safe-area-inset-bottom)); scrollbar-width:none; }
+.scroll::-webkit-scrollbar { display:none; }
+
+.ihead { display:flex; align-items:baseline; gap:8px; margin:22px 3px 8px; }
+.ihead h2 { font:600 13px/1.2 var(--font); color:var(--muted-foreground); letter-spacing:0; }
+.ihead .hn { margin-left:auto; font:500 12px/1.2 var(--font); color:var(--muted-foreground); }
+
+.pill { display:inline-flex; align-items:center; gap:6px; height:24px; padding:0 9px; border-radius:999px; font:600 12px/1 var(--font); white-space:nowrap; }
+.pill.draft { color:var(--muted-foreground); background:var(--muted); }
+.pill.gold { color:var(--tint-gold-fg); background:var(--tint-gold-bg); }
+.pill.green { color:var(--tint-green-fg); background:var(--tint-green-bg); }
+
+.ilist { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-card); box-shadow:var(--shadow-sm); overflow:hidden; }
+.irow { position:relative; display:flex; align-items:center; gap:10px; width:100%; min-height:56px; padding:11px 15px; border:0; background:transparent; color:var(--foreground); font-family:var(--font); text-align:left; text-decoration:none; cursor:pointer; }
+.irow + .irow::before { content:''; position:absolute; left:15px; right:0; top:0; height:1px; background:var(--border); }
+.irow:active { background:rgba(255,255,255,.04); }
+.irow:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
+.irow .ik { min-width:0; flex:1; display:flex; flex-direction:column; gap:3px; }
+.irow .ik b { font:500 15px/1.3 var(--font); }
+.irow .ik em { font:500 12px/1.3 var(--font); font-style:normal; color:var(--muted-foreground); }
+.irow .amt { flex:none; font:600 15px/1.2 var(--font); font-variant-numeric:tabular-nums; }
+.irow .chev { flex:none; font-size:16px; color:var(--muted-foreground); }
+.empty { padding:14px 15px; font:500 13px/1.4 var(--font); color:var(--muted-foreground); }
+.note { margin:16px 4px 0; font:500 12px/1.5 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+
+.banner { display:flex; align-items:flex-start; gap:10px; margin:0 0 2px; padding:12px 14px; border-radius:var(--radius-card); background:var(--tint-gold-bg); color:var(--tint-gold-fg); font:500 13px/1.45 var(--font); text-wrap:pretty; }
+.banner i { flex:none; font-size:17px; line-height:1.2; }
+.banner[hidden] { display:none; }
+
+.toast { position:absolute; left:16px; right:16px; bottom:calc(20px + env(safe-area-inset-bottom)); z-index:30; padding:12px 14px; border-radius:14px; background:rgba(32,32,36,.96); box-shadow:0 12px 30px rgba(0,0,0,.4), inset 0 0 0 1px rgba(255,255,255,.08); color:var(--foreground); font:500 13px/1.4 var(--font); opacity:0; transform:translateY(10px); transition:opacity 200ms ease, transform 200ms ease; pointer-events:none; }
+.toast.on { opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce) { .toast { transition:none; } }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen" id="screen" data-role="agent" data-screen-label="Wire instructions">
+    <div class="statusbar"><span>9:41</span>
+      <div class="sb-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="5" width="3" height="7" rx="1"/><rect x="9" y="2.5" width="3" height="9.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity="0.7"/></svg>
+        <svg width="20" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor"><rect x="1" y="1" width="17" height="10" rx="3"/><rect x="3" y="3" width="11" height="6" rx="1.5" fill="currentColor" stroke="none"/><path d="M20 4v4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div class="pg-head">
+      <div class="hrow">
+        <a href="Commission breakdown.html" id="backLink" class="back-btn" aria-label="Back to the commission breakdown">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </a>
+        <h1>Wire instructions</h1>
+        <button class="hd-btn" type="button" aria-label="How wires work" data-toast="Fees paid by external wire need a payee on file before escrow can release funds."><i class="ph ph-info" aria-hidden="true"></i></button>
+      </div>
+      <div class="subrow">
+        <span class="prop" id="wireSub">1284 Willow Creek Dr</span>
+        <span class="pill" id="wireTopPill" hidden></span>
+      </div>
+    </div>
+
+    <div class="scroll" id="scroll">
+
+      <div class="banner" id="wireBanner" role="status">
+        <i class="ph ph-warning" aria-hidden="true"></i>
+        <span id="wireTxt"></span>
+      </div>
+
+      <div class="ihead"><h2>Fees paid by wire</h2><span class="hn" id="wireCount"></span></div>
+      <div class="ilist" id="wireList"></div>
+      <div class="ilist" id="wireEmpty" hidden><div class="empty">No fees on this breakdown are paid by external wire.</div></div>
+      <p class="note">Amounts come from the breakdown deductions. Changing a fee there updates it here.</p>
+
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var toastEl = document.getElementById('toast'), tt;
+  function toast(m) { toastEl.textContent = m; toastEl.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove('on'); }, 2600); }
+  document.addEventListener('click', function (e) { var t = e.target.closest('[data-toast]'); if (t) toast(t.getAttribute('data-toast')); });
+
+  var q = new URLSearchParams(location.search);
+  var addr = q.get('addr') || '1284 Willow Creek Dr';
+  document.getElementById('wireSub').textContent = addr;
+  document.getElementById('backLink').href = 'Commission breakdown.html' + (location.search || '');
+
+  /* same set the breakdown carried — no invented payees */
+  var WIRES = [
+    { fee: 'Credits', amt: '$50', to: 'Bay Area Escrow', status: 'on-file' },
+    { fee: 'Referral', amt: '$20', to: '', status: 'missing' },
+    { fee: 'SBTC', amt: '$400', to: 'Southern Bay Title Company', status: 'on-file' },
+    { fee: 'E&O', amt: '$250', to: 'Radius Agent Realty', status: 'on-file' },
+    { fee: 'Team admin fee', amt: '$250', to: '', status: 'missing' },
+    { fee: 'Vendor referral fee', amt: '$500', to: '', status: 'missing' }
+  ];
+
+  function renderWires() {
+    var host = document.getElementById('wireList'); host.textContent = '';
+    var miss = 0;
+    WIRES.forEach(function (w) {
+      if (w.status !== 'on-file') miss++;
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'irow';
+      b.setAttribute('data-toast', w.status === 'on-file'
+        ? w.fee + ' ' + w.amt + ' wires to ' + w.to + '.'
+        : w.fee + ' ' + w.amt + ' has no payee on file yet.');
+      var k = document.createElement('span'); k.className = 'ik';
+      var nb = document.createElement('b'); nb.textContent = w.fee;
+      var em = document.createElement('em');
+      em.textContent = w.status === 'on-file' ? w.to : 'No wire instructions yet';
+      k.appendChild(nb); k.appendChild(em);
+      var amt = document.createElement('span'); amt.className = 'amt'; amt.textContent = w.amt;
+      var pill = document.createElement('span');
+      pill.className = 'pill ' + (w.status === 'on-file' ? 'green' : 'gold');
+      pill.textContent = w.status === 'on-file' ? 'On file' : 'Missing';
+      var chev = document.createElement('i'); chev.className = 'ph ph-caret-right chev'; chev.setAttribute('aria-hidden', 'true');
+      b.appendChild(k); b.appendChild(amt); b.appendChild(pill); b.appendChild(chev);
+      host.appendChild(b);
+    });
+    host.hidden = !WIRES.length;
+    document.getElementById('wireEmpty').hidden = WIRES.length > 0;
+    document.getElementById('wireCount').textContent = WIRES.length ? WIRES.length + ' fees' : '';
+
+    var banner = document.getElementById('wireBanner');
+    banner.hidden = !miss;
+    document.getElementById('wireTxt').textContent = miss === 1
+      ? 'One fee on this breakdown is paid by external wire and has no instructions yet.'
+      : miss + ' fees on this breakdown are paid by external wire and have no instructions yet.';
+
+    var p = document.getElementById('wireTopPill');
+    p.hidden = !WIRES.length;
+    p.className = 'pill ' + (miss ? 'gold' : 'green');
+    p.textContent = miss ? miss + ' missing' : 'All on file';
+    fitHead();
+  }
+
+  var headEl = document.querySelector('.pg-head'), scrollEl = document.getElementById('scroll');
+  function fitHead() { scrollEl.style.paddingTop = (headEl.offsetHeight + 8) + 'px'; }
+  window.addEventListener('resize', fitHead);
+  renderWires();
+})();
+</script>
+</body>
+</html>
