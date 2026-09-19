@@ -407,6 +407,25 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
   #infoSheet.on .calc-list:not([hidden]) > .poprow,
   #infoSheet.on .calc-list:not([hidden]) > .popsep { animation:none; }
 }
+.commission-map { display:grid; gap:0; padding:0 10px 4px; }
+.commission-map-item { border-bottom:1px solid var(--border); }
+.commission-map-item:last-child { border-bottom:0; }
+.commission-map-item summary { display:flex; align-items:center; gap:10px; min-height:52px; padding:8px 2px; list-style:none; cursor:pointer; color:var(--foreground); }
+.commission-map-item summary::-webkit-details-marker { display:none; }
+.commission-map-label { min-width:0; flex:1; font:600 15px/1.3 var(--font); }
+.commission-map-value { flex:none; font:700 16px/1 var(--font-hubot); font-variant-numeric:tabular-nums; }
+.commission-map-item.net .commission-map-value { color:var(--tint-green-fg); }
+.commission-map-item.radius .commission-map-value { color:var(--tint-indigo-fg); }
+.commission-map-item.team .commission-map-value { color:var(--tint-violet-fg); }
+.commission-map-item.group .commission-map-value { color:var(--tint-gold-fg); }
+.commission-map-item summary i { flex:none; width:18px; color:var(--muted-foreground); font-size:16px; transition:transform 200ms var(--ease-out); }
+.commission-map-item[open] summary i { transform:rotate(45deg); color:var(--foreground); }
+.commission-map-body { padding:0 2px 12px; }
+#commissionInfoSheet .calc-list { display:grid; gap:1px; }
+#commissionInfoSheet .poprow { min-height:30px; padding:4px 8px; }
+#commissionInfoSheet .poprow.head, #commissionInfoSheet .poprow.tot { min-height:38px; padding:7px 10px; border-radius:10px; }
+#commissionInfoSheet .popsep { margin:5px 8px 2px; }
+.commission-map-item summary:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; border-radius:var(--radius-sm); }
 .klab { display:flex; align-items:center; gap:4px; }
 .ibtn { flex:none; position:relative; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; margin:-2px 0; padding:0; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer; }
 .ibtn::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
@@ -504,6 +523,9 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .screen.light .net-float { background:rgba(255,255,255,.92); border-color:rgba(10,10,10,.10); box-shadow:0 8px 22px rgba(0,0,0,.10); }
 .net-float span { font:600 15px/1.2 var(--font); }
 .net-float b { color:var(--tint-green-fg); font:700 21px/1 var(--font-hubot); font-variant-numeric:tabular-nums; letter-spacing:-.015em; }
+.net-value { display:inline-flex; align-items:center; gap:7px; }
+.net-float .net-info { margin:0; color:var(--tint-green-fg); opacity:.9; }
+.net-float .net-info i { font-size:18px; }
 .net-out { position:absolute; left:0; right:0; top:-24px; margin:0 auto; z-index:3; width:36px; height:36px; padding:0; border:1px solid rgba(255,255,255,.10); border-radius:999px; background:#171719; color:var(--muted-foreground); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
 .screen.light .net-out { background:#fff; border-color:rgba(10,10,10,.12); }
 .net-out i { font-size:18px; }
@@ -1409,7 +1431,7 @@ body { position:relative; gap:0; }
           <button class="net-out" type="button" id="netFloatOpen" aria-label="Go to your breakdown"><i class="ph ph-caret-down" aria-hidden="true"></i></button>
           <div class="net-float" id="netFloat">
             <span id="netFloatLabel">Net commission</span>
-            <b id="netFloatValue">$4,485</b>
+            <span class="net-value"><b id="netFloatValue">$4,485</b><button class="ibtn net-info" type="button" id="netFloatInfo" aria-haspopup="dialog" aria-controls="commissionInfoSheet" aria-label="Explain net commission"><i class="ph ph-question" aria-hidden="true"></i></button></span>
           </div>
         </div>
       </div>
@@ -1634,6 +1656,30 @@ body { position:relative; gap:0; }
         <div id="pop1RadB" hidden></div>
         <div id="pop1TeamB" hidden></div>
         <div id="pop1GroupB" hidden></div>
+      </div>
+    </div>
+
+    <!-- all commission totals sheet -->
+    <div class="sheet" id="commissionInfoSheet" role="dialog" aria-modal="true" aria-labelledby="commissionInfoSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="sh-name" id="commissionInfoSheetT" tabindex="-1">Where the commission goes<span class="sh-sub" id="commissionInfoSheetSub">See how splits, fees, and deductions produce each total.</span></div>
+      <div class="commission-map" id="commissionMap">
+        <details class="commission-map-item net" data-commission-kind="Net" open>
+          <summary><span class="commission-map-label">Net commission</span><span class="commission-map-value" id="commissionMapNetValue">$4,485</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <div class="commission-map-body" id="commissionMapNet"></div>
+        </details>
+        <details class="commission-map-item radius" data-commission-kind="Rad">
+          <summary><span class="commission-map-label">Radius commission</span><span class="commission-map-value" id="commissionMapRadValue">$2,060</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <div class="commission-map-body" id="commissionMapRad"></div>
+        </details>
+        <details class="commission-map-item team" data-commission-kind="Team">
+          <summary><span class="commission-map-label">Team commission</span><span class="commission-map-value" id="commissionMapTeamValue">$2,786</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <div class="commission-map-body" id="commissionMapTeam"></div>
+        </details>
+        <details class="commission-map-item group" data-commission-kind="Group">
+          <summary><span class="commission-map-label">Group commission</span><span class="commission-map-value" id="commissionMapGroupValue">$697</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <div class="commission-map-body" id="commissionMapGroup"></div>
+        </details>
       </div>
     </div>
 
@@ -2343,6 +2389,36 @@ body { position:relative; gap:0; }
       { sep: true },
       { k: 'Group commission', v: cur(groupNet), tot: true }
     ]);
+    syncCommissionMap(false);
+  }
+  function syncCommissionMap(resetOpen) {
+    var map = [
+      { key: 'Net', value: 'r1Net' },
+      { key: 'Rad', value: 'r1Rad' },
+      { key: 'Team', value: 'r1Team' },
+      { key: 'Group', value: 'r1Group' }
+    ];
+    map.forEach(function (item) {
+      var source = document.getElementById('pop1' + item.key + 'B'),
+          destination = document.getElementById('commissionMap' + item.key),
+          sourceValue = document.getElementById(item.value),
+          destinationValue = document.getElementById('commissionMap' + item.key + 'Value');
+      if (!source || !destination || !sourceValue || !destinationValue) return;
+      destinationValue.textContent = sourceValue.textContent;
+      destination.textContent = '';
+      var list = source.cloneNode(true);
+      list.removeAttribute('id');
+      list.hidden = false;
+      destination.appendChild(list);
+    });
+    if (!resetOpen) return;
+    var primary = role === 'team_lead' ? ['Team']
+      : role === 'group_lead' ? ['Group']
+      : role === 'group_lead_agent' ? ['Net', 'Group']
+      : ['Net'];
+    Array.prototype.forEach.call(document.querySelectorAll('#commissionMap [data-commission-kind]'), function (item) {
+      item.open = primary.indexOf(item.getAttribute('data-commission-kind')) !== -1;
+    });
   }
   function renderAgents() {
     var h1 = document.getElementById('agentList1'), i, o;
@@ -3204,6 +3280,7 @@ body { position:relative; gap:0; }
       document.getElementById('netFloatLabel').textContent = 'Group commission';
       document.getElementById('netFloatValue').textContent = cur(groupNet);
     }
+    document.getElementById('netFloatInfo').setAttribute('aria-label', 'Explain ' + document.getElementById('netFloatLabel').textContent.toLowerCase() + ' ' + document.getElementById('netFloatValue').textContent);
     document.getElementById('ybdClose').textContent = closeShort;
     lad.textContent = '';
     ybdLadder().forEach(function (o) { lad.appendChild(ybdRowEl(o)); });
@@ -3223,6 +3300,11 @@ body { position:relative; gap:0; }
     if (full.getAttribute('aria-expanded') !== 'true') full.click();
     var sc = document.getElementById('scroll'), card = document.getElementById('ybdCard');
     if (sc && card) sc.scrollTo({ top:Math.max(0, card.offsetTop - 10), behavior:'smooth' });
+  });
+  document.getElementById('netFloatInfo').addEventListener('click', function () {
+    syncCommissionMap(true);
+    document.getElementById('commissionInfoSheetSub').textContent = document.getElementById('netFloatLabel').textContent + ' ' + document.getElementById('netFloatValue').textContent + ' · see every split, fee, and deduction.';
+    open(document.getElementById('commissionInfoSheet'), this);
   });
 
   /* top-level financials share one explicit sheet. Editing remains a mode,
@@ -5026,7 +5108,7 @@ body { position:relative; gap:0; }
   });
   document.addEventListener('click', function (e) {
     if (e.target.closest('.pop')) return;
-    var b = e.target.closest('.ibtn:not([data-infosheet])');
+    var b = e.target.closest('.ibtn:not([data-infosheet]):not(#netFloatInfo)');
     var prev = popBtn;
     closePop();
     if (!b || b === prev) return;
