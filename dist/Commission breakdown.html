@@ -23,6 +23,13 @@
   --tint-green-bg:rgba(109,165,68,.18); --tint-green-fg:#a9cf80;
   --tint-violet-bg:rgba(107,75,171,.24); --tint-violet-fg:#c9b3f5;
   --tint-gold-bg:rgba(217,165,20,.18); --tint-gold-fg:#f0cf6a;
+  --lux-champagne:#dcc997; --lux-champagne-surface:#302c24; --lux-champagne-border:rgba(220,201,151,.26);
+  --lux-bronze:#d1ab7a; --lux-bronze-surface:#302820; --lux-bronze-border:rgba(209,171,122,.25);
+  --lux-olive:#c1c596; --lux-olive-surface:#292b22; --lux-olive-border:rgba(193,197,150,.24);
+  --lux-gold:#e2c36f; --lux-gold-surface:#312b1d; --lux-gold-border:rgba(226,195,111,.27);
+  --lux-card-surface:#211f1b; --lux-card-surface-alt:#24211c; --lux-card-border:rgba(218,190,128,.18);
+  --lux-label:#bdb5a7; --lux-value:#f3eee4; --lux-accent:#cdb16d;
+  --lux-texture:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
   --overlay-press:var(--overlay-press); --glass-fill:var(--glass-fill); --glass-border:var(--glass-border); --glass-border-strong:rgba(255,255,255,.14); --glass-hover:rgba(255,255,255,.14);
   /* the head is a scrim over the hero wash, not a bar — light enough that the
      blurred photo reads through it, dark enough to hold white 17px title */
@@ -41,6 +48,12 @@
   --tint-green-bg:#dcfce7; --tint-green-fg:#166534;
   --tint-violet-bg:#ede9fe; --tint-violet-fg:#5b21b6;
   --tint-gold-bg:#fef3c7; --tint-gold-fg:#854d0e;
+  --lux-champagne:#6f592b; --lux-champagne-surface:#f7f1e5; --lux-champagne-border:rgba(111,89,43,.22);
+  --lux-bronze:#755033; --lux-bronze-surface:#f4e9dc; --lux-bronze-border:rgba(117,80,51,.20);
+  --lux-olive:#59603e; --lux-olive-surface:#edf0e4; --lux-olive-border:rgba(89,96,62,.20);
+  --lux-gold:#765b13; --lux-gold-surface:#f7efd7; --lux-gold-border:rgba(118,91,19,.22);
+  --lux-card-surface:#fbf8f1; --lux-card-surface-alt:#f7f2e8; --lux-card-border:rgba(116,91,38,.18);
+  --lux-label:#6b6356; --lux-value:#211e18; --lux-accent:#87691f;
   --overlay-press:rgba(10,10,10,.04); --glass-fill:rgba(10,10,10,.05); --glass-border:rgba(10,10,10,.12); --glass-border-strong:rgba(10,10,10,.18); --glass-hover:rgba(10,10,10,.08);
   --chrome-1:rgba(255,255,255,.58); --chrome-2:rgba(255,255,255,.32); --chrome-3:rgba(255,255,255,.92); --chrome-4:rgba(255,255,255,.72); --chrome-solid:rgba(255,255,255,.97); --chrome-hairline:rgba(10,10,10,.08); --hero-fade:rgba(10,10,10,.015);
   --input-stroke:#d4d4d4; --input-stroke-hover:#a3a3a3; --input-placeholder:#a3a3a3;
@@ -246,21 +259,21 @@ button.srow:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; 
 .srow .go { flex:none; font-size:14px; color:var(--muted-foreground); }
 
 /* caps */
-.cap { display:flex; flex-direction:column; gap:8px; padding:14px 0; border-top:1px solid var(--border); }
+.cap { display:flex; flex-direction:column; gap:7px; padding:14px 0; border-top:1px solid var(--border); }
 .caps > .cap:first-child { border-top:0; padding-top:3px; }
 .cap .cph { display:flex; align-items:center; gap:8px; }
-.cap .cn { min-width:0; flex:1; font:600 15px/1.25 var(--font); }
-.cap .cstat { flex:none; display:inline-flex; align-items:center; gap:5px; font:600 13px/1 var(--font); color:var(--tint-green-fg); }
-.cap .cstat i { font-size:15px; }
-.cap[data-state="open"] .cstat { color:var(--tint-indigo-fg); }
-.cap .cmeta { display:flex; align-items:center; flex-wrap:wrap; gap:8px; font:500 13px/1.3 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.cap .cn { min-width:0; flex:1; font:600 14px/1.2 var(--font); }
+.cap .cstat { flex:none; display:inline-flex; align-items:center; gap:4px; font:600 13px/1 var(--font); color:var(--tint-green-fg); }
+.cap .cstat i { font-size:14px; }
+.cap[data-state="open"] .cstat { color:var(--lux-gold); }
+.cap .cmeta { display:flex; align-items:center; gap:6px; white-space:nowrap; font:600 15px/1.15 var(--font-hubot); color:inherit; font-variant-numeric:tabular-nums; }
 .cap .cplan { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:var(--radius-badge); background:var(--muted); color:var(--muted-foreground); font:600 12px/1 var(--font); }
-.cap .track { display:block; height:4px; border-radius:999px; background:var(--muted); overflow:hidden; }
-.cap .track i { display:block; height:100%; width:var(--p); border-radius:999px; background:var(--tint-indigo-fg); }
+.cap .track { display:block; height:4px; border-radius:999px; background:color-mix(in srgb,var(--foreground) 13%,transparent); overflow:hidden; }
+.cap .track i { display:block; height:100%; width:var(--p); border-radius:999px; background:var(--lux-gold); }
 .cap[data-state="met"] .track i { background:var(--tint-green-fg); opacity:.6; }
 .cap .cfee { display:flex; align-items:baseline; gap:10px; margin-top:1px; }
-.cap .cfee .k { flex:none; font:500 13px/1.35 var(--font); color:var(--muted-foreground); }
-.cap .cfee .v { min-width:0; flex:1; text-align:right; font:600 13px/1.35 var(--font); color:var(--foreground); font-variant-numeric:tabular-nums; text-wrap:pretty; }
+.cap .cfee .k { flex:none; font:500 12px/1.3 var(--font); color:var(--muted-foreground); }
+.cap .cfee .v { min-width:0; flex:1; text-align:right; font:600 13px/1.3 var(--font); color:var(--foreground); font-variant-numeric:tabular-nums; text-wrap:pretty; }
 
 /* sides */
 button.side { cursor:pointer; text-align:left; }
@@ -361,11 +374,16 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .pplan i { flex:none; font-size:15px; color:var(--muted-foreground); }
 .pplan:active { background:var(--overlay-press); }
 .pplan:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; border-radius:var(--radius-sm); }
-.capstack { display:grid; gap:8px; margin:8px 0 4px; padding:12px;
-  border:1px solid var(--border); border-radius:20px; background:var(--muted); box-shadow:var(--shadow-sm); }
-.capstack-body { display:grid; gap:8px; overflow:hidden; }
-.capstack-body > .cap { padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--card); }
-.capstack-body > .cap:first-child { padding-top:12px; border-top:1px solid var(--border); }
+.capstack { display:grid; gap:8px; margin:8px 0 4px; padding:10px;
+  border:1px solid var(--border); border-radius:16px; background:var(--muted); box-shadow:var(--shadow-sm); }
+.capstack-body { display:grid; grid-template-columns:minmax(0,1fr); gap:8px; overflow:hidden; }
+.capstack-body > .cap { min-width:0; min-height:0; padding:12px 14px; border:1px solid var(--lux-card-border); border-radius:12px;
+  background-color:var(--lux-card-surface); background-image:var(--lux-texture); background-size:120px 120px;
+  background-blend-mode:soft-light; color:var(--lux-value); box-shadow:inset 0 1px 0 rgba(255,255,255,.05),var(--shadow-sm); }
+.capstack-body > .cap:nth-child(2) { border-color:var(--lux-card-border); background-color:var(--lux-card-surface-alt); color:var(--lux-value); }
+.capstack-body > .cap:nth-child(n+3) { min-height:0; border-color:var(--lux-card-border); background-color:var(--lux-card-surface); color:var(--lux-value); }
+.capstack-body > .cap:first-child { padding-top:12px; border-top:1px solid var(--lux-card-border); }
+.capstack-body .cap .cn { color:var(--lux-label); }
 .capstack-extra[hidden] { display:none; }
 .capstack-foot { display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:30px; padding:2px 2px 0; color:var(--muted-foreground); }
 .capstack-summary { display:inline-flex; align-items:center; gap:7px; font:600 11px/1.2 var(--font); }
@@ -407,6 +425,25 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
   #infoSheet.on .calc-list:not([hidden]) > .poprow,
   #infoSheet.on .calc-list:not([hidden]) > .popsep { animation:none; }
 }
+.commission-map { display:grid; gap:0; padding:0 10px 4px; }
+.commission-map-item { border-bottom:1px solid var(--border); }
+.commission-map-item:last-child { border-bottom:0; }
+.commission-map-item summary { display:flex; align-items:center; gap:10px; min-height:52px; padding:8px 2px; list-style:none; cursor:pointer; color:var(--foreground); }
+.commission-map-item summary::-webkit-details-marker { display:none; }
+.commission-map-label { min-width:0; flex:1; font:600 15px/1.3 var(--font); }
+.commission-map-value { flex:none; font:700 16px/1 var(--font-hubot); font-variant-numeric:tabular-nums; }
+.commission-map-item.net .commission-map-value { color:var(--tint-green-fg); }
+.commission-map-item.radius .commission-map-value { color:var(--tint-indigo-fg); }
+.commission-map-item.team .commission-map-value { color:var(--tint-violet-fg); }
+.commission-map-item.group .commission-map-value { color:var(--tint-gold-fg); }
+.commission-map-item summary i { flex:none; width:18px; color:var(--muted-foreground); font-size:16px; transition:transform 200ms var(--ease-out); }
+.commission-map-item[open] summary i { transform:rotate(45deg); color:var(--foreground); }
+.commission-map-body { padding:0 2px 12px; }
+#commissionInfoSheet .calc-list { display:grid; gap:1px; }
+#commissionInfoSheet .poprow { min-height:30px; padding:4px 8px; }
+#commissionInfoSheet .poprow.head, #commissionInfoSheet .poprow.tot { min-height:38px; padding:7px 10px; border-radius:10px; }
+#commissionInfoSheet .popsep { margin:5px 8px 2px; }
+.commission-map-item summary:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; border-radius:var(--radius-sm); }
 .klab { display:flex; align-items:center; gap:4px; }
 .ibtn { flex:none; position:relative; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; margin:-2px 0; padding:0; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer; }
 .ibtn::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
@@ -503,7 +540,12 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .net-float { position:relative; display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:58px; padding:12px 18px; border:1px solid rgba(255,255,255,.10); border-radius:var(--radius-card); background:rgba(18,18,20,.92); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%); box-shadow:0 8px 24px rgba(0,0,0,.35); }
 .screen.light .net-float { background:rgba(255,255,255,.92); border-color:rgba(10,10,10,.10); box-shadow:0 8px 22px rgba(0,0,0,.10); }
 .net-float span { font:600 15px/1.2 var(--font); }
+.net-copy { min-width:0; display:flex; flex-direction:column; gap:3px; }
+.net-copy small { font:500 11px/1.2 var(--font); color:var(--muted-foreground); white-space:nowrap; }
 .net-float b { color:var(--tint-green-fg); font:700 21px/1 var(--font-hubot); font-variant-numeric:tabular-nums; letter-spacing:-.015em; }
+.net-value { display:inline-flex; align-items:center; gap:7px; }
+.net-float .net-info { margin:0; color:var(--tint-green-fg); opacity:.9; }
+.net-float .net-info i { font-size:18px; }
 .net-out { position:absolute; left:0; right:0; top:-24px; margin:0 auto; z-index:3; width:36px; height:36px; padding:0; border:1px solid rgba(255,255,255,.10); border-radius:999px; background:#171719; color:var(--muted-foreground); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
 .screen.light .net-out { background:#fff; border-color:rgba(10,10,10,.12); }
 .net-out i { font-size:18px; }
@@ -526,6 +568,30 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 /* the confirmation line sits under the actions, never beside them */
 .abar .state { display:flex; align-items:flex-start; gap:9px; padding:1px 4px 2px; font:500 14px/1.35 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
 .abar .state i { flex:none; font-size:19px; line-height:1.1; color:var(--tint-green-fg); }
+
+/* Banking-card composition: the existing breakdown, net summary and actions
+   share one Radius shell without changing their behavior or information. */
+.commission-wallet { position:relative; margin:0 -8px; padding:0; border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius-card); background:rgba(18,18,20,.94);
+  box-shadow:var(--shadow-md),inset 0 1px 0 var(--chrome-hairline); }
+.screen.light .commission-wallet { border-color:rgba(10,10,10,.09); background:rgba(252,252,253,.94); }
+.commission-wallet .ybd-card { margin:0; border:0; border-radius:var(--radius-card) var(--radius-card) 0 0;
+  background:transparent; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; }
+.commission-wallet .ybd-sep { border-radius:0; }
+.commission-wallet .net-flow { margin:0 8px 8px; }
+.commission-wallet .net-out { display:none; }
+.commission-wallet .net-float { min-height:60px; padding:12px 14px; border-color:var(--lux-card-border); border-radius:var(--radius-card);
+  background-color:var(--lux-card-surface); background-image:var(--lux-texture); background-size:120px 120px;
+  background-blend-mode:soft-light; backdrop-filter:none; -webkit-backdrop-filter:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05); }
+.commission-wallet .net-copy > span { color:var(--lux-label); }
+.commission-wallet .net-float b { color:var(--lux-value); }
+.commission-wallet .net-float .net-info { color:var(--lux-accent); }
+.commission-wallet .abar { position:relative; left:auto; right:auto; bottom:auto; z-index:2; gap:8px; padding:0 8px 8px; }
+.commission-wallet .abar .arow { gap:8px; padding:0; border-radius:0; background:transparent;
+  box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; }
+.commission-wallet .abar .state { padding:2px 4px 4px; }
+.screen .scroll { padding-bottom:calc(28px + env(safe-area-inset-bottom) + var(--folderpad, 0px)); }
 
 /* sheets */
 .scrim { position:absolute; inset:0; background:rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity 240ms ease; z-index:30; }
@@ -725,18 +791,21 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
    carries the closing and the status, and the money starts at the top of the
    scroller */
 
-.fin-card { position:relative; z-index:1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px; margin:0 -8px 8px; padding:12px; border:1px solid var(--border); border-radius:20px; background:var(--muted); box-shadow:var(--shadow-sm); }
+.fin-card { position:relative; z-index:1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:0 -8px 8px; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; }
 .fin-card[data-count="1"] { grid-template-columns:minmax(0,1fr); }
 .fin-card[data-count="3"],.fin-card[data-count="4"] { grid-template-columns:repeat(2,minmax(0,1fr)); }
-.fin-row { min-width:0; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:5px; width:100%; min-height:68px; padding:10px 12px; border:1px solid color-mix(in srgb,var(--tint-indigo-fg) 24%,var(--border)); border-radius:12px; background:color-mix(in srgb,var(--tint-indigo-fg) 22%,var(--card)); box-shadow:var(--shadow-sm); color:var(--tint-indigo-fg); text-align:left; }
-.fin-row + .fin-row { border-color:color-mix(in srgb,var(--tint-violet-fg) 24%,var(--border)); background:color-mix(in srgb,var(--tint-violet-fg) 22%,var(--card)); color:var(--tint-violet-fg); }
+.fin-row { min-width:0; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:5px; width:100%; min-height:68px; padding:10px 12px;
+  border:1px solid var(--lux-card-border); border-radius:12px; background-color:var(--lux-card-surface); background-image:var(--lux-texture);
+  background-size:120px 120px; background-blend-mode:soft-light; box-shadow:inset 0 1px 0 rgba(255,255,255,.05),var(--shadow-sm); color:var(--lux-value); text-align:left; }
+.fin-row + .fin-row { border-color:var(--lux-card-border); background-color:var(--lux-card-surface-alt); color:var(--lux-value); }
 .fin-row.editable { cursor:pointer; }
-.fin-row span { display:flex; align-items:center; gap:5px; min-width:0; font:600 12px/1.2 var(--font); color:currentColor; white-space:nowrap; }
-.fin-row .fin-icon { flex:none; font-size:15px; line-height:1; }
+.fin-row span { display:flex; align-items:center; gap:5px; min-width:0; font:600 12px/1.2 var(--font); color:var(--lux-label); white-space:nowrap; }
+.fin-row .fin-icon { flex:none; font-size:15px; line-height:1; color:var(--lux-label); }
 .fin-row .fin-badge { position:relative; flex:none; width:15px; height:15px; display:inline-flex; align-items:center; justify-content:center; }
 .fin-row .fin-badge i { font-size:15px; }
 .fin-row .fin-badge::after { content:attr(data-mark); position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding-top:.5px; font:700 8px/1 var(--font); }
-.fin-row b { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; font:700 17px/1.1 var(--font-hubot); letter-spacing:-.01em; font-variant-numeric:tabular-nums; color:currentColor; white-space:nowrap; }
+.fin-row .fin-badge { color:var(--lux-label); }
+.fin-row b { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; font:700 17px/1.1 var(--font-hubot); letter-spacing:-.01em; font-variant-numeric:tabular-nums; color:var(--lux-value); white-space:nowrap; }
 .fin-row:nth-child(2) b { font-size:17px; font-weight:700; }
 .ybd-card { position:relative; z-index:1; margin:0 -8px; padding:6px 16px 14px; border-radius:var(--radius-card);
   border:1px solid rgba(255,255,255,.08); background:rgba(18,18,20,.94);
@@ -1001,12 +1070,16 @@ button.ybd-r:active { opacity:.7; }
 .ybd-ppl .p .n em { font:500 13px/1.3 var(--font); font-style:normal; color:var(--muted-foreground); }
 .ybd-ppl .p .a { flex:none; font:600 15px/1.3 var(--font); font-variant-numeric:tabular-nums; }
 
-/* Detailed breakdown is an integrated card footer. Expanded content grows
-   above it, so the disclosure never becomes an orphan between sections. */
-.ybd-sep { position:relative; z-index:1; display:flex; align-items:center; justify-content:center;
-  gap:10px; width:calc(100% + 32px); min-height:48px; margin:8px -16px -14px; padding:0 16px;
+/* Detailed breakdown is an integrated utility row, matching the quiet
+   "View all" treatment used by the summary cards instead of becoming a
+   second primary action. Expanded content still grows above it. */
+.ybd-sep { position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between;
+  gap:16px; width:calc(100% + 32px); min-height:52px; margin:8px -16px -14px; padding:0 16px;
   border:0; border-top:1px solid rgba(255,255,255,.08); border-radius:0 0 var(--radius-card) var(--radius-card);
-  background:transparent; font:600 14px/1.3 var(--font); color:var(--primary); text-align:center; cursor:pointer; }
+  background:transparent; font:600 13px/1.3 var(--font); text-align:left; cursor:pointer; }
+.ybd-sep-label { min-width:0; color:var(--muted-foreground); }
+.ybd-sep-action { flex:none; display:inline-flex; align-items:center; gap:5px; color:var(--lux-champagne); }
+.ybd-sep-action i { font-size:15px; }
 .screen.light .ybd-sep { border-top-color:rgba(10,10,10,.09); }
 .ybd-sep:hover { background:rgba(255,255,255,.035); }
 .screen.light .ybd-sep:hover { background:rgba(10,10,10,.025); }
@@ -1058,7 +1131,8 @@ button.ybd-r:active { opacity:.7; }
   background:var(--muted); box-shadow:var(--shadow-sm); }
 .side-metric-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 4px; }
 .side-metric { position:relative; z-index:3; min-width:0; min-height:54px; padding:9px 12px; border:1px solid var(--border);
-  border-radius:12px; background:var(--card); box-shadow:var(--shadow-sm); transform:scaleX(1); transform-origin:center;
+  border-radius:12px; background-color:var(--card); background-image:var(--lux-texture); background-size:120px 120px;
+  background-blend-mode:soft-light; box-shadow:inset 0 1px 0 rgba(255,255,255,.06),var(--shadow-sm); transform:scaleX(1); transform-origin:center;
   transition:margin-top 460ms var(--metric-spring),transform 460ms var(--metric-spring),box-shadow 200ms ease; }
 .side-metric:nth-child(1) { grid-column:1; }
 .side-metric:nth-child(2) { grid-column:2; }
@@ -1072,18 +1146,29 @@ button.ybd-r:active { opacity:.7; }
 .side-metric .metric-badge::after { content:attr(data-mark); position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
   padding-top:.5px; font:700 8px/1 var(--font); }
 .side-metric b { display:block; margin-top:4px; overflow:hidden; text-overflow:ellipsis; font:700 15px/1.15 var(--font-hubot); font-variant-numeric:tabular-nums; }
-.side-metric.gross { border-color:color-mix(in srgb,var(--tint-indigo-fg) 24%,var(--border)); background:color-mix(in srgb,var(--tint-indigo-fg) 22%,var(--card)); }
-.side-metric.gross span,.side-metric.gross b { color:var(--tint-indigo-fg); }
-.side-metric.after-deductions { border-color:color-mix(in srgb,var(--tint-violet-fg) 24%,var(--border)); background:color-mix(in srgb,var(--tint-violet-fg) 22%,var(--card)); }
-.side-metric.after-deductions span,.side-metric.after-deductions b { color:var(--tint-violet-fg); }
-.side-metric.to-agents { border-color:color-mix(in srgb,var(--tint-green-fg) 24%,var(--border)); background:color-mix(in srgb,var(--tint-green-fg) 20%,var(--card)); }
-.side-metric.to-agents span,.side-metric.to-agents b { color:var(--tint-green-fg); }
+.side-metric.gross,
+.side-metric.after-deductions,
+.side-metric.to-agents,
+.side-metric.rest-group { border-color:var(--lux-card-border); background-color:var(--lux-card-surface); }
+.side-metric.after-deductions,
+.rest-metrics .side-metric:nth-child(even) { background-color:var(--lux-card-surface-alt); }
+.side-metric.gross > span:first-child,
+.side-metric.after-deductions > span:first-child,
+.side-metric.to-agents > span:first-child,
+.side-metric.rest-group > span:first-child { color:var(--lux-label); }
+.side-metric.gross > span:first-child i,
+.side-metric.after-deductions > span:first-child i,
+.side-metric.to-agents > span:first-child i { color:var(--lux-accent); }
+.side-metric.gross b,
+.side-metric.after-deductions b,
+.side-metric.to-agents b,
+.side-metric.rest-group b { color:var(--lux-value); }
 .side-metric-foot { display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:28px; margin-top:10px; color:var(--muted-foreground); }
 .side-metric-summary { display:inline-flex; align-items:center; gap:8px; min-width:0; font:600 12px/1.2 var(--font); }
 .side-metric-count { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:999px;
   background:var(--muted-foreground); color:var(--background); font:600 11px/1 var(--font); }
 .side-metric-toggle { flex:none; display:inline-flex; align-items:center; justify-content:flex-end; gap:4px; min-height:28px; padding:0;
-  border:0; background:transparent; color:var(--tint-indigo-fg); font:600 12px/1 var(--font); cursor:pointer; }
+  border:0; background:transparent; color:var(--lux-champagne); font:600 12px/1 var(--font); cursor:pointer; }
 .side-metric-toggle i { font-size:14px; transition:transform 220ms ease; }
 .side-metric-toggle[aria-expanded="true"] i { transform:rotate(180deg); }
 .side-metric-toggle:focus-visible { outline:2px solid var(--ring); outline-offset:3px; border-radius:4px; }
@@ -1095,25 +1180,21 @@ button.ybd-r:active { opacity:.7; }
 .rest-metrics .side-metric:nth-child(4) { grid-column:1/-1; z-index:1; margin-top:-50px; transform:scaleX(.82); }
 .rest-metrics[data-expanded="true"] .side-metric:nth-child(3) { grid-column:1; margin-top:4px; transform:scaleX(1); }
 .rest-metrics[data-expanded="true"] .side-metric:nth-child(4) { grid-column:2; margin-top:4px; transform:scaleX(1); }
-.side-metric.rest-group { border-color:color-mix(in srgb,var(--tint-gold-fg) 24%,var(--border)); background:color-mix(in srgb,var(--tint-gold-fg) 18%,var(--card)); }
-.side-metric.rest-group span,.side-metric.rest-group b { color:var(--tint-gold-fg); }
+.side-metric.rest-group .metric-info,
+.side-metric.gross .metric-info,
+.side-metric.after-deductions .metric-info,
+.side-metric.to-agents .metric-info { color:var(--lux-accent); }
 .agentrow .ab { min-width:0; }
 .agentrow .meta-line { display:flex; align-items:center; gap:6px; min-width:0; }
-.agent-alloc { flex:none; min-height:24px; padding:0 7px; border:1px solid var(--border);
-  border-radius:999px; background:var(--muted); color:var(--muted-foreground); font:600 11px/1 var(--font); cursor:default; }
-.relationship-stack { display:grid; gap:8px; padding:8px 0 4px; }
-.relationship-row { display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:4px 8px; width:100%; padding:10px 11px;
-  border:1px solid var(--border); border-radius:12px; background:var(--muted); color:var(--foreground); font-family:var(--font); text-align:left; }
-.relationship-row.is-picker { cursor:pointer; }
-.relationship-row.is-picker:active { background:var(--overlay-press); }
-.relationship-row.is-picker:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
-.relationship-row.is-postcap { border-color:color-mix(in srgb,var(--tint-indigo-fg) 26%,var(--border)); }
-.relationship-row b { font:600 13px/1.25 var(--font); }
-.relationship-row strong { font:600 12px/1.25 var(--font); color:var(--tint-indigo-fg); }
-.relationship-row > i { font-size:14px; color:var(--muted-foreground); }
-.relationship-row em { grid-column:1/-1; font:500 11px/1.35 var(--font); font-style:normal; color:var(--muted-foreground); }
-.relationship-row.is-postcap em { color:var(--tint-indigo-fg); }
-.relationship-row .rel-assigned { grid-column:1/-1; display:inline-flex; align-items:center; gap:5px; width:max-content; max-width:100%; padding:3px 7px; border:1px solid var(--border); border-radius:999px; background:var(--card); color:var(--muted-foreground); font:600 10px/1.2 var(--font); text-wrap:pretty; }
+.agentrow .meta-line > b { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.agent-alloc { flex:none; display:inline-flex; align-items:center; justify-content:center; min-width:40px; height:20px; padding:0 8px;
+  border:1px solid var(--border); border-radius:999px; background:var(--muted); color:var(--muted-foreground);
+  white-space:nowrap; font:600 11px/1 var(--font); font-variant-numeric:tabular-nums; cursor:default; }
+.relationship-stack { display:grid; padding:4px 0; }
+.relationship-plan-row { position:relative; min-height:44px; align-items:center; }
+.relationship-plan-row .pk { display:flex; align-items:center; gap:5px; color:var(--muted-foreground); }
+.relationship-plan-row .pv { min-width:0; max-width:62%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+.relationship-plan-row .ibtn { color:var(--muted-foreground); }
 .fee-flags { display:inline-flex; gap:4px; margin-left:5px; vertical-align:middle; }
 .fee-flag { padding:2px 5px; border-radius:999px; background:var(--muted); color:var(--muted-foreground); font:600 10px/1 var(--font); }
 .parity-state { margin:0 0 10px; padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:var(--muted);
@@ -1281,6 +1362,7 @@ body { position:relative; gap:0; }
           <div class="fin-row" data-editfinancial="price"><span><i class="ph ph-house-line fin-icon" aria-hidden="true"></i>Sale price</span><b id="finPrice">$1,150,000</b></div>
           <div class="fin-row" data-editfinancial="gross"><span><span class="fin-badge" data-mark="$" aria-hidden="true"><i class="ph ph-seal"></i></span>Gross commission</span><b id="finGross">$23,000</b></div>
         </div>
+        <div class="commission-wallet" id="commissionWallet">
         <div class="ybd-card" id="ybdCard">
           <div class="ybd-lad" id="ybdLad"></div>
           <div class="ybd-ppl" id="ybdPpl" hidden></div>
@@ -1322,6 +1404,15 @@ body { position:relative; gap:0; }
             <span class="svv" id="x1Alloc">50%</span>
             <i class="ph ph-caret-right chev" aria-hidden="true"></i>
           </button>
+        <div class="ssub">Agents on this side</div>
+        <div class="agentlist" id="agentList1"></div>
+        <button class="addrow" type="button" data-agentalloc="mine">
+          <i class="ph ph-percent lead" aria-hidden="true"></i><span class="ab"><b>Edit agent allocation</b></span>
+        </button>
+        <button class="addrow" type="button" aria-haspopup="dialog" data-addagent="Listing side">
+          <i class="ph ph-plus-circle lead" aria-hidden="true"></i>
+          <span class="ab"><b>Add agent</b></span>
+        </button>
           <div id="deds1"></div>
           <button class="addrow" type="button" aria-haspopup="dialog" data-addded="mine|credit">
             <i class="ph ph-plus-circle lead" aria-hidden="true"></i>
@@ -1335,15 +1426,6 @@ body { position:relative; gap:0; }
             <span class="sk"><b>Gross after deductions</b><em>What the splits are taken from</em></span>
             <span class="svv" id="x1Basis">$49,430</span>
           </div>
-        <div class="ssub">Agents on this side</div>
-        <div class="agentlist" id="agentList1"></div>
-        <button class="addrow" type="button" data-agentalloc="mine">
-          <i class="ph ph-percent lead" aria-hidden="true"></i><span class="ab"><b>Edit agent allocation</b></span>
-        </button>
-        <button class="addrow" type="button" aria-haspopup="dialog" data-addagent="Listing side">
-          <i class="ph ph-plus-circle lead" aria-hidden="true"></i>
-          <span class="ab"><b>Add agent</b></span>
-        </button>
         <div id="leadDetailBreakdown" hidden></div>
         <div class="side-metrics rest-metrics" data-expanded="false">
           <div class="side-metric-list" id="restMetricList1" aria-label="Where the rest goes totals">
@@ -1402,33 +1484,34 @@ body { position:relative; gap:0; }
             </div>
           </div>
           <button class="ybd-sep" type="button" id="addDetBtn" aria-haspopup="dialog" aria-controls="detailPage">
-            <span id="addDetLabel">View detailed breakdown</span>
+            <span class="ybd-sep-label">Commission breakdown</span>
+            <span class="ybd-sep-action" id="addDetLabel">View all<i class="ph ph-caret-right" aria-hidden="true"></i></span>
           </button>
         </div>
         <div class="net-flow" id="netFlow">
           <button class="net-out" type="button" id="netFloatOpen" aria-label="Go to your breakdown"><i class="ph ph-caret-down" aria-hidden="true"></i></button>
           <div class="net-float" id="netFloat">
-            <span id="netFloatLabel">Net commission</span>
-            <b id="netFloatValue">$4,485</b>
+            <span class="net-copy"><span id="netFloatLabel">Net commission</span><small id="netFloatSub">After all fees and deductions</small></span>
+            <span class="net-value"><b id="netFloatValue">$4,485</b><button class="ibtn net-info" type="button" id="netFloatInfo" aria-haspopup="dialog" aria-controls="commissionInfoSheet" aria-label="Explain net commission"><i class="ph ph-question" aria-hidden="true"></i></button></span>
           </div>
+        </div>
+        <!-- action footer -->
+        <div class="abar" id="abar">
+          <div class="arow">
+            <button class="prim" type="button" id="primBtn"><i class="ph ph-check-circle" aria-hidden="true"></i><span id="primLbl">Confirm</span></button>
+            <div class="cdabar" id="cdaBar" hidden>
+              <button class="cgo" type="button" id="cdaGoBtn"><i class="ph ph-eye" id="cdaGoIcon" aria-hidden="true"></i><span id="cdaGoLbl">View CDA</span></button>
+              <button class="creinit" type="button" id="cdaReinitBtn" hidden><i class="ph ph-arrow-u-up-left" aria-hidden="true"></i><span>Reinitiate</span></button>
+              <button class="cmo" type="button" id="cdaMoreBtn" aria-label="CDA options"><i class="ph ph-dots-three" aria-hidden="true"></i></button>
+            </div>
+            <button class="ghost" type="button" id="msgBtn" aria-label="Comment"><i class="ph ph-chat-circle-dots" aria-hidden="true"></i><span>Comment</span></button>
+          </div>
+          <div class="state" id="stateMsg" hidden><i class="ph-fill ph-check-circle" aria-hidden="true"></i><span id="stateTxt"></span></div>
+        </div>
         </div>
       </div>
 
       <!-- comment field -->
-    </div>
-
-    <!-- action bar -->
-    <div class="abar" id="abar">
-      <div class="arow">
-        <button class="prim" type="button" id="primBtn"><i class="ph ph-check-circle" aria-hidden="true"></i><span id="primLbl">Confirm</span></button>
-        <div class="cdabar" id="cdaBar" hidden>
-          <button class="cgo" type="button" id="cdaGoBtn"><i class="ph ph-eye" id="cdaGoIcon" aria-hidden="true"></i><span id="cdaGoLbl">View CDA</span></button>
-          <button class="creinit" type="button" id="cdaReinitBtn" hidden><i class="ph ph-arrow-u-up-left" aria-hidden="true"></i><span>Reinitiate</span></button>
-          <button class="cmo" type="button" id="cdaMoreBtn" aria-label="CDA options"><i class="ph ph-dots-three" aria-hidden="true"></i></button>
-        </div>
-        <button class="ghost" type="button" id="msgBtn" aria-label="Comment"><i class="ph ph-chat-circle-dots" aria-hidden="true"></i><span>Comment</span></button>
-      </div>
-      <div class="state" id="stateMsg" hidden><i class="ph-fill ph-check-circle" aria-hidden="true"></i><span id="stateTxt"></span></div>
     </div>
 
     <div class="scrim" id="scrim"></div>
@@ -1637,6 +1720,30 @@ body { position:relative; gap:0; }
       </div>
     </div>
 
+    <!-- all commission totals sheet -->
+    <div class="sheet" id="commissionInfoSheet" role="dialog" aria-modal="true" aria-labelledby="commissionInfoSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="sh-name" id="commissionInfoSheetT" tabindex="-1">Where the commission goes<span class="sh-sub" id="commissionInfoSheetSub">See how splits, fees, and deductions produce each total.</span></div>
+      <div class="commission-map" id="commissionMap">
+        <details class="commission-map-item net" data-commission-kind="Net" open>
+          <summary><span class="commission-map-label">Net commission</span><span class="commission-map-value" id="commissionMapNetValue">$4,485</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <div class="commission-map-body" id="commissionMapNet"></div>
+        </details>
+        <details class="commission-map-item radius" data-commission-kind="Rad">
+          <summary><span class="commission-map-label">Radius commission</span><span class="commission-map-value" id="commissionMapRadValue">$2,060</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <div class="commission-map-body" id="commissionMapRad"></div>
+        </details>
+        <details class="commission-map-item team" data-commission-kind="Team">
+          <summary><span class="commission-map-label">Team commission</span><span class="commission-map-value" id="commissionMapTeamValue">$2,786</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <div class="commission-map-body" id="commissionMapTeam"></div>
+        </details>
+        <details class="commission-map-item group" data-commission-kind="Group">
+          <summary><span class="commission-map-label">Group commission</span><span class="commission-map-value" id="commissionMapGroupValue">$697</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <div class="commission-map-body" id="commissionMapGroup"></div>
+        </details>
+      </div>
+    </div>
+
     <!-- side sheet -->
 
     <!-- activity and comments sheet -->
@@ -1785,7 +1892,6 @@ body { position:relative; gap:0; }
   var gross = price * 0.02,
       allocPct = 50,
       CO = { mine: [], other: [] },
-      myShare = 0,
       DEDS = {
         mine: [
           { id: 'd1', name: 'Credits', amt: 50, payee: 'Bay Area Escrow', kind: 'credit', type: 'credit', payTo: 'external' },
@@ -2009,7 +2115,6 @@ body { position:relative; gap:0; }
       c = agentChain(AG.mine[i], n, AG.mine[i].allocation);
       MINE.push(c);
       sn += c.net; ss += c.splitAmt; sr += c.radius; st += c.team;
-      if (AG.mine[i].me) myShare = c.net;
     }
     net = sn;
     agentsPaid = ss;
@@ -2094,36 +2199,28 @@ body { position:relative; gap:0; }
     d.className = 'paybody'; d.id = o.id; d.hidden = !openPays[o.id];
     o.rows.forEach(function (r) {
       var el;
-      /* the signed-in agent's chain is already printed in full in the card
-         above — repeating it here was the same money twice. Their chevron
-         opens the one thing the card does not carry: cap progress. */
-      if (o.capsOnly && !r.hasOwnProperty('caps') && !r.relationships) return;
       if (r.relationships) {
         el = document.createElement('div'); el.className = 'relationship-stack';
         r.relationships.forEach(function (rel) {
-          var canPick = !!rel.editable,
-              rr = document.createElement(canPick ? 'button' : 'div');
-          rr.className = 'relationship-row' + (canPick ? ' is-picker' : '') + (rel.postActive ? ' is-postcap' : '');
-          if (canPick) {
-            rr.type = 'button';
-            rr.setAttribute('data-plan', r.agent);
-            rr.setAttribute('data-plan-rel', rel.key);
-            rr.setAttribute('aria-haspopup', 'dialog');
-            rr.setAttribute('aria-label', rel.k + ' plan: ' + rel.activePlan);
-          }
-          var rk = document.createElement('b'); rk.textContent = rel.k;
-          var rv = document.createElement('strong'); rv.textContent = rel.activePlan;
-          var rs = document.createElement('em'); rs.textContent = rel.state;
-          rr.appendChild(rk); rr.appendChild(rv);
-          if (canPick) {
-            var ri = document.createElement('i'); ri.className = 'ph ph-caret-down'; ri.setAttribute('aria-hidden', 'true'); rr.appendChild(ri);
-          }
-          rr.appendChild(rs);
-          if (rel.assigned) {
-            var assigned = document.createElement('span'); assigned.className = 'rel-assigned';
-            assigned.textContent = rel.assigned + ' · assigned, not charging'; rr.appendChild(assigned);
-          }
-          el.appendChild(rr);
+          var row = document.createElement('div'); row.className = 'prow relationship-plan-row';
+          var key = document.createElement('span'); key.className = 'pk'; key.appendChild(document.createTextNode('Plan'));
+          var info = document.createElement('button'); info.type = 'button'; info.className = 'ibtn';
+          var infoId = o.id + '-rel-' + rel.key;
+          info.setAttribute('aria-expanded', 'false'); info.setAttribute('aria-controls', infoId);
+          info.setAttribute('aria-label', 'About ' + rel.activePlan);
+          var infoIcon = document.createElement('i'); infoIcon.className = 'ph ph-question'; infoIcon.setAttribute('aria-hidden', 'true'); info.appendChild(infoIcon);
+          key.appendChild(info);
+          var value = document.createElement('span'); value.className = 'pv'; value.textContent = rel.activePlan;
+          var pop = document.createElement('div'); pop.className = 'pop'; pop.id = infoId; pop.hidden = true;
+          var arrow = document.createElement('span'); arrow.className = 'arr'; arrow.setAttribute('aria-hidden', 'true');
+          var meta = document.createElement('div'); meta.className = 'popv';
+          var relation = document.createElement('b'); relation.textContent = rel.k;
+          var state = document.createElement('span'); state.textContent = rel.state;
+          meta.appendChild(relation); meta.appendChild(state); pop.appendChild(arrow); pop.appendChild(meta);
+          var assigned = document.createElement('p');
+          assigned.textContent = rel.assigned ? rel.assigned + ' · assigned, not charging' : rel.commissionPlan;
+          pop.appendChild(assigned);
+          row.appendChild(key); row.appendChild(value); row.appendChild(pop); el.appendChild(row);
         });
         d.appendChild(el); return;
       }
@@ -2168,7 +2265,7 @@ body { position:relative; gap:0; }
                 extras = Array.prototype.slice.call(capBody.querySelectorAll('.capstack-extra')),
                 startHeight = capBody.getBoundingClientRect().height,
                 firstCards = Array.prototype.slice.call(capBody.querySelectorAll('.cap')).slice(0, 2),
-                collapsedHeight = firstCards.reduce(function (sum, card) { return sum + card.getBoundingClientRect().height; }, 0) + 8;
+                collapsedHeight = firstCards.reduce(function (height, card) { return height + card.getBoundingClientRect().height; }, 0) + 8;
             openCapStacks[o.id] = next;
             capToggle.setAttribute('aria-expanded', String(next));
             capToggleText.textContent = next ? 'Show less' : 'Show more';
@@ -2343,12 +2440,42 @@ body { position:relative; gap:0; }
       { sep: true },
       { k: 'Group commission', v: cur(groupNet), tot: true }
     ]);
+    syncCommissionMap(false);
+  }
+  function syncCommissionMap(resetOpen) {
+    var map = [
+      { key: 'Net', value: 'r1Net' },
+      { key: 'Rad', value: 'r1Rad' },
+      { key: 'Team', value: 'r1Team' },
+      { key: 'Group', value: 'r1Group' }
+    ];
+    map.forEach(function (item) {
+      var source = document.getElementById('pop1' + item.key + 'B'),
+          destination = document.getElementById('commissionMap' + item.key),
+          sourceValue = document.getElementById(item.value),
+          destinationValue = document.getElementById('commissionMap' + item.key + 'Value');
+      if (!source || !destination || !sourceValue || !destinationValue) return;
+      destinationValue.textContent = sourceValue.textContent;
+      destination.textContent = '';
+      var list = source.cloneNode(true);
+      list.removeAttribute('id');
+      list.hidden = false;
+      destination.appendChild(list);
+    });
+    if (!resetOpen) return;
+    var primary = role === 'team_lead' ? ['Team']
+      : role === 'group_lead' ? ['Group']
+      : role === 'group_lead_agent' ? ['Net', 'Group']
+      : ['Net'];
+    Array.prototype.forEach.call(document.querySelectorAll('#commissionMap [data-commission-kind]'), function (item) {
+      item.open = primary.indexOf(item.getAttribute('data-commission-kind')) !== -1;
+    });
   }
   function renderAgents() {
     var h1 = document.getElementById('agentList1'), i, o;
     h1.textContent = '';
     for (i = 0; i < AG.mine.length; i++) {
-      o = { name: AG.mine[i].name, role: AG.mine[i].role, id: 'apay-m' + i, pay: cur(MINE[i].net), rows: MINE[i].rows, capsOnly: !!AG.mine[i].me, allocation: AG.mine[i].allocation, side: 'mine', index: i, removable: !AG.mine[i].me };
+      o = { name: AG.mine[i].name, role: AG.mine[i].role, id: 'apay-m' + i, pay: cur(MINE[i].net), rows: MINE[i].rows, allocation: AG.mine[i].allocation, side: 'mine', index: i, removable: !AG.mine[i].me };
       h1.appendChild(agentRowEl(o, i === 0));
       h1.appendChild(payBodyEl(o));
     }
@@ -2564,11 +2691,11 @@ body { position:relative; gap:0; }
   /* ── role ───────────────────────────────────────────── */
   var ROLE = {
     agent: { chip: 'Agent', math: 'How yours is calculated',
-      heroLbl: 'Your net commission', heroVal: function () { return myShare; }, thirdK: 'Your plan', thirdV: function () { return '80/20'; },
+      heroLbl: 'Your net commission', heroVal: function () { return agentNetCommission(); }, thirdK: 'Your plan', thirdV: function () { return '80/20'; },
       net: 'Net commission to you', who: 'Jessica Hall \u00b7 Radius auditing prepared this', shortWho: 'Radius auditing',
       wire: 'Add your wire instructions in settings before this breakdown can be finalized.' },
     group_agent: { chip: 'Agent \u00b7 Rise Group', math: 'How yours is calculated',
-      heroLbl: 'Your net commission', heroVal: function () { return myShare; }, thirdK: 'Your plan', thirdV: function () { return '80/20'; },
+      heroLbl: 'Your net commission', heroVal: function () { return agentNetCommission(); }, thirdK: 'Your plan', thirdV: function () { return '80/20'; },
       net: 'Net commission to you', who: 'Jessica Hall \u00b7 Radius auditing prepared this', shortWho: 'Radius auditing',
       wire: 'Add your wire instructions in settings before this breakdown can be finalized.' },
     team_lead: { chip: 'Team lead', math: 'How the team share is calculated',
@@ -2580,7 +2707,7 @@ body { position:relative; gap:0; }
       net: 'Net commission to Mark Perez', who: 'Waiting on Mark Perez and Andy Martin', shortWho: 'Waiting on the team',
       wire: 'Group wire instructions are missing \u2014 the group share can\u2019t be disbursed yet.' },
     group_lead_agent: { chip: 'Group lead \u00b7 agent', math: 'How your agent and group income are calculated',
-      heroLbl: 'Total payout', heroVal: function () { return myShare + groupNet; }, thirdK: 'Group commission', thirdV: function () { return cur(groupNet); },
+      heroLbl: 'Total payout', heroVal: function () { return agentNetCommission() + groupNet; }, thirdK: 'Group commission', thirdV: function () { return cur(groupNet); },
       net: 'Total payout to you', who: 'You are the agent and Group Lead on this side', shortWho: 'Your two roles',
       wire: 'Agent or group wire instructions are missing.' }
   };
@@ -2591,7 +2718,7 @@ body { position:relative; gap:0; }
   /* which fee groups are open, kept across re-renders so editing a fee does
      not fold the list you were reading */
   var ybdFull = true, ybdPost = false, ybdAsm = false, ybdEditing = false,
-      ybdGrp = { pre: false, plan: false, post: false, radius: false },
+      ybdGrp = { basis: false, pre: false, plan: false, post: false, radius: false, commissions: false },
       ybdMotion = { frame:0, card:null, det:null, row:null, chev:null,
         h:0, vh:0, rot:90, vrot:0, th:0, trot:90, closing:false, last:0 },
       ybdInnerSprings = new WeakMap(), ybdInnerStates = [],
@@ -2755,18 +2882,18 @@ body { position:relative; gap:0; }
     for (var i = 0; i < AG.mine.length; i++) if (AG.mine[i].me) return MINE[i];
     return MINE[0];
   }
-  /* Assumptions is the reference block now, not the edit home: the plan itself,
-     the basis it is applied to, and the post-commission adder. Every fee that
-     used to be duplicated here is editable in place inside Full breakdown, so
-     no number has two doors. */
+  /* This is the amount the agent actually receives. It comes from the final
+     total of their own calculation chain, after plan fees, post-split
+     deductions and every payable-to-Radius item have been removed. */
+  function agentNetCommission() {
+    var chain = myChain();
+    return chain ? chain.net : 0;
+  }
+  /* Plan leads the person's breakdown. Commission basis owns fee rows, so it
+     is rendered by the same count/value disclosure pattern as other groups. */
   function ybdAsmRows() {
-    var n = AG.mine.length || 1, share = 1 / n,
-        s = SCHED['Mark Perez'],
-        splitLbl = s.flat != null ? '$' + s.flat + ' flat' : s.split + '%',
-        rows = [
-          { k: 'Plan', sub: splitLbl + ' to you', v: s.plan, txt: true, nav: 'plan' },
-          { k: 'Commission basis', sub: allocPct + '% of ' + cur(gross) + (n > 1 ? ' · ' + pctLbl(share) + ' to you' : ''), v: cur(basis * share), lock: true }
-        ];
+    var s = SCHED['Mark Perez'],
+        rows = [{ k: 'Plan', v: s.plan, txt: true, nav: ybdEditing ? 'plan' : null }];
     rows.push({ addplan: true });
     return rows;
   }
@@ -2781,12 +2908,11 @@ body { position:relative; gap:0; }
             { k: 'Group split', v: groupSplitPct + '%' },
             { k: 'Group payout', v: cur(groupNet) }
           ] },
-          { k: 'Total payout', v: cur(myShare + groupNet), tot: true }
+          { k: 'Total payout', v: cur(agentNetCommission() + groupNet), tot: true }
         ]) };
       }
       return [
-        { k: role === 'group_lead_agent' ? 'Your Agent + Group Breakdown' : 'Your Breakdown', full: ch, v: cur(role === 'group_lead_agent' ? myShare + groupNet : myShare) },
-        { k: 'Plan & commission basis', sub: SCHED['Mark Perez'].plan + ' · basis ' + cur(basis * share), asm: true }
+        { k: role === 'group_lead_agent' ? 'Your Agent + Group Breakdown' : 'Your Breakdown', full: ch, v: cur(role === 'group_lead_agent' ? agentNetCommission() + groupNet : agentNetCommission()) }
       ];
     }
     if (role === 'team_lead') {
@@ -2979,6 +3105,16 @@ body { position:relative; gap:0; }
         if (r.post && r.post.flag) s.appendChild(ybdIco('ph-warning-circle', r.post.flag, 'warn'));
         var a = document.createElement('b'); a.textContent = String(r.v).replace(/^[\u2212-]/, '');
         l.appendChild(s); l.appendChild(a);
+        if (r.infosheet) {
+          l.setAttribute('data-info-value', String(r.v).replace(/^[\u2212-]/, ''));
+          var info = document.createElement('button');
+          info.type = 'button'; info.className = 'ibtn';
+          info.setAttribute('aria-haspopup', 'dialog');
+          info.setAttribute('data-infosheet', r.infosheet);
+          info.setAttribute('aria-label', 'View ' + (r.cardk || r.k).toLowerCase() + ' calculation');
+          var infoIcon = document.createElement('i'); infoIcon.className = 'ph ph-question'; infoIcon.setAttribute('aria-hidden', 'true');
+          info.appendChild(infoIcon); s.appendChild(info);
+        }
         if (tgt) {
           var c = document.createElement('i'); c.className = 'ph ph-pencil-simple edit-mark'; c.setAttribute('aria-hidden', 'true');
           l.appendChild(c);
@@ -3004,9 +3140,15 @@ body { position:relative; gap:0; }
       /* the chain, bucketed: what stands on its own above the groups (the
          split), and the three fee groups the card collapses. */
       var loose = [], groups = [], cur_ = null, flagged = [];
+      if (role === 'agent' || role === 'group_agent' || role === 'group_lead_agent') {
+        ybdAsmRows().forEach(function (r) { det.appendChild(ybdRowEl(r)); });
+      }
       o.full.rows.forEach(function (r) {
         /* Net commission already lives in the persistent floating summary. */
         if (r.tot && typeof r.v === 'string') return;
+        /* Plan plus commission basis now explain this result first. Repeating
+           the percentage split and split dollars adds no new information. */
+        if (r.cardk === 'Your split') return;
         if (r.head) {
           cur_ = r.grp ? { key: r.grp, label: r.cardhead || r.head, rows: [] } : null;
           if (cur_) groups.push(cur_);
@@ -3017,29 +3159,42 @@ body { position:relative; gap:0; }
         if (cur_) cur_.rows.push(r); else loose.push(r);
       });
       loose.forEach(function (r) { ybdFeeEl(r, det); });
-      /* Keep the full deduction amount in one disclosure. The prototype only
-         needs two scan-friendly fee lines; their raw totals still reconcile
-         with the detailed calculation behind this card. */
-      var totAmt = 0,
-          planAmt = 0,
-          postAmt = 0,
-          radiusAmt = 0;
+      /* Commission ownership and Radius-payable fees are different concepts.
+         Give each the same compact disclosure treatment and keep them adjacent. */
+      var mineParticipant = AG.mine.filter(function (a) { return a.me; })[0] || AG.mine[0],
+          basisShare = Math.max(0, Number(mineParticipant && mineParticipant.allocation != null ? mineParticipant.allocation : 100)) / 100,
+          basisFees = DEDS.mine.filter(function (d) { return d.kind === 'credit'; }).map(function (d) {
+            return { k:d.name, v:neg(d.amt * basisShare), amt:d.amt * basisShare };
+          }),
+          basisGroup = {
+            key: 'basis', label: 'Commission basis', itemLabel: 'fees',
+            amt: basis * basisShare, rows: basisFees
+          },
+          radiusGroup = groups.filter(function (g) { return g.key === 'radius'; })[0],
+          commissionGroup = null;
+      if (radiusGroup && (role === 'agent' || role === 'group_agent' || role === 'group_lead_agent')) {
+        commissionGroup = {
+          key: 'commissions', label: 'Commissions', itemLabel: 'totals',
+          /* Group commission is already a slice of Team commission, so do not
+             double-count it in the header's top-level destination total. */
+          amt: agentNetCommission() + radiusNet + teamNet,
+          rows: [
+            { k:'Net commission', v:cur(agentNetCommission()), infosheet:'Net' },
+            { k:'Radius commission', v:cur(radiusNet), infosheet:'Rad' },
+            { k:'Team commission', v:cur(teamNet), infosheet:'Team' },
+            { k:'Group commission', v:cur(groupNet), infosheet:'Group' }
+          ]
+        };
+      }
+      /* Each fee belongs to exactly one visible group. Do not manufacture a
+         second "pre-split" subtotal from these groups: that made the screen
+         look as if the same fees were removed twice even though the final
+         agent net only subtracts them once. */
       groups.forEach(function (g) {
         g.amt = g.rows.reduce(function (t, r) { return t + (r.amt || 0); }, 0);
-        totAmt += g.amt;
-        if (g.key === 'plan') planAmt = g.amt;
-        if (g.key === 'post') postAmt = g.amt;
-        if (g.key === 'radius') radiusAmt = g.amt;
       });
-      if (totAmt) groups.unshift({
-        key: 'pre',
-        label: 'Pre-split deductions',
-        rows: [
-          { k: 'Plan and Radius fees', v: neg(planAmt + radiusAmt), amt: planAmt + radiusAmt },
-          { k: 'Transaction fees', v: neg(postAmt), amt: postAmt }
-        ].filter(function (r) { return r.amt; }),
-        amt: totAmt
-      });
+      if (basisGroup.rows.length) groups.unshift(basisGroup);
+      if (commissionGroup) groups.splice(groups.indexOf(radiusGroup) + 1, 0, commissionGroup);
       /* anything needing attention reads above the groups, open or closed —
          a collapsed group must never be able to hide a problem */
       if (flagged.length) {
@@ -3062,11 +3217,11 @@ body { position:relative; gap:0; }
         var gs = document.createElement('span');
         gs.appendChild(document.createTextNode(g.label));
         var ge = document.createElement('em');
-        ge.textContent = g.rows.length + (g.rows.length === 1 ? ' fee' : ' fees');
+        ge.textContent = g.rows.length + (g.itemLabel ? ' ' + g.itemLabel : (g.rows.length === 1 ? ' fee' : ' fees'));
         gs.appendChild(ge);
         var gv = document.createElement('b'); gv.textContent = cur(g.amt);
         var gm = document.createElement('i'); gm.className = 'ph ' + (open ? 'ph-minus' : 'ph-plus') + ' expand-mark'; gm.setAttribute('aria-hidden', 'true');
-        gb.appendChild(gs); gb.appendChild(gv); gb.appendChild(gm);
+        gb.appendChild(gs); if (!g.hideTotal) gb.appendChild(gv); gb.appendChild(gm);
         gb.setAttribute('aria-expanded', String(open));
         gb.setAttribute('aria-controls', gid);
         var box = document.createElement('div');
@@ -3193,17 +3348,22 @@ body { position:relative; gap:0; }
     document.getElementById('finGross').textContent = cur(gross);
     if (role === 'agent' || role === 'group_agent') {
       document.getElementById('netFloatLabel').textContent = 'Net commission';
-      document.getElementById('netFloatValue').textContent = cur(myShare);
+      document.getElementById('netFloatSub').textContent = 'After all fees and deductions';
+      document.getElementById('netFloatValue').textContent = cur(agentNetCommission());
     } else if (role === 'group_lead_agent') {
       document.getElementById('netFloatLabel').textContent = 'Total payout';
-      document.getElementById('netFloatValue').textContent = cur(myShare + groupNet);
+      document.getElementById('netFloatSub').textContent = 'Agent net + group commission';
+      document.getElementById('netFloatValue').textContent = cur(agentNetCommission() + groupNet);
     } else if (role === 'team_lead') {
       document.getElementById('netFloatLabel').textContent = 'Net to team lead';
+      document.getElementById('netFloatSub').textContent = 'After group share and team fees';
       document.getElementById('netFloatValue').textContent = cur(teamLeadTakeHome());
     } else {
       document.getElementById('netFloatLabel').textContent = 'Group commission';
+      document.getElementById('netFloatSub').textContent = 'Group share from team commission';
       document.getElementById('netFloatValue').textContent = cur(groupNet);
     }
+    document.getElementById('netFloatInfo').setAttribute('aria-label', 'Explain ' + document.getElementById('netFloatLabel').textContent.toLowerCase() + ' ' + document.getElementById('netFloatValue').textContent);
     document.getElementById('ybdClose').textContent = closeShort;
     lad.textContent = '';
     ybdLadder().forEach(function (o) { lad.appendChild(ybdRowEl(o)); });
@@ -3223,6 +3383,11 @@ body { position:relative; gap:0; }
     if (full.getAttribute('aria-expanded') !== 'true') full.click();
     var sc = document.getElementById('scroll'), card = document.getElementById('ybdCard');
     if (sc && card) sc.scrollTo({ top:Math.max(0, card.offsetTop - 10), behavior:'smooth' });
+  });
+  document.getElementById('netFloatInfo').addEventListener('click', function () {
+    syncCommissionMap(true);
+    document.getElementById('commissionInfoSheetSub').textContent = document.getElementById('netFloatLabel').textContent + ' ' + document.getElementById('netFloatValue').textContent + ' · see every split, fee, and deduction.';
+    open(document.getElementById('commissionInfoSheet'), this);
   });
 
   /* top-level financials share one explicit sheet. Editing remains a mode,
@@ -3692,7 +3857,7 @@ body { position:relative; gap:0; }
     document.getElementById('confirmTitle').textContent = agentView ? 'Confirm your commission' : role === 'team_lead' ? 'Confirm team commission' : 'Confirm group commission';
     document.getElementById('confirmAmountLabel').textContent = agentView ? 'Net commission to you' : role === 'team_lead' ? 'Net to team lead' : 'Group commission';
     document.getElementById('confirmPlanRow').hidden = !agentView;
-    document.getElementById('confirmNet').textContent = cur(agentView ? myShare : leadNet);
+    document.getElementById('confirmNet').textContent = cur(agentView ? agentNetCommission() : leadNet);
     document.getElementById('confirmSub').textContent = agentView
       ? 'You\u2019re confirming the calculated net commission for ' + addr + '.'
       : 'You\u2019re confirming your calculated net commission for ' + addr + '.';
@@ -5019,14 +5184,17 @@ body { position:relative; gap:0; }
     ['Net', 'Rad', 'Team', 'Group'].forEach(function (k) {
       document.getElementById('pop1' + k + 'B').hidden = k !== key;
     });
-    var value = ib.closest('.side-metric').querySelector('b').textContent;
+    var owner = ib.closest('.side-metric, [data-info-value]'),
+        value = owner && owner.hasAttribute('data-info-value')
+          ? owner.getAttribute('data-info-value')
+          : owner.querySelector('b').textContent;
     document.getElementById('infoSheetLabel').textContent = INFOSHEETS[key];
     document.getElementById('infoSheetSub').textContent = 'Complete calculation · ' + value;
     open(document.getElementById('infoSheet'), ib);
   });
   document.addEventListener('click', function (e) {
     if (e.target.closest('.pop')) return;
-    var b = e.target.closest('.ibtn:not([data-infosheet])');
+    var b = e.target.closest('.ibtn:not([data-infosheet]):not(#netFloatInfo)');
     var prev = popBtn;
     closePop();
     if (!b || b === prev) return;
