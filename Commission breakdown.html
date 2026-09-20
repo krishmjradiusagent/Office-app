@@ -1221,6 +1221,38 @@ button.ybd-r:active { opacity:.7; }
 .relationship-plan-row .pk { display:flex; align-items:center; gap:5px; color:var(--muted-foreground); }
 .relationship-plan-row .pv { min-width:0; max-width:62%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
 .relationship-plan-row .ibtn { color:var(--muted-foreground); }
+.post-cap-host { position:relative; margin:10px 0 0; }
+.detail-scroll > .post-cap-host { margin:0 0 10px; }
+.post-cap-banner { position:relative; overflow:visible; border:1px solid var(--tint-amber-border); border-radius:16px;
+  background:linear-gradient(145deg,var(--tint-amber-bg),rgba(255,255,255,.025)); box-shadow:var(--shadow-sm); }
+.post-cap-summary { display:flex; align-items:center; gap:11px; width:100%; min-height:70px; padding:10px 12px;
+  border:0; border-radius:16px; background:transparent; color:var(--foreground); text-align:left; cursor:pointer; }
+.post-cap-summary:focus-visible,.post-cap-change:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.post-cap-icon { flex:none; display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px;
+  border:1px solid var(--tint-amber-border); border-radius:12px; background:var(--tint-amber-bg); color:var(--tint-amber-fg); font-size:19px; }
+.post-cap-copy { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:3px; }
+.post-cap-copy b { font:650 14px/1.2 var(--font); letter-spacing:.035em; text-transform:uppercase; }
+.post-cap-copy small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted-foreground); font:500 12px/1.25 var(--font); }
+.post-cap-count { flex:none; display:inline-flex; align-items:center; justify-content:center; min-height:26px; padding:0 9px;
+  border:1px solid var(--tint-amber-border); border-radius:999px; color:var(--tint-amber-fg); font:600 12px/1 var(--font); }
+.post-cap-summary > .chev { flex:none; color:var(--muted-foreground); font-size:15px; transition:transform 180ms var(--ease-out); }
+.post-cap-summary[aria-expanded="true"] > .chev { transform:rotate(180deg); }
+.post-cap-body { padding:0 12px 10px 61px; }
+.post-cap-row { position:relative; display:flex; align-items:center; gap:8px; min-height:48px; border-top:1px solid var(--border); }
+.post-cap-plan { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.post-cap-plan b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:600 13px/1.2 var(--font); }
+.post-cap-plan span { color:var(--muted-foreground); font:500 12px/1.2 var(--font); }
+.post-cap-change { flex:none; min-height:32px; padding:0 4px; border:0; background:transparent; color:var(--primary); font:600 12px/1 var(--font); cursor:pointer; }
+.post-cap-picker { position:relative; flex:none; }
+.post-cap-picker .plan-drop { top:calc(100% + 4px); bottom:auto; right:-6px; width:min(260px,calc(100vw - 72px));
+  transform:translate3d(6px,-2px,0) scale(.97); transform-origin:100% 0; transition:opacity 150ms var(--ease-out),transform 180ms var(--ease-out); }
+.post-cap-picker.open .plan-drop { opacity:1; transform:none; }
+.post-cap-picker .plan-drop-list button { align-items:flex-start; padding-top:8px; padding-bottom:8px; }
+.post-cap-option-copy { display:flex; flex:1; min-width:0; flex-direction:column; gap:2px; }
+.post-cap-option-copy b { font:600 13px/1.2 var(--font); }
+.post-cap-option-copy span { color:var(--muted-foreground); font:500 12px/1.2 var(--font); }
+.screen.light .post-cap-banner { background:linear-gradient(145deg,var(--tint-amber-bg),rgba(255,255,255,.82)); }
+@media (prefers-reduced-motion:reduce) { .post-cap-summary > .chev,.post-cap-picker .plan-drop { transition:none; } }
 .fee-flags { display:inline-flex; gap:4px; margin-left:5px; vertical-align:middle; }
 .fee-flag { padding:2px 5px; border-radius:999px; background:var(--muted); color:var(--muted-foreground); font:600 10px/1 var(--font); }
 .parity-state { margin:0 0 10px; padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:var(--muted);
@@ -1388,6 +1420,7 @@ body { position:relative; gap:0; }
           <div class="fin-row" data-editfinancial="price"><span><i class="ph ph-house-line fin-icon" aria-hidden="true"></i>Sale price</span><b id="finPrice">$1,150,000</b></div>
           <div class="fin-row" data-editfinancial="gross"><span><span class="fin-badge" data-mark="$" aria-hidden="true"><i class="ph ph-seal"></i></span>Gross commission</span><b id="finGross">$23,000</b></div>
         </div>
+        <div class="post-cap-host" id="postCapMain" hidden></div>
         <div class="commission-wallet" id="commissionWallet">
         <div class="ybd-card" id="ybdCard">
           <div class="ybd-lad" id="ybdLad"></div>
@@ -1406,6 +1439,7 @@ body { position:relative; gap:0; }
             <div class="fin-row"><span><i class="ph ph-house-line fin-icon" aria-hidden="true"></i>Sale price</span><b id="detailFinPrice">$1,150,000</b></div>
             <div class="fin-row"><span><span class="fin-badge" data-mark="$" aria-hidden="true"><i class="ph ph-seal"></i></span>Gross commission</span><b id="detailFinGross">$23,000</b></div>
           </div>
+          <div class="post-cap-host" id="postCapDetail" hidden></div>
           <div id="sec-sides">
       <div class="card sides">
         <div class="side">
@@ -1860,6 +1894,13 @@ body { position:relative; gap:0; }
       <span class="sp-k">Theme</span>
       <button class="sp-b" type="button" id="themeToggle" aria-pressed="false"><i class="ph ph-moon" aria-hidden="true"></i>Dark</button>
     </div>
+    <div class="sp-grp">
+      <span class="sp-k">Cap state</span>
+      <div class="sp-row">
+        <button class="sp-b" type="button" data-setcap="progress" aria-pressed="false">In progress</button>
+        <button class="sp-b" type="button" data-setcap="reached" aria-pressed="true">Reached</button>
+      </div>
+    </div>
   </aside>
 </div>
 
@@ -1951,6 +1992,18 @@ body { position:relative; gap:0; }
         { name: '90/10 Premier', split: 90 },
         { name: 'Capped \u00b7 $250 flat', flat: 250 }
       ],
+      POST_CAP_PLANS = {
+        group: [
+          { name: 'Group Post-Cap Fee', formula: '5% of gross + $495 flat', rate: .05, flat: 495 },
+          { name: 'Group Post-Cap 4%', formula: '4% of gross', rate: .04, flat: 0 }
+        ],
+        team: [
+          { name: 'Team Post-Cap Fee', formula: '$250 flat', rate: 0, flat: 250 },
+          { name: 'Team Post-Cap 2%', formula: '2% of gross', rate: .02, flat: 0 }
+        ]
+      },
+      postCapSelection = { group: 0, team: 0 },
+      capReached = true,
       /* Radius Web sends each cap as its own key. Group-plan agents use the
          two relationship caps and never use internal_team; direct agents use
          internal_team and never the group pair. */
@@ -1999,7 +2052,36 @@ body { position:relative; gap:0; }
       return (kind && d.kind !== kind) ? t : t + (Number(d.amt) || 0);
     }, 0);
   }
+  function capMet(c) { return !!(c && c.at >= c.of); }
+  function selectedPostCap(kind) { return POST_CAP_PLANS[kind][postCapSelection[kind]]; }
+  function postCapCharge(kind, amount) {
+    var p = selectedPostCap(kind);
+    return amount * p.rate + p.flat;
+  }
+  function postCapActiveFor(s, kind) {
+    var caps = CAPS['Mark Perez'] || {}, key;
+    if (kind === 'group') key = usesGroupRelationships(s) ? 'agent_group' : 'radius';
+    else key = usesGroupRelationships(s) ? 'group_team' : 'internal_team';
+    return capMet(caps[key]);
+  }
+  function syncPostCapSchedule() {
+    var s = SCHED['Mark Perez'], group = selectedPostCap('group'), team = selectedPostCap('team');
+    if (!s || !s.postCap) return;
+    s.postCap.agent_group_lead.name = group.name;
+    s.postCap.agent_group_lead.formula = group.formula;
+    s.postCap.agent_team.name = team.name;
+    s.postCap.agent_team.formula = team.formula;
+    s.postCap.group_team.name = team.name;
+    s.postCap.group_team.formula = team.formula;
+    if (CAPS['Mark Perez']) {
+      if (CAPS['Mark Perez'].radius) CAPS['Mark Perez'].radius.fee = group.formula;
+      if (CAPS['Mark Perez'].internal_team) CAPS['Mark Perez'].internal_team.fee = team.formula;
+      if (CAPS['Mark Perez'].agent_group) CAPS['Mark Perez'].agent_group.fee = group.formula;
+      if (CAPS['Mark Perez'].group_team) CAPS['Mark Perez'].group_team.fee = team.formula;
+    }
+  }
   function compute() {
+    syncPostCapSchedule();
     /* two stages, and they genuinely differ:
        off the top reduces the side gross everyone splits;
        pre-split comes off the agent's share only */
@@ -2011,7 +2093,8 @@ body { position:relative; gap:0; }
     otherGross = gross - sideGross;
     basis = sideGross - offTop;
     split = basis * 0.8;
-    postCap = sideGross * 0.05 + 495;
+    postCap = postCapActiveFor(SCHED['Mark Perez'], 'group') ? postCapCharge('group', sideGross) : 0;
+    teamPostCap = postCapActiveFor(SCHED['Mark Perez'], 'team') ? postCapCharge('team', sideGross) : 0;
     net = Math.max(0, split - preSplit - radiusFee - postCap - teamPostCap - postDed
       - PAYRADIUS.reduce(function (t, d) { return t + d.a; }, 0));
     teamNet = (basis - split) + teamPostCap + 250;
@@ -2046,14 +2129,14 @@ body { position:relative; gap:0; }
     var post = s.postCap || {};
     function card(key, label, commissionPlan, formula, cap) {
       var postPlan = post[key] || null,
-          capMet = !!(cap && cap.at >= cap.of),
-          postActive = !!(capMet && postPlan && postPlan.active);
+          isMet = capMet(cap),
+          postActive = !!(isMet && postPlan && postPlan.active);
       return {
         key: key,
         k: label,
         commissionPlan: commissionPlan || 'No plan selected',
         activePlan: postActive ? postPlan.name : (commissionPlan || 'No plan selected'),
-        state: postActive ? 'Post-cap · ' + postPlan.formula : capMet ? 'Cap reached · no post-cap plan applied' : formula,
+        state: postActive ? 'Post-cap · ' + postPlan.formula : isMet ? 'Cap reached · no post-cap plan applied' : formula,
         postActive: postActive,
         assigned: postActive ? commissionPlan : '',
         editable: relationshipCanEdit(key)
@@ -2074,8 +2157,8 @@ body { position:relative; gap:0; }
         aPre = preSplit * share,
         aDed = postDed * share,
         splitAmt = s.flat != null ? Math.max(0, aBasis - s.flat) : aBasis * s.split / 100,
-        pc = s.capped ? aGross * 0.05 + 495 : 0,
-        tpc = s.team ? teamPostCap : 0,
+        pc = s.capped && postCapActiveFor(s, 'group') ? postCapCharge('group', aGross) : 0,
+        tpc = s.team && postCapActiveFor(s, 'team') ? postCapCharge('team', aGross) : 0,
         rows = [];
     /* `cardhide` keeps supporting calculation rows in the lower breakdown
        without repeating them in the compact card. */
@@ -2107,14 +2190,14 @@ body { position:relative; gap:0; }
        summed from these, never parsed back out of "−$2,970". Both keys are
        inert in the lower breakdown, which reads the same chain. */
     rows.push({ head: 'Deductions', cardhead: 'Plan fees', grp: 'plan' });
-    if (tpc) rows.push({ k: 'Team post-cap fee', sub2: '$250 flat', v: neg(tpc), amt: tpc, psub: true, ed: 'fee:team', det: [{ k: 'Rule', v: '$' + teamPostCap + ' flat' }] });
+    if (tpc) rows.push({ k: selectedPostCap('team').name, sub2: selectedPostCap('team').formula, v: neg(tpc), amt: tpc, psub: true, ed: 'fee:team', det: [{ k: 'Rule', v: selectedPostCap('team').formula }] });
     if (aPre) rows.push({ k: 'Pre-split deductions', v: neg(aPre), amt: aPre });
     rows.push({ k: 'Radius fee', v: neg(radiusFee), amt: radiusFee, ed: 'fee:radius', det: [{ k: 'Rule', v: '$' + radiusFee + ' flat' }] });
-    if (pc) rows.push({ k: 'Group post-cap fee', sub2: '5% of gross + $495 flat', v: neg(pc), amt: pc, det: [
-      { k: 'Rule', v: '5% of side gross + $495 flat' },
+    if (pc) rows.push({ k: selectedPostCap('group').name, sub2: selectedPostCap('group').formula, v: neg(pc), amt: pc, det: [
+      { k: 'Rule', v: selectedPostCap('group').formula },
       { k: 'Side gross', v: cur(aGross) },
-      { k: '5% of side gross', v: cur(aGross * 0.05) },
-      { k: 'Flat', v: '$495' }
+      { k: 'Percentage charge', v: cur(aGross * selectedPostCap('group').rate) },
+      { k: 'Flat charge', v: cur(selectedPostCap('group').flat) }
     ] });
     rows.push({ head: 'Post-split deductions', grp: 'post' });
     POSTDEDS.forEach(function (d) {
@@ -2444,8 +2527,8 @@ body { position:relative; gap:0; }
                 { k: 'Team split', v: neg(teamSplit) }];
     if (preSplit) rows.push({ k: 'Pre-split deductions', v: neg(preSplit) });
     rows.push({ k: 'Radius fee', v: neg(sumRad) });
-    if (sumPc) rows.push({ k: 'Group post-cap fee', v: neg(sumPc) });
-    if (sumTpc) rows.push({ k: 'Team post-cap fee', v: neg(sumTpc) });
+    if (sumPc) rows.push({ k: selectedPostCap('group').name, v: neg(sumPc) });
+    if (sumTpc) rows.push({ k: selectedPostCap('team').name, v: neg(sumTpc) });
     POSTDEDS.forEach(function (d) { rows.push({ k: d.n, v: neg(d.a) }); });
     PAYRADIUS.forEach(function (d) { rows.push({ k: d.n, v: neg(d.a) }); });
     rows.push({ sep: true });
@@ -2455,7 +2538,7 @@ body { position:relative; gap:0; }
     var radiusRows = [
       { k: 'Radius fee', v: cur(sumRad), head: true }
     ];
-    if (sumPc) radiusRows.push({ k: 'Group post-cap fee', v: '+ ' + cur(sumPc) });
+    if (sumPc) radiusRows.push({ k: selectedPostCap('group').name, v: '+ ' + cur(sumPc) });
     PAYRADIUS.forEach(function (d) { radiusRows.push({ k: d.n, v: '+ ' + cur(d.a) }); });
     radiusRows.push({ sep: true });
     radiusRows.push({ k: 'Radius commission', v: cur(radiusNet), tot: true });
@@ -2463,7 +2546,7 @@ body { position:relative; gap:0; }
 
     popRows('pop1TeamB', [
       { k: 'Team split', v: cur(teamSplit), head: true },
-      { k: 'Team post-cap fee', v: '+ ' + cur(sumTpc) },
+      { k: selectedPostCap('team').name, v: '+ ' + cur(sumTpc) },
       { k: 'Team admin fee', v: '+ ' + cur(250) },
       { sep: true },
       { k: 'Team commission', v: cur(teamNet), tot: true }
@@ -2592,6 +2675,117 @@ body { position:relative; gap:0; }
 
   document.getElementById('s2Title').textContent = coopTitle;
 
+  var postCapOpen = { postCapMain:false, postCapDetail:false };
+  function activePostCapPlans() {
+    var s = SCHED['Mark Perez'], plans = [];
+    if (s.capped && postCapActiveFor(s, 'group')) plans.push({ kind:'group', plan:selectedPostCap('group') });
+    if (s.team && postCapActiveFor(s, 'team')) plans.push({ kind:'team', plan:selectedPostCap('team') });
+    return plans;
+  }
+  function postCapPicker(kind, hostId) {
+    var anchor = document.createElement('span'); anchor.className = 'post-cap-picker';
+    var change = document.createElement('button'); change.type = 'button'; change.className = 'post-cap-change';
+    change.textContent = 'Change'; change.setAttribute('data-postcap-change', kind);
+    change.setAttribute('aria-haspopup', 'listbox'); change.setAttribute('aria-expanded', 'false');
+    var menu = document.createElement('div'); menu.className = 'plan-drop'; menu.hidden = true;
+    menu.setAttribute('data-postcap-menu', kind); menu.setAttribute('role', 'dialog');
+    menu.setAttribute('aria-label', 'Choose ' + kind + ' post-cap plan');
+    var search = document.createElement('label'); search.className = 'plan-drop-search';
+    var si = document.createElement('i'); si.className = 'ph ph-magnifying-glass'; si.setAttribute('aria-hidden', 'true');
+    var input = document.createElement('input'); input.type = 'search'; input.placeholder = 'Search post-cap plans';
+    input.setAttribute('data-postcap-search', kind); input.setAttribute('aria-label', 'Search post-cap plans');
+    search.appendChild(si); search.appendChild(input); menu.appendChild(search);
+    var list = document.createElement('div'); list.className = 'plan-drop-list';
+    list.setAttribute('role', 'listbox'); list.setAttribute('aria-label', kind + ' post-cap plans');
+    POST_CAP_PLANS[kind].forEach(function (p, index) {
+      var option = document.createElement('button'); option.type = 'button'; option.setAttribute('role', 'option');
+      option.setAttribute('data-postcap-option', kind + '|' + index);
+      option.setAttribute('aria-selected', String(index === postCapSelection[kind]));
+      var check = document.createElement('i'); check.className = 'ph-fill ph-check-circle plan-check'; check.setAttribute('aria-hidden', 'true');
+      var copy = document.createElement('span'); copy.className = 'post-cap-option-copy';
+      var name = document.createElement('b'); name.textContent = p.name;
+      var formula = document.createElement('span'); formula.textContent = p.formula;
+      copy.appendChild(name); copy.appendChild(formula); option.appendChild(check); option.appendChild(copy); list.appendChild(option);
+    });
+    menu.appendChild(list); anchor.appendChild(change); anchor.appendChild(menu);
+    return anchor;
+  }
+  function renderPostCapBanner(host) {
+    var plans = activePostCapPlans(), open = !!postCapOpen[host.id];
+    host.textContent = ''; host.hidden = !plans.length;
+    if (!plans.length) return;
+    var banner = document.createElement('section'); banner.className = 'post-cap-banner';
+    var summary = document.createElement('button'); summary.type = 'button'; summary.className = 'post-cap-summary';
+    summary.setAttribute('data-postcap-toggle', host.id); summary.setAttribute('aria-expanded', String(open));
+    var bodyId = host.id + '-body'; summary.setAttribute('aria-controls', bodyId);
+    var icon = document.createElement('span'); icon.className = 'post-cap-icon';
+    var iconGlyph = document.createElement('i'); iconGlyph.className = 'ph ph-currency-dollar'; iconGlyph.setAttribute('aria-hidden', 'true'); icon.appendChild(iconGlyph);
+    var copy = document.createElement('span'); copy.className = 'post-cap-copy';
+    var title = document.createElement('b'); title.textContent = plans.length === 1 ? 'Post-cap plan' : 'Post-cap plans';
+    var sub = document.createElement('small'); sub.textContent = plans.map(function (x) { return x.plan.name; }).join(' · ');
+    copy.appendChild(title); copy.appendChild(sub);
+    var count = document.createElement('span'); count.className = 'post-cap-count'; count.textContent = plans.length + ' applied';
+    var chev = document.createElement('i'); chev.className = 'ph ph-caret-down chev'; chev.setAttribute('aria-hidden', 'true');
+    summary.appendChild(icon); summary.appendChild(copy); summary.appendChild(count); summary.appendChild(chev); banner.appendChild(summary);
+    var body = document.createElement('div'); body.className = 'post-cap-body'; body.id = bodyId; body.hidden = !open;
+    plans.forEach(function (entry) {
+      var row = document.createElement('div'); row.className = 'post-cap-row';
+      var planCopy = document.createElement('span'); planCopy.className = 'post-cap-plan';
+      var name = document.createElement('b'); name.textContent = entry.plan.name;
+      var formula = document.createElement('span'); formula.textContent = entry.plan.formula;
+      planCopy.appendChild(name); planCopy.appendChild(formula); row.appendChild(planCopy); row.appendChild(postCapPicker(entry.kind, host.id)); body.appendChild(row);
+    });
+    banner.appendChild(body); host.appendChild(banner);
+  }
+  function renderPostCapBanners() {
+    renderPostCapBanner(document.getElementById('postCapMain'));
+    renderPostCapBanner(document.getElementById('postCapDetail'));
+  }
+  function closePostCapMenus(except) {
+    Array.prototype.forEach.call(document.querySelectorAll('.post-cap-picker.open'), function (anchor) {
+      if (anchor === except) return;
+      anchor.classList.remove('open');
+      var trigger = anchor.querySelector('[data-postcap-change]'), menu = anchor.querySelector('[data-postcap-menu]');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      if (menu) menu.hidden = true;
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var toggle = e.target.closest('[data-postcap-toggle]');
+    if (toggle) {
+      var hostId = toggle.getAttribute('data-postcap-toggle'); postCapOpen[hostId] = !postCapOpen[hostId];
+      renderPostCapBanners(); return;
+    }
+    var change = e.target.closest('[data-postcap-change]');
+    if (change) {
+      var anchor = change.closest('.post-cap-picker'), opening = !anchor.classList.contains('open');
+      closePostCapMenus(anchor); anchor.classList.toggle('open', opening);
+      change.setAttribute('aria-expanded', String(opening));
+      var menu = anchor.querySelector('[data-postcap-menu]'); menu.hidden = !opening;
+      if (opening) { var input = menu.querySelector('input'); if (input) input.focus(); }
+      return;
+    }
+    var option = e.target.closest('[data-postcap-option]');
+    if (option) {
+      var parts = option.getAttribute('data-postcap-option').split('|'), kind = parts[0], index = Number(parts[1]);
+      postCapSelection[kind] = index; closePostCapMenus(); applyNumbers();
+      toast(selectedPostCap(kind).name + ' applied.'); return;
+    }
+    if (!e.target.closest('.post-cap-picker')) closePostCapMenus();
+  });
+  document.addEventListener('input', function (e) {
+    if (!e.target.matches('[data-postcap-search]')) return;
+    var query = e.target.value.trim().toLowerCase(), menu = e.target.closest('[data-postcap-menu]');
+    Array.prototype.forEach.call(menu.querySelectorAll('[data-postcap-option]'), function (option) {
+      option.hidden = option.textContent.toLowerCase().indexOf(query) === -1;
+    });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || !e.target.closest('.post-cap-picker')) return;
+    var anchor = e.target.closest('.post-cap-picker'), trigger = anchor.querySelector('[data-postcap-change]');
+    closePostCapMenus(); if (trigger) trigger.focus();
+  });
+
   /* every number that moves when the allocation moves */
   function applyNumbers() {
     compute();
@@ -2629,6 +2823,7 @@ body { position:relative; gap:0; }
     renderPops();
     renderDeds();
     renderYbd();
+    renderPostCapBanners();
   }
   document.getElementById('moreSheetT').firstChild.textContent = addr;
   document.getElementById('moreSub').textContent = 'Commission breakdown \u00b7 ' + closeTxt.toLowerCase();
@@ -2959,7 +3154,7 @@ body { position:relative; gap:0; }
           { k: 'Group percentage', v: groupSplitPct + '%' }
         ] },
         { head: 'Deductions', cardhead: 'Plan fees', grp: 'plan' },
-        { k: 'Team post-cap fee', v: neg(teamPostCap), amt: teamPostCap, det: [{ k: 'Rule', v: cur(teamPostCap) + ' flat' }] },
+        { k: selectedPostCap('team').name, v: neg(teamPostCap), amt: teamPostCap, det: [{ k: 'Rule', v: selectedPostCap('team').formula }] },
         { head: 'Post-split deductions', grp: 'post' },
         { k: 'Team admin fee', v: neg(250), amt: 250, det: [{ k: 'Paid by', v: 'Team lead' }] },
         { k: 'Net to team lead', v: cur(teamLeadTakeHome()), tot: true }
@@ -2994,7 +3189,7 @@ body { position:relative; gap:0; }
     if (r.post && r.list) return r.post.id ? { 'data-editpost': r.post.id, 'data-list': r.list } : null;
     if (r.ed === 'split') return { 'data-editsplit': '1' };
     if (r.ed === 'fee:radius') return { 'data-editfee': 'radius' };
-    if (r.ed === 'fee:team') return { 'data-editfee': 'team' };
+    if (r.ed === 'fee:team' && selectedPostCap('team').rate === 0) return { 'data-editfee': 'team' };
     return null;
   }
   function ybdRowEl(o) {
@@ -3488,7 +3683,11 @@ body { position:relative; gap:0; }
           set: function (v) { radiusFee = v; },
           note: 'The flat Radius transaction fee, taken off your split. Changing it recalculates your net and sends the breakdown back to draft.' },
         team: { t: 'Team post-cap fee', s: function () { return teamPostCap; },
-          set: function (v) { teamPostCap = v; },
+          set: function (v) {
+            var plan = selectedPostCap('team');
+            if (plan.rate === 0) { plan.flat = v; plan.formula = cur(v) + ' flat'; }
+            teamPostCap = v;
+          },
           note: 'The flat team fee charged once your team cap is met. Changing it recalculates your net and the team commission, and sends the breakdown back to draft.' }
       };
   function openFee(k, trigger) {
@@ -3818,6 +4017,20 @@ body { position:relative; gap:0; }
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-setstatus]'); if (!b) return;
     status = b.getAttribute('data-setstatus'); renderStatus();
+  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-setcap]'); if (!b) return;
+    capReached = b.getAttribute('data-setcap') === 'reached';
+    Object.keys(CAPS).forEach(function (agent) {
+      Object.keys(CAPS[agent]).forEach(function (key) {
+        var cap = CAPS[agent][key]; cap.at = capReached ? cap.of : Math.round(cap.of * .72);
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-setcap]'), function (button) {
+      button.setAttribute('aria-pressed', String((button.getAttribute('data-setcap') === 'reached') === capReached));
+    });
+    applyNumbers();
+    toast(capReached ? 'Post-cap plans are active.' : 'Caps are now in progress.');
   });
   document.getElementById('screen').setAttribute('data-sections', 'folder');
   document.addEventListener('click', function (e) {
