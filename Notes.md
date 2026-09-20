@@ -1,0 +1,59 @@
+# Notes
+
+Durable AI working notes for Radius Office.
+
+## Harness
+
+- Current project root: `/Users/radius/Desktop/Radius Office app`.
+- `AGENTS.md` controls project-context loading and session-end behavior.
+- `Sessions.md` stays append-only and updates when user says `session end`.
+- `Transcripts.md` stores structured meeting evidence, not raw transcript dumps.
+- `Notes.md` stores project observations useful across sessions.
+
+## Current project direction
+
+- Commission breakdown needs scan-first quick view plus expandable detailed math.
+- Financial totals must reconcile across agent, team, group, and Radius responsibility.
+- Role and visibility rules affect both information shown and actions allowed.
+- Verify current implementation before editing; transcript records describe intended behavior.
+- Home commission approvals use a scan-first three-row card ordered by nearest closing date. Do not show commission values there.
+- Only a commission requiring the viewing agent's signature gets an action; other rows show status. Each row opens its breakdown, and the footer opens the complete commissions list.
+- The home-card `Review` action is a compact 30px solid `#5A5FF2` button with a larger invisible touch target; it is deliberately distinct from the soft status badges and has no gradient, transparency, glass blur, highlight, or shadow.
+- The home Commissions card uses a flat surface, tight outer padding, and 58px rows. Commission statuses reuse the transaction badge sizing (`12px` type, `6px 10px` padding, `6px` dot) while retaining semantic amber and periwinkle colors.
+- Status badges do not contain navigation icons. `Waiting on team` and `Processing` use separate neutral-gray chevrons aligned at the row edge; localized press feedback dims the tapped row and nudges its chevron while the card itself remains still.
+- Keep the home Commissions card image- and icon-free: the address, closing date, status/action, and chevron provide sufficient identification. The footer currently shows a task-style `3` count badge, pending confirmation that this is the full production count.
+- On list pages, never place a horizontally scrolling pill row flush against the header divider. Preserve at least 8px of visible top clearance (the All Commissions row uses 10px) and verify selected/focus outlines are not clipped at the mobile viewport before handoff.
+- Commission workflow uses exactly five user-facing statuses: `Agent pending`, `Team lead pending`, `Group lead pending`, `Commission received`, and `Paid`. Do not introduce separate confirmed or waiting states.
+- Home campaign cards are a horizontal rail of simple cards: reserve two title lines for alignment, show contact count and reply rate, and use amber `Needs review` only where action is required. Do not restore tags, warning/watchers, redundant campaign-type labels, or channel icons.
+- In the compact Commission breakdown, Full breakdown opens by default; Plan fees and Plan & commission basis stay folded. The persistent Net commission card sits above Confirm and Comment. Its circular chevron must be centered in the gap between Full breakdown and Net commission in a shared foreground layer; attaching it to either card creates visible clipping or asymmetric overlap.
+- In Full breakdown, keep `Pre-split deductions` as a two-fee disclosure while preserving the separate `Plan fees`, `Post-split deductions`, and `Payable to Radius` disclosures. Do not repeat Net commission inside the card; the floating summary owns that result.
+- The compact split row is static: no chevron and no hidden calculation detail. Its percentage uses the indigo information badge treatment, but the final label must identify the recipient. Before changing group math, confirm whether `Group · 80%` replaces the current `25% of team share` rule or applies after that group commission is calculated.
+- Mobile Commission Breakdown role coverage is limited to Agent, Agent in a group, Team lead, and Group lead. Radius Auditor is workflow context only, not a mobile viewer. Commission Breakdown audits must exclude CDA Settings screens unless separately requested.
+- Detailed breakdown is a full-page task reached from the integrated `View detailed breakdown` footer inside the `Your Breakdown` card. Its header uses back navigation on the left and Edit on the right.
+- Listing and Buying sides use a single-open spring accordion: closed rows join into one stack; the open row separates by 10px and becomes fully rounded. Preserve semantic buttons, `aria-expanded`, keyboard behavior, and reduced-motion fallback.
+- Sheets opened from Detailed breakdown must render above the full-page layer and temporarily isolate it. Closing a nested sheet must restore Detailed breakdown while keeping the underlying summary page hidden from assistive technology; Escape closes only the topmost layer.
+- Allocation presets are radio choices, not navigation tabs. Render 50/50, 60/40, and 70/30 as independently bounded chips with only the selected value using the primary treatment.
+- The floating Skiper 22 sheet treatment is reversible: original sheet CSS remains the base, while `data-sheet-style="skiper22"` on `#screen` enables the experimental inset, rounded, blurred, spring-entry variant.
+- Commission Breakdown must distinguish Group Lead-only from Group Lead-as-participating-agent. Group Lead-only receives Group commission sourced from the side/group payout and must not inherit participant pre/post-split deductions, plan fees, Radius payable fees, or agent net commission. Credits and referrals remain side-level deductions. A dual-role Group Lead gets the complete Agent breakdown plus separate Group commission and combined payout.
+- Mobile approval order is Agent, Team Lead, then Group Lead. Keep Confirm visible but muted outside the viewer's turn; tapping the muted control opens a short blocker sheet naming the required prior confirmation. Do not duplicate workflow status below the action bar; header status is canonical. Radius Auditor is workflow context only and has no mobile viewer.
+- Group commission production mapping comes from `agent_team_split_basis.group_split_percentage`, `agent_team_split_basis.group_commission_amount`, and `cda_summary.group_payouts[].amount`. Do not derive it from a hard-coded percentage of Team commission.
+- The compact Plan control in `Your Breakdown` is an in-place selector, not navigation: use a down-caret inside the value well. Its popover opens above the trigger, uses an origin-aware interruptible spring, includes search, and constrains options to a scrolling list with a persistent custom scrollbar so overflow remains discoverable when system scrollbars auto-hide.
+- Do not add decorative motion to financial rows or totals. Plan-popover motion exists only for spatial consistency and state indication; opening and closing must remain reversible from the current presentation value, with a reduced-motion opacity fallback.
+- Detailed Listing and Buying side awards are editable badges placed inline beside the brokerage name. Format compound awards as `Award 1% + $1K`, keep the badge as its own control with a trailing chevron, and open the existing award bottom sheet on tap. Do not restore the redundant `50%` in the collapsed side header.
+- Your Breakdown fee disclosures use a left-aligned `+` when collapsed and `−` when expanded. Keep the marker aligned with the `Your split` label and preserve single-line fee-count labels at the 390px viewport.
+- Detailed side-summary totals use a touch-first animated stack: Gross and After deductions share the top row; To agents is layered underneath and revealed by the explicit right-aligned `View all` control; `3 Commission totals` remains visible. Do not depend on hover for mobile behavior.
+- Match Radius Web summary semantics with opaque Radius-token tints: indigo Gross, violet After deductions, and green To agents. Gross uses a Phosphor `seal` composed with `$`, After deductions uses `seal` composed with `i`, and To agents uses the plain Phosphor `user` icon. Retain reduced-motion support and ensure underlying stacked text cannot show through translucent surfaces.
+- Cap cards and relationship cards are not interchangeable. Cap cards only communicate progress toward a seasonal threshold. The relationship cards `Agent to Team`, `Agent to Group`, and `Group to Team` own the commission plan that currently governs money for that relationship.
+- Direct agents use Radius and internal Team cap ledgers and one `Agent to Team` relationship. Group-plan participants use Radius, Agent-to-Group, and Group-to-Team cap ledgers; do not also show the internal Team cap. Order group relationships as `Group to Team`, then `Agent to Group`.
+- Once a relationship cap is met, its selected post-cap plan becomes the charging plan while the underlying commission plan remains assigned but does not charge. If the cap is met and no post-cap plan is selected, keep the relationship card visible and say `Cap reached · no post-cap plan applied`; never make the plan logic disappear.
+- In group relationships, Team Leads may edit both `Group to Team` and `Agent to Group`. Group Leads and group agents may edit `Agent to Group`, while `Group to Team` remains visible but read-only. When more than two cap cards apply, show two initially and reveal the remainder through the existing `Show more` / `Show less` animation.
+- In the compact `Your Breakdown` header, place one small `+` control directly beside Edit. Its anchored Plan-style spring selector has exactly three actions: `Pre-split deduction`, `Post-split deduction`, and `Add fee`.
+- Keep pre-split and post-split deductions as separate entry points because their timing changes the commission math. Consolidate Credit and Referral under `Add fee`; both use the same bottom sheet, with Credit selected by default and Referral available as the alternate type.
+- Do not show the Net commission amount as unlabeled text in the collapsed `Your Breakdown` header. The labelled Net commission card is the canonical compact total.
+- The approved compact composition is one `commission-wallet` shell containing `Your Breakdown`, a labelled Net commission card, and Confirm/Comment. Do not reintroduce separate stacked summary cards that push the final result and actions below the fold.
+- Enter the full-page Detailed breakdown through a quiet two-sided utility row: muted `Commission breakdown` on the left and champagne `View all` with a caret on the right. Avoid restoring the centered purple text CTA.
+- Agent-facing Net commission must be read from the final per-agent calculation chain after plan fees, post-split deductions, and payable-to-Radius items. Do not substitute an allocation/share subtotal, and keep the same final amount across the compact card, participant row, detailed totals, information sheet, and confirmation sheet.
+- Do not synthesize a `Pre-split deductions` subtotal by adding Plan fees, Post-split deductions, and Payable to Radius. Those are already separate disclosures; duplicating their total makes the visible calculation appear to deduct the same fees twice. A true pre-split row should appear only when real pre-split data exists.
+- The compact breakdown uses separate count-and-total disclosures for Commission basis, Plan fees, Post-split deductions, Payable to Radius, and Commissions. Question-mark actions belong beside commission labels rather than beside their dollar values.
+- Current `AWARD` percentage/flat controls update presentation state only and do not feed `compute()`. Do not invent award math: first determine whether a flat award adds to gross commission or reallocates the existing gross between sides.
+- Current external handoff targets are the GPT Site at `https://radius-office-commissions.radiusagent-2682.chatgpt.site` and the private source repository at `https://github.com/krishmjradiusagent/commission-breakdown`.

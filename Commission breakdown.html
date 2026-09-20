@@ -862,9 +862,6 @@ button.ybd-r:active { opacity:.7; }
 .ybd-plan-anchor.open { z-index:8; }
 .ybd-card.plan-menu-open { z-index:14; }
 .ybd-plan-anchor .ybd-r { gap:10px; }
-/* Separate plan choice from calculation waterfall. Same gap in read and edit
-   modes, whether plan row is static or wrapped by dropdown anchor. */
-#ybdFullDet > .plan-row, #ybdFullDet > .ybd-plan-anchor { margin-bottom:12px; }
 /* A compact value well makes this read as a selector, not another navigation
    row. The whole row remains the 44px target; only the changing value floats. */
 .plan-select-value { flex:none; display:inline-flex; align-items:center; gap:7px; min-height:34px; max-width:200px;
@@ -1012,7 +1009,7 @@ button.ybd-r:active { opacity:.7; }
 /* 40px of ink, 44px of target: the row carries a centred pseudo-element so a
    tappable fee meets the touch floor without spending 4px per row on height.
    Same trick as .fb-edit. */
-.ybd-det .d { position:relative; display:flex; align-items:center; gap:10px; min-height:40px; padding:4px 0; border-left:0; }
+.ybd-det .d { position:relative; display:flex; align-items:baseline; gap:10px; min-height:40px; padding:4px 0; border-left:0; }
 .ybd-det button.d::before { content:''; position:absolute; left:0; right:0; top:50%;
   height:44px; transform:translateY(-50%); }
 .ybd-det .d span { flex:1; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:6px; row-gap:2px;
@@ -1032,14 +1029,6 @@ button.ybd-r:active { opacity:.7; }
 .ybd-det .d .pico { flex:none; display:inline-flex; color:var(--muted-foreground); }
 .ybd-det .d .pico i { font-size:15px; }
 .ybd-det .d .pico.warn { color:var(--tint-amber-fg); }
-.ybd-det .d span.ybd-fee-meta { flex:0 1 auto; min-width:0; display:inline-flex; align-items:center; gap:5px; flex-wrap:nowrap; }
-.ybd-det .d .paid-by { flex:none; display:inline-flex; align-items:center; gap:4px; min-height:20px; padding:2px 7px;
-  border-radius:999px; background:var(--muted); color:var(--muted-foreground); font:500 11px/1 var(--font); white-space:nowrap; }
-.ybd-det .d .paid-by i { font-size:12px; line-height:1; }
-.ybd-det .d .paid-by span { flex:none; min-width:0; display:inline; color:inherit; font:inherit; white-space:nowrap; }
-.ybd-det .d .private-fee { flex:none; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px;
-  border-radius:999px; background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); }
-.ybd-det .d .private-fee i { font-size:13px; line-height:1; }
 /* payout leads the card — the agent reads what they are paid before
    they read why. The chain below explains it and does not repeat it. */
 .ybd-det .d.lead { min-height:0; margin:10px 0; padding:0 0 11px; border-bottom:1px solid rgba(255,255,255,.08); }
@@ -1058,11 +1047,6 @@ button.ybd-r:active { opacity:.7; }
 .ybd-det .d-det .dd b { flex:none; text-align:right; font:500 13px/1.35 var(--font);
   font-variant-numeric:tabular-nums; color:var(--foreground); }
 .ybd-det .d-det .dd-note { margin:6px 0 0; font:500 13px/1.4 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
-/* Commission-basis fees are a compact continuation of the basis row. Remove
-   the generic detail panel's extra inset so Credits starts sooner and the
-   following calculation does not inherit a padded gap after Referral. */
-.ybd-det .d-det.basis-fees { margin:0; padding:1px 0; border-radius:0; background:transparent; }
-.screen.light .ybd-det .d-det.basis-fees { background:transparent; }
 /* the group row IS the section label now — count and subtotal on the same
    line, the fees themselves one tap away */
 /* block, not flex: as flex items the label and the count are two boxes, so a
@@ -1070,21 +1054,16 @@ button.ybd-r:active { opacity:.7; }
    normal inline flow they reflow together as one phrase. */
 .ybd-det .d.grp span, .ybd-det .d.sum span { display:block; }
 .ybd-det .d.grp span em, .ybd-det .d.sum span em { display:inline; }
-.ybd-det .d.grp span { font:500 14px/1.35 var(--font); }
+.ybd-det .d.grp span { font:600 15px/1.35 var(--font); }
 .ybd-det .d.grp { align-items:center; }
-.ybd-det .d.grp > span, .ybd-det .d.grp > b { color:var(--foreground); }
-/* Expanded fee items share the same quiet hierarchy as Credits and Referral:
-   muted 13px labels, foreground 13px amounts. */
-.ybd-det .d-fees .d > span { font:500 13px/1.35 var(--font); color:var(--muted-foreground); }
-.ybd-det .d-fees .d > b { font:500 13px/1.35 var(--font); color:var(--foreground); }
 .ybd-det .d.grp span em, .ybd-det .d.sum span em { font:500 13px/1.35 var(--font); font-style:normal;
   color:var(--muted-foreground); }
 .ybd-det .d.grp span em::before, .ybd-det .d.sum span em::before { content:'\00a0\00b7\00a0'; }
 /* everything that comes out, above the groups that break it down */
 .ybd-det .d.sum { margin:2px 0 4px; }
 .ybd-det .d.sum span { font:600 15px/1.35 var(--font); }
-.ybd-det .d-fees { margin:0 0 2px; padding:0 0 4px; }
-.ybd-det .d-fees .d > .chev { display:none; }
+.ybd-det .d-fees { margin:0 0 2px; padding:0 0 4px 12px; border-left:1px solid rgba(255,255,255,.08); }
+.screen.light .ybd-det .d-fees { border-left-color:rgba(10,10,10,.09); }
 /* a collapsed group must never hide a problem */
 .ybd-issues { margin:6px 0 10px; padding:9px 11px; border-radius:var(--radius-md);
   background:rgba(245,158,11,.10); box-shadow:inset 0 0 0 1px rgba(245,158,11,.22); }
@@ -1468,12 +1447,8 @@ body { position:relative; gap:0; }
             <span class="ab"><b>Add pre-split deduction</b></span>
           </button>
           <div class="srow tot plain">
-            <span class="sk"><b>Commission before split</b><em>After credits and pre-split deductions</em></span>
+            <span class="sk"><b>Gross after deductions</b><em>What the splits are taken from</em></span>
             <span class="svv" id="x1Basis">$49,430</span>
-          </div>
-          <div class="srow tot plain">
-            <span class="sk"><b>Agent split</b><em>Combined agent share on this side</em></span>
-            <span class="svv" id="x1AgentSplit">$39,544</span>
           </div>
         <div id="leadDetailBreakdown" hidden></div>
         <div class="side-metrics rest-metrics" data-expanded="false">
@@ -1518,7 +1493,7 @@ body { position:relative; gap:0; }
           </div>
           <div id="deds2"></div>
           <div class="srow tot plain">
-            <span class="sk"><b>Commission before split</b><em>After credits and pre-split deductions</em></span>
+            <span class="sk"><b>Gross after deductions</b><em>What the splits are taken from</em></span>
             <span class="svv" id="x2Basis">$49,430</span>
           </div>
         <div class="ssub">Agents on this side</div>
@@ -2091,9 +2066,8 @@ body { position:relative; gap:0; }
         aBasis = basis * share,
         aGross = sideGross * share,
         aPre = preSplit * share,
-        commissionBeforeSplit = Math.max(0, aBasis - aPre),
         aDed = postDed * share,
-        splitAmt = s.flat != null ? Math.max(0, commissionBeforeSplit - s.flat) : commissionBeforeSplit * s.split / 100,
+        splitAmt = s.flat != null ? Math.max(0, aBasis - s.flat) : aBasis * s.split / 100,
         pc = s.capped ? aGross * 0.05 + 495 : 0,
         tpc = s.team ? teamPostCap : 0,
         rows = [];
@@ -2113,24 +2087,22 @@ body { position:relative; gap:0; }
     rows.push({ head: 'Commission', cardhide: true });
     rows.push({ k: 'Sale price', v: cur(price), cardhide: true });
     rows.push({ k: 'Commission %', v: '2.0%', cardhide: true });
-    var basisDetails = DEDS.mine.filter(function (d) { return d.kind === 'credit' || d.kind === 'presplit'; }).map(function (d) {
-      return { k: d.name, v: neg(d.amt * share) };
-    });
-    rows.push({ k: 'Commission basis', sub2: n > 1 ? pctLbl(share) + ' of this side' : 'This side before deductions', v: cur(aGross), det: basisDetails });
-    rows.push({ k: 'Commission before split', sub2: 'After credits and pre-split deductions', v: cur(commissionBeforeSplit) });
+    rows.push({ k: 'Gross commission', sub2: n > 1 ? pctLbl(share) + ' of this side after credits' : 'This side after credits', v: cur(aBasis), cardhide: true });
     /* `ed` marks the rows a person actually sets. It is inert everywhere the
        chain is read-only — only the card's edit mode turns it into a target,
        and only on the reader's own chain. */
+    rows.push({ head: 'Agent split', cardhide: true });
     rows.push(s.flat != null
-      ? { k: a.me ? 'Agent split' : firstName(a.name) + ' split', badge: '$' + s.flat + ' flat', sub2: '$' + s.flat + ' flat instead of the split', v: cur(splitAmt) }
-      : { k: a.me ? 'Agent split' : firstName(a.name) + ' split', badge: s.split + '%', sub2: s.split + '%', v: cur(splitAmt) });
-    rows.push({ k: 'Brokerage', sub2: s.flat != null ? 'Remainder after capped agent amount' : (100 - s.split) + '%', v: cur(Math.max(0, commissionBeforeSplit - splitAmt)), cardhide: true });
+      ? { k: a.me ? 'Agent' : firstName(a.name), cardk: a.me ? 'Your split' : firstName(a.name), badge: '$' + s.flat + ' flat', sub2: '$' + s.flat + ' flat instead of the split', v: cur(splitAmt) }
+      : { k: a.me ? 'Agent' : firstName(a.name), cardk: a.me ? 'Your split' : firstName(a.name), badge: s.split + '%', sub2: s.split + '%', v: cur(splitAmt) });
+    rows.push({ k: 'Brokerage', sub2: s.flat != null ? 'Remainder after capped agent amount' : (100 - s.split) + '%', v: cur(Math.max(0, aBasis - splitAmt)), cardhide: true });
     /* `grp` buckets the chain into the card's three collapsible groups, and
        `amt` carries the raw figure its `v` string formats — a subtotal is
        summed from these, never parsed back out of "−$2,970". Both keys are
        inert in the lower breakdown, which reads the same chain. */
-    rows.push({ head: 'Post-split deductions', grp: 'post' });
+    rows.push({ head: 'Deductions', cardhead: 'Plan fees', grp: 'plan' });
     if (tpc) rows.push({ k: 'Team post-cap fee', sub2: '$250 flat', v: neg(tpc), amt: tpc, psub: true, ed: 'fee:team', det: [{ k: 'Rule', v: '$' + teamPostCap + ' flat' }] });
+    if (aPre) rows.push({ k: 'Pre-split deductions', v: neg(aPre), amt: aPre });
     rows.push({ k: 'Radius fee', v: neg(radiusFee), amt: radiusFee, ed: 'fee:radius', det: [{ k: 'Rule', v: '$' + radiusFee + ' flat' }] });
     if (pc) rows.push({ k: 'Group post-cap fee', sub2: '5% of gross + $495 flat', v: neg(pc), amt: pc, det: [
       { k: 'Rule', v: '5% of side gross + $495 flat' },
@@ -2138,6 +2110,7 @@ body { position:relative; gap:0; }
       { k: '5% of side gross', v: cur(aGross * 0.05) },
       { k: 'Flat', v: '$495' }
     ] });
+    rows.push({ head: 'Post-split deductions', grp: 'post' });
     POSTDEDS.forEach(function (d) {
       rows.push({ k: d.n, pay: d.p, v: neg(d.a * share), amt: d.a * share, post: d, list: 'post', det: dedDet(d) });
     });
@@ -2152,7 +2125,7 @@ body { position:relative; gap:0; }
       rows.push({ k: d.n, pay: d.p, v: neg(d.a * share), amt: d.a * share, post: d, list: 'radius', det: dedDet(d) });
     });
     rows.push({ addpost: 'radius' });
-    var netA = Math.max(0, splitAmt - radiusFee - pc - tpc - aDed - aRad);
+    var netA = Math.max(0, splitAmt - aPre - radiusFee - pc - tpc - aDed - aRad);
     rows.push({ k: a.me ? 'Your payout' : 'Agent payout · ' + firstName(a.name), v: cur(netA), tot: true });
     return { net: netA, splitAmt: splitAmt, radius: radiusFee + pc, team: tpc, rows: rows };
   }
@@ -2167,7 +2140,7 @@ body { position:relative; gap:0; }
     net = sn;
     agentsPaid = ss;
     radiusNet = sr + PAYRADIUS.reduce(function (t, d) { return t + d.a; }, 0);
-    teamNet = (basis - preSplit - ss) + st + 250;
+    teamNet = (basis - ss) + st + 250;
     groupNet = teamNet * groupSplitPct / 100;
   }
   /* Team lead has downstream share and role fees. Group lead receives the
@@ -2452,13 +2425,10 @@ body { position:relative; gap:0; }
       sumPc += MINE[i].radius - radiusFee;
       sumTpc += MINE[i].team;
     }
-    var commissionBeforeSplit = Math.max(0, basis - preSplit),
-        teamSplit = commissionBeforeSplit - sumSplit;
-    var rows = [{ k: 'Commission basis', v: cur(sideGross), head: true }];
-    if (offTop) rows.push({ k: 'Credits and referrals', v: neg(offTop) });
+    var teamSplit = basis - sumSplit;
+    var rows = [{ k: 'Commission basis', v: cur(basis), head: true },
+                { k: 'Team split', v: neg(teamSplit) }];
     if (preSplit) rows.push({ k: 'Pre-split deductions', v: neg(preSplit) });
-    rows.push({ k: 'Commission before split', v: cur(commissionBeforeSplit) });
-    rows.push({ k: 'Agent split', v: cur(sumSplit) });
     rows.push({ k: 'Radius fee', v: neg(sumRad) });
     if (sumPc) rows.push({ k: 'Group post-cap fee', v: neg(sumPc) });
     if (sumTpc) rows.push({ k: 'Team post-cap fee', v: neg(sumTpc) });
@@ -2595,10 +2565,10 @@ body { position:relative; gap:0; }
     ? 'Commissions.html' + (q.get('filter') ? '?filter=' + encodeURIComponent(q.get('filter')) : '')
     : q.get('from') === 'home'
       ? 'Implemented Home.html'
-      : 'Transaction detail.html?addr=' + encodeURIComponent(addr);
+      : 'Implemented Home.html';
   if (q.get('from') === 'commissions') backLink.setAttribute('aria-label', 'Back to all commissions');
   if (q.get('from') === 'home') backLink.setAttribute('aria-label', 'Back to home');
-  $id('txLink').href = 'Transaction detail.html?addr=' + encodeURIComponent(addr);
+  $id('txLink').href = 'Implemented Home.html';
   $id('dealAddr').textContent = addr;
   $id('dealClose').textContent = closeDate;
   $id('dealSide').textContent = myTitle + ' \u00b7 ' + COOP[mySide] + ' co-op';
@@ -2622,8 +2592,7 @@ body { position:relative; gap:0; }
     document.getElementById('s2Sub').textContent = COOP[mySide];
     document.getElementById('x1Alloc').textContent = allocPct + '%';
     document.getElementById('x2Alloc').textContent = other + '%';
-    document.getElementById('x1Basis').textContent = cur(Math.max(0, basis - preSplit));
-    document.getElementById('x1AgentSplit').textContent = cur(agentsPaid);
+    document.getElementById('x1Basis').textContent = cur(basis);
     document.getElementById('x2Basis').textContent = cur(otherGross - otherDed);
     document.getElementById('r1Net').textContent = cur(net);
     document.getElementById('r1Rad').textContent = cur(radiusNet);
@@ -2650,7 +2619,6 @@ body { position:relative; gap:0; }
   document.getElementById('moreSheetT').firstChild.textContent = addr;
   document.getElementById('moreSub').textContent = 'Commission breakdown \u00b7 ' + closeTxt.toLowerCase();
   document.getElementById('activitySub').textContent = addr;
-  document.getElementById('activityFullLink').href = 'Commission activity.html?addr=' + encodeURIComponent(addr);
 
   function toast(m) { toastEl.textContent = m; toastEl.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove('on'); }, 2600); }
 
@@ -2770,7 +2738,7 @@ body { position:relative; gap:0; }
   /* which fee groups are open, kept across re-renders so editing a fee does
      not fold the list you were reading */
   var ybdFull = true, ybdPost = false, ybdAsm = false, ybdEditing = false,
-      ybdGrp = { pre: false, post: false, radius: false, commissions: false },
+      ybdGrp = { basis: false, pre: false, plan: false, post: false, radius: false, commissions: false },
       ybdMotion = { frame:0, card:null, det:null, row:null, chev:null,
         h:0, vh:0, rot:90, vrot:0, th:0, trot:90, closing:false, last:0 },
       ybdInnerSprings = new WeakMap(), ybdInnerStates = [],
@@ -2906,7 +2874,7 @@ body { position:relative; gap:0; }
     var state = ybdInnerState(body), continuing = !!state.frame,
         liveHeight = body.hidden ? 0 : body.getBoundingClientRect().height,
         liveRotation = continuing ? state.rot : (button.getAttribute('aria-expanded') === 'true' ? 90 : 0),
-        chev = ybdDirectChev(button), marker = button.querySelector('.expand-mark');
+        chev = ybdDirectChev(button);
     if (state.frame) cancelAnimationFrame(state.frame);
     state.frame = 0;
     if (open) { body.hidden = false; state.th = body.scrollHeight; }
@@ -2915,10 +2883,6 @@ body { position:relative; gap:0; }
     if (!continuing) state.vh = state.vrot = 0;
     state.trot = open ? 90 : 0; state.closing = !open;
     button.setAttribute('aria-expanded', String(open));
-    if (marker) {
-      marker.classList.toggle('ph-plus', !open);
-      marker.classList.toggle('ph-minus', open);
-    }
     body.hidden = false;
     body.style.height = liveHeight.toFixed(2) + 'px';
     body.style.overflow = 'hidden';
@@ -2939,8 +2903,8 @@ body { position:relative; gap:0; }
     return MINE[0];
   }
   /* This is the amount the agent actually receives. It comes from the final
-     total of their own calculation chain, after post-split deductions and
-     every payable-to-Radius item have been removed. */
+     total of their own calculation chain, after plan fees, post-split
+     deductions and every payable-to-Radius item have been removed. */
   function agentNetCommission() {
     var chain = myChain();
     return chain ? chain.net : 0;
@@ -2980,8 +2944,9 @@ body { position:relative; gap:0; }
           { k: 'Team commission', v: cur(teamNet) },
           { k: 'Group percentage', v: groupSplitPct + '%' }
         ] },
-        { head: 'Post-split deductions', grp: 'post' },
+        { head: 'Deductions', cardhead: 'Plan fees', grp: 'plan' },
         { k: 'Team post-cap fee', v: neg(teamPostCap), amt: teamPostCap, det: [{ k: 'Rule', v: cur(teamPostCap) + ' flat' }] },
+        { head: 'Post-split deductions', grp: 'post' },
         { k: 'Team admin fee', v: neg(250), amt: 250, det: [{ k: 'Paid by', v: 'Team lead' }] },
         { k: 'Net to team lead', v: cur(teamLeadTakeHome()), tot: true }
       ] };
@@ -3041,7 +3006,7 @@ body { position:relative; gap:0; }
       i.setAttribute('role', 'img'); i.setAttribute('aria-label', label);
       w.appendChild(i); return w;
     }
-    row.className = 'ybd-r' + (o.tot ? ' tot' : '') + (o.out ? ' out' : '') + (o.lock ? ' lock' : '') + (o.asm ? ' asm' : '') + (o.full ? ' head' : '') + (o.planStatic ? ' plan-row' : '');
+    row.className = 'ybd-r' + (o.tot ? ' tot' : '') + (o.out ? ' out' : '') + (o.lock ? ' lock' : '') + (o.asm ? ' asm' : '') + (o.full ? ' head' : '');
     var k = document.createElement('span');
     k.className = 'k';
     var b = document.createElement('b'); b.textContent = o.k; k.appendChild(b);
@@ -3171,22 +3136,6 @@ body { position:relative; gap:0; }
         /* one glyph, and only when something needs attention. Who pays it,
            whether it wires and what it is all moved into the row's detail. */
         if (r.post && r.post.flag) s.appendChild(ybdIco('ph-warning-circle', r.post.flag, 'warn'));
-        if (r.post && r.list === 'post') {
-          var meta = document.createElement('span'); meta.className = 'ybd-fee-meta';
-          var paid = document.createElement('span'); paid.className = 'paid-by';
-          paid.setAttribute('aria-label', 'Paid by ' + r.post.p);
-          var payerIcon = document.createElement('i'); payerIcon.className = 'ph ' + (PAYICON[r.post.p] || 'ph-user'); payerIcon.setAttribute('aria-hidden', 'true');
-          var payerLabel = document.createElement('span'); payerLabel.textContent = r.post.p;
-          paid.appendChild(payerIcon); paid.appendChild(payerLabel);
-          meta.appendChild(paid);
-          if (r.post.private) {
-            var privacy = document.createElement('span'); privacy.className = 'private-fee';
-            privacy.setAttribute('role', 'img'); privacy.setAttribute('aria-label', 'Private fee'); privacy.title = 'Private fee';
-            var lock = document.createElement('i'); lock.className = 'ph ph-lock-simple'; lock.setAttribute('aria-hidden', 'true');
-            privacy.appendChild(lock); meta.appendChild(privacy);
-          }
-          s.appendChild(meta);
-        }
         var a = document.createElement('b'); a.textContent = String(r.v).replace(/^[\u2212-]/, '');
         l.appendChild(s); l.appendChild(a);
         if (r.infosheet) {
@@ -3208,14 +3157,10 @@ body { position:relative; gap:0; }
         if (!expandable) return;
         l.type = 'button';
         var did = 'ybdDD' + (detSeq++),
-            basisDisclosure = r.k === 'Commission basis',
             blk = ybdDetBlock(r.det, did);
-        if (basisDisclosure) blk.classList.add('basis-fees');
         l.setAttribute('aria-expanded', 'false');
         l.setAttribute('aria-controls', did);
-        var cc = document.createElement('i');
-        cc.className = basisDisclosure ? 'ph ph-plus expand-mark' : 'ph ph-caret-right chev';
-        cc.setAttribute('aria-hidden', 'true');
+        var cc = document.createElement('i'); cc.className = 'ph ph-caret-right chev'; cc.setAttribute('aria-hidden', 'true');
         l.appendChild(cc);
         host.appendChild(blk);
         l.addEventListener('click', function (e) {
@@ -3234,6 +3179,9 @@ body { position:relative; gap:0; }
       o.full.rows.forEach(function (r) {
         /* Payout already lives in the persistent floating summary. */
         if (r.tot && typeof r.v === 'string') return;
+        /* Plan plus commission basis now explain this result first. Repeating
+           the percentage split and split dollars adds no new information. */
+        if (r.cardk === 'Your split') return;
         if (r.head) {
           cur_ = r.grp ? { key: r.grp, label: r.cardhead || r.head, rows: [] } : null;
           if (cur_) groups.push(cur_);
@@ -3246,7 +3194,16 @@ body { position:relative; gap:0; }
       loose.forEach(function (r) { ybdFeeEl(r, det); });
       /* Commission ownership and Radius-payable fees are different concepts.
          Give each the same compact disclosure treatment and keep them adjacent. */
-      var radiusGroup = groups.filter(function (g) { return g.key === 'radius'; })[0],
+      var mineParticipant = AG.mine.filter(function (a) { return a.me; })[0] || AG.mine[0],
+          basisShare = Math.max(0, Number(mineParticipant && mineParticipant.allocation != null ? mineParticipant.allocation : 100)) / 100,
+          basisFees = DEDS.mine.filter(function (d) { return d.kind === 'credit'; }).map(function (d) {
+            return { k:d.name, v:neg(d.amt * basisShare), amt:d.amt * basisShare };
+          }),
+          basisGroup = {
+            key: 'basis', label: 'Commission basis', itemLabel: 'fees',
+            amt: basis * basisShare, rows: basisFees
+          },
+          radiusGroup = groups.filter(function (g) { return g.key === 'radius'; })[0],
           commissionGroup = null;
       if (radiusGroup && (role === 'agent' || role === 'group_agent' || role === 'group_lead_agent')) {
         commissionGroup = {
@@ -3269,6 +3226,7 @@ body { position:relative; gap:0; }
       groups.forEach(function (g) {
         g.amt = g.rows.reduce(function (t, r) { return t + (r.amt || 0); }, 0);
       });
+      if (basisGroup.rows.length) groups.unshift(basisGroup);
       if (commissionGroup) groups.splice(groups.indexOf(radiusGroup) + 1, 0, commissionGroup);
       /* anything needing attention reads above the groups, open or closed —
          a collapsed group must never be able to hide a problem */
