@@ -155,19 +155,67 @@ a.irow:focus-visible, button.irow:focus-visible { outline:2px solid var(--ring);
 .irow .iv { flex:none; font:600 15px/1.2 var(--font); font-variant-numeric:tabular-nums; }
 .irow .chev { flex:none; font-size:15px; color:var(--muted-foreground); }
 
-/* CDA bar — takes over the action bar once the deal is finalized */
-.cdabar { flex:1; display:flex; align-items:center; gap:10px; }
+/* CDA controls — replace confirmation actions after finalization */
+.cdabar { flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; }
+.cda-status-line { display:flex; align-items:center; gap:8px; padding:0 4px; }
+.cda-status-line > span:first-child { color:var(--muted-foreground); font:600 12px/1.2 var(--font); }
+.cda-action-row { display:flex; align-items:center; gap:8px; }
 .pill.sm { height:22px; padding:0 9px; font-size:11px; }
 .cdabar .cgo { position:relative; flex:1; min-width:0; display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:46px; padding:0 14px; border:0; border-radius:999px; background:var(--primary); color:#fff; font:600 15px/1 var(--font); white-space:nowrap; cursor:pointer; }
 .cdabar .cgo i { font-size:18px; }
-.cdabar .cgo:active, .cdabar .cmo:active { transform:scale(.98); }
+.cdabar .cgo:active, .cdabar .cmo:active, .cdabar .cregen:active { transform:scale(.98); }
 .cdabar .cmo { position:relative; flex:none; width:44px; height:44px; border:0; border-radius:999px; background:var(--glass-fill); box-shadow:inset 0 0 0 1px var(--glass-border); color:var(--foreground); display:inline-flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; }
 .cdabar .cgo::before, .cdabar .cmo::before { content:''; position:absolute; left:50%; top:50%; width:100%; min-width:44px; height:44px; transform:translate(-50%,-50%); }
-/* Reinitiate rides the same row as View CDA and the comment button — finalized only */
-.cdabar .creinit { position:relative; flex:1; min-width:0; display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:46px; padding:0 10px; border:0; border-radius:999px; background:var(--glass-fill); box-shadow:inset 0 0 0 1px var(--glass-border-strong); color:var(--foreground); font:600 15px/1 var(--font); white-space:nowrap; cursor:pointer; }
-.cdabar .creinit i { font-size:18px; }
-.cdabar .creinit:active { transform:scale(.98); }
-.cdabar .cgo:focus-visible, .cdabar .cmo:focus-visible, .cdabar .creinit:focus-visible { outline:2px solid var(--ring); outline-offset:3px; }
+.cdabar .cregen { position:relative; flex:1.25; min-width:0; min-height:44px; padding:0 10px; border:0; border-radius:999px; background:var(--glass-fill); box-shadow:inset 0 0 0 1px var(--glass-border-strong); color:var(--foreground); display:inline-flex; align-items:center; justify-content:center; gap:6px; font:600 14px/1 var(--font); white-space:nowrap; cursor:pointer; }
+.cdabar .cregen i { flex:none; font-size:17px; }
+.cdabar .cdelete { color:var(--tint-red-fg); }
+.cdabar .cgo:focus-visible, .cdabar .cmo:focus-visible, .cdabar .cregen:focus-visible { outline:2px solid var(--ring); outline-offset:3px; }
+
+/* CDA full-page send task */
+.cda-send-page { position:absolute; inset:calc(44px + env(safe-area-inset-top)) 0 0; z-index:25; display:flex; flex-direction:column; min-height:0; background:var(--background); color:var(--foreground); }
+.cda-send-scroll { flex:1; min-height:0; overflow-y:auto; padding:16px 16px 24px; }
+.cda-form { display:flex; flex-direction:column; gap:18px; }
+.cda-field { display:flex; flex-direction:column; gap:8px; }
+.cda-field > label { font:600 14px/1.2 var(--font); }
+.cda-field input,.cda-field textarea { width:100%; box-sizing:border-box; border:1px solid var(--input); border-radius:var(--radius-md); background:var(--card); color:var(--foreground); font:400 16px/1.4 var(--font); }
+.cda-field input { min-height:46px; padding:0 12px; }
+.cda-field textarea { min-height:190px; padding:12px; resize:vertical; }
+.cda-field input:focus-visible,.cda-field textarea:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
+.cda-address-row { display:flex; gap:8px; }
+.cda-address-row input { min-width:0; flex:1; }
+.cda-add { flex:none; min-height:46px; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--card); color:var(--foreground); font:600 14px/1 var(--font); cursor:pointer; }
+.cda-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.cda-chip { display:inline-flex; align-items:center; gap:5px; min-height:32px; padding:0 8px 0 11px; border-radius:999px; background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); font:500 14px/1 var(--font); }
+.cda-chip button { width:24px; height:24px; padding:0; border:0; border-radius:999px; background:transparent; color:inherit; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+.cda-attachment { display:flex; align-items:center; gap:8px; min-height:46px; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--card); font:500 14px/1.3 var(--font); }
+.cda-attachment i { color:var(--muted-foreground); font-size:18px; }
+.cda-attachment small { color:var(--muted-foreground); }
+.cda-send-actions { flex:none; display:flex; gap:8px; padding:8px 16px calc(12px + env(safe-area-inset-bottom)); }
+.cda-send-actions button { min-height:46px; border:0; border-radius:999px; font:600 15px/1 var(--font); cursor:pointer; }
+.cda-send-actions .cancel { flex:none; padding:0 18px; background:var(--glass-fill); box-shadow:inset 0 0 0 1px var(--glass-border-strong); color:var(--foreground); }
+.cda-send-actions .send { flex:1; background:var(--primary); color:#fff; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+
+/* Anchored regenerate menu */
+.cda-regen-menu { position:absolute; left:12px; right:12px; bottom:calc(100% + 10px); z-index:2; padding:14px; border:1px solid var(--border); border-radius:18px; background:var(--card); box-shadow:var(--shadow-lg); }
+.cda-regen-menu h3 { margin:0 0 8px; color:var(--muted-foreground); font:650 12px/1.2 var(--font); letter-spacing:.07em; text-transform:uppercase; }
+.cda-regen-menu .regen-sep { height:1px; margin:10px 0 12px; background:var(--border); }
+.cda-choice { width:100%; min-height:44px; padding:0 8px; border:0; border-radius:12px; background:transparent; color:var(--foreground); display:flex; align-items:center; gap:10px; font:500 15px/1.2 var(--font); text-align:left; cursor:pointer; }
+.cda-choice[aria-checked="true"] { background:var(--muted); }
+.cda-choice .radio { width:18px; height:18px; border:2px solid var(--muted-foreground); border-radius:999px; box-sizing:border-box; }
+.cda-choice[aria-checked="true"] .radio { border:5px solid var(--primary); }
+.cda-choice small { margin-left:auto; color:var(--muted-foreground); font:500 12px/1 var(--font); }
+.cda-regen-go { width:100%; min-height:46px; margin-top:12px; border:0; border-radius:999px; background:var(--primary); color:#fff; font:600 14px/1 var(--font); cursor:pointer; }
+
+/* Delete confirmation remains a dialog; Send is the full-page task. */
+.cda-dialog-backdrop { position:absolute; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.56); }
+.cda-dialog { width:100%; padding:20px; border:1px solid var(--border); border-radius:20px; background:var(--card); box-shadow:var(--shadow-lg); }
+.cda-dialog h2 { margin:0 0 8px; font:700 20px/1.25 var(--font); }
+.cda-dialog p { margin:0; color:var(--muted-foreground); font:400 15px/1.45 var(--font); }
+.cda-dialog-actions { display:flex; gap:8px; margin-top:20px; }
+.cda-dialog-actions button { flex:1; min-height:44px; border:0; border-radius:999px; font:600 14px/1 var(--font); cursor:pointer; }
+.cda-dialog-actions .cancel { background:var(--glass-fill); box-shadow:inset 0 0 0 1px var(--glass-border-strong); color:var(--foreground); }
+.cda-dialog-actions .danger { background:var(--destructive); color:#fff; }
+.cda-send-page[hidden],.cda-regen-menu[hidden],.cda-dialog-backdrop[hidden] { display:none; }
 
 /* +35 for the gap the floating bar leaves under itself, so the last row still
    clears it */
@@ -1555,9 +1603,23 @@ body { position:relative; gap:0; }
           <div class="arow">
             <button class="prim" type="button" id="primBtn"><i class="ph ph-check-circle" aria-hidden="true"></i><span id="primLbl">Confirm</span></button>
             <div class="cdabar" id="cdaBar" hidden>
-              <button class="cgo" type="button" id="cdaGoBtn"><i class="ph ph-eye" id="cdaGoIcon" aria-hidden="true"></i><span id="cdaGoLbl">View CDA</span></button>
-              <button class="creinit" type="button" id="cdaReinitBtn" hidden><i class="ph ph-arrow-u-up-left" aria-hidden="true"></i><span>Reinitiate</span></button>
-              <button class="cmo" type="button" id="cdaMoreBtn" aria-label="CDA options"><i class="ph ph-dots-three" aria-hidden="true"></i></button>
+              <div class="cda-status-line"><span>CDA Status</span><span class="pill green sm" id="cdaPill">Generated</span></div>
+              <div class="cda-action-row">
+                <button class="cgo" type="button" id="cdaSendBtn"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i><span>Send</span></button>
+                <button class="cregen" type="button" id="cdaRegenBtn" aria-expanded="false" aria-controls="cdaRegenMenu"><i class="ph ph-arrows-clockwise" aria-hidden="true"></i><span id="cdaRegenLabel">Regenerate</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
+                <button class="cmo cdelete" type="button" id="cdaDeleteBtn" aria-label="Delete CDA"><i class="ph ph-trash" aria-hidden="true"></i></button>
+              </div>
+              <div class="cda-regen-menu" id="cdaRegenMenu" role="dialog" aria-label="Regenerate CDA options" hidden>
+                <h3>Transparency settings</h3>
+                <button class="cda-choice" type="button" role="radio" data-regen-transparency="Full transparency" aria-checked="true"><span class="radio" aria-hidden="true"></span>Full transparency<small>Default</small></button>
+                <button class="cda-choice" type="button" role="radio" data-regen-transparency="Radius hidden" aria-checked="false"><span class="radio" aria-hidden="true"></span>Radius hidden</button>
+                <button class="cda-choice" type="button" role="radio" data-regen-transparency="Team hidden" aria-checked="false"><span class="radio" aria-hidden="true"></span>Team hidden</button>
+                <div class="regen-sep"></div>
+                <h3>CDA settings</h3>
+                <button class="cda-choice" type="button" role="radio" data-regen-type="CDA" aria-checked="true"><span class="radio" aria-hidden="true"></span>CDA<small>Default</small></button>
+                <button class="cda-choice" type="button" role="radio" data-regen-type="Gross CDA" aria-checked="false"><span class="radio" aria-hidden="true"></span>Gross CDA</button>
+                <button class="cda-regen-go" type="button" id="cdaRegenGo">Regenerate — Full transparency + CDA</button>
+              </div>
             </div>
             <button class="ghost" type="button" id="msgBtn" aria-label="Comment"><i class="ph ph-chat-circle-dots" aria-hidden="true"></i><span>Comment</span></button>
           </div>
@@ -1571,15 +1633,45 @@ body { position:relative; gap:0; }
 
     <div class="scrim" id="scrim"></div>
 
-    <!-- CDA sheet -->
-    <div class="sheet" id="cdaSheet" role="dialog" aria-modal="true" aria-labelledby="cdaSheetT" hidden>
-      <div class="grab" aria-hidden="true"></div>
-      <div class="sh-name" id="cdaSheetT">CDA<span class="sh-sub">CDA-Willow-Creek.pdf · standard CDA · generated May 12</span></div>
-      <button class="act" type="button" data-toast="Opens the CDA PDF"><i class="ph ph-eye" aria-hidden="true"></i><span class="lbl"><b>View CDA</b><span>Opens the PDF as escrow will see it</span></span></button>
-      <button class="act" type="button" id="cdaReopen"><i class="ph ph-arrow-u-up-left" aria-hidden="true"></i><span class="lbl"><b>Reinitiate</b><span>The breakdown reopens and everyone confirms again</span></span></button>
-      <button class="act" type="button" id="cdaRegen"><i class="ph ph-arrows-clockwise" aria-hidden="true"></i><span class="lbl"><b>Regenerate</b><span>Rebuilds the CDA from the current numbers</span></span></button>
-      <div class="sep" id="cdaLeadSep" aria-hidden="true"></div>
-      <button class="act" type="button" id="cdaDelete" style="color:var(--tint-red-fg)"><i class="ph ph-trash" aria-hidden="true"></i><span class="lbl"><b>Delete CDA</b><span>The breakdown stays; the CDA has to be generated again</span></span></button>
+    <!-- Send CDA is a full-page task, not a popup. -->
+    <div class="cda-send-page" id="cdaSendPage" role="dialog" aria-modal="true" aria-labelledby="cdaSendTitle" hidden>
+      <div class="detail-head">
+        <button class="detail-control" type="button" id="cdaSendBack" aria-label="Back to commission breakdown"><i class="ph ph-caret-left" aria-hidden="true"></i></button>
+        <h2 class="detail-title" id="cdaSendTitle">Send CDA</h2>
+        <span aria-hidden="true"></span>
+      </div>
+      <div class="cda-send-scroll">
+        <div class="cda-form">
+          <div class="cda-field">
+            <label for="cdaToInput">To</label>
+            <div class="cda-chips" id="cdaToChips"><span class="cda-chip">escrow@example.com<button type="button" aria-label="Remove escrow@example.com"><i class="ph ph-x" aria-hidden="true"></i></button></span></div>
+            <div class="cda-address-row"><input id="cdaToInput" type="email" placeholder="Add email address"><button class="cda-add" type="button" data-add-email="to">+ Add Email</button></div>
+          </div>
+          <div class="cda-field">
+            <label for="cdaCcInput">CC</label>
+            <div class="cda-chips" id="cdaCcChips"></div>
+            <div class="cda-address-row"><input id="cdaCcInput" type="email" placeholder="Add CC email"><button class="cda-add" type="button" data-add-email="cc">+ Add CC</button></div>
+          </div>
+          <div class="cda-field"><label for="cdaSubject">Subject</label><input id="cdaSubject" type="text" value="Commission Disbursement Authorization"></div>
+          <div class="cda-field"><label for="cdaMessage">Message</label><textarea id="cdaMessage">Hi,
+
+Please find attached the Commission Disbursement Authorization. Kindly review and confirm receipt so we can proceed to close on the scheduled COE date.
+
+Reach out with any questions.
+
+Thanks</textarea></div>
+          <div class="cda-field"><label>Attachment</label><div class="cda-attachment"><i class="ph ph-paperclip" aria-hidden="true"></i><span id="cdaAttachment">CDA.pdf</span><small>· Full transparency + CDA</small></div></div>
+        </div>
+      </div>
+      <div class="cda-send-actions"><button class="cancel" type="button" id="cdaSendCancel">Cancel</button><button class="send" type="button" id="cdaSendGo"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i>Send</button></div>
+    </div>
+
+    <div class="cda-dialog-backdrop" id="cdaDeleteDialog" hidden>
+      <div class="cda-dialog" role="alertdialog" aria-modal="true" aria-labelledby="cdaDeleteTitle" aria-describedby="cdaDeleteCopy">
+        <h2 id="cdaDeleteTitle">Delete CDA draft?</h2>
+        <p id="cdaDeleteCopy">This removes current CDA and resets its status to <strong>Confirmed by Team Lead and Agent</strong>. You must generate CDA again from scratch.</p>
+        <div class="cda-dialog-actions"><button class="cancel" type="button" id="cdaDeleteCancel">Cancel</button><button class="danger" type="button" id="cdaDeleteConfirm"><i class="ph ph-trash" aria-hidden="true"></i> Delete CDA</button></div>
+      </div>
     </div>
 
     <!-- overflow sheet -->
@@ -3953,31 +4045,16 @@ body { position:relative; gap:0; }
   function renderCda() {
     var finalized = isFinalizedStatus(status),
         cdaOn = finalized && !cdaDeleted;
-    /* the CDA row lives on the finalized state; View CDA drops out if the CDA was deleted,
-       but the leads keep the ⋯ so they can regenerate it */
+    /* Finalized state owns CDA status and lifecycle controls. */
     document.getElementById('cdaBar').hidden = !finalized;
-    document.getElementById('cdaGoBtn').hidden = !cdaOn;
-    /* Reinitiate belongs to the finalized state only, and it shares the CDA row:
-       View CDA · Reinitiate · comment, one line */
-    document.getElementById('cdaReinitBtn').hidden = !finalized;
+    document.getElementById('cdaSendBtn').hidden = !cdaOn;
+    document.getElementById('cdaDeleteBtn').hidden = !cdaOn;
     document.querySelector('.abar .arow').classList.toggle('cda-actions', finalized);
-    document.getElementById('msgBtn').hidden = false;
-    $id('cdaCard').hidden = !cdaOn;
-    $id('cdaEmpty').hidden = cdaOn;
+    document.getElementById('msgBtn').hidden = finalized;
     var p = $id('cdaPill');
     p.className = 'pill ' + (cdaOn ? 'green' : 'draft');
     p.textContent = cdaOn ? 'Generated' : 'Not generated';
-    /* the CDA is sent from the web office — on the phone it is only ever viewed */
-    document.getElementById('cdaGoLbl').textContent = 'View CDA';
-    document.getElementById('cdaGoIcon').className = 'ph ph-eye';
-    /* the paid party can view and reinitiate; regenerating or deleting a live CDA is a lead's call.
-       Reinitiate is on the bar, so the agent's ⋯ would hold nothing new — it only appears for
-       the leads, who still need Regenerate and Delete CDA. */
-    var lead = role === 'team_lead' || role === 'group_lead' || role === 'group_lead_agent';
-    document.getElementById('cdaMoreBtn').hidden = !isFinalizedStatus(status) || !lead;
-    $id('cdaRegen').hidden = !lead;
-    $id('cdaDelete').hidden = !lead;
-    $id('cdaLeadSep').hidden = !lead;
+    document.getElementById('cdaRegenLabel').textContent = cdaOn ? 'Regenerate' : 'Generate';
     fitHead();
   }
   /* Detailed breakdown is a full-page task, not an accordion inside the
@@ -4038,13 +4115,97 @@ body { position:relative; gap:0; }
     renderFeed();
     open(document.getElementById('activitySheet'), this);
   });
-  document.getElementById('cdaGoBtn').addEventListener('click', function () { toast('Opens the CDA PDF'); });
-  document.getElementById('cdaReinitBtn').addEventListener('click', function () { openReinitiate(this); });
-  document.getElementById('cdaMoreBtn').addEventListener('click', function () { open(document.getElementById('cdaSheet'), this); });
-  document.getElementById('cdaRegen').addEventListener('click', function () { cdaDeleted = false; renderStatus(); close(); toast('Regenerating the CDA from the current numbers.'); });
-  document.getElementById('cdaDelete').addEventListener('click', function () { cdaDeleted = true; renderStatus(); close(); toast('CDA deleted. Generate it again when the numbers are settled.'); });
-  document.getElementById('cdaReopen').addEventListener('click', function () {
-    close(); openReinitiate(this);
+  var cdaSendPage = document.getElementById('cdaSendPage'),
+      cdaSendTrigger = null,
+      cdaRegenMenu = document.getElementById('cdaRegenMenu'),
+      cdaTransparency = 'Full transparency',
+      cdaType = 'CDA';
+  function cdaFileName() {
+    return 'CDA-' + addr.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') + '.pdf';
+  }
+  function setCdaBackground(hidden) {
+    bgEls.forEach(function (el) {
+      if (!el) return;
+      if (hidden) { el.setAttribute('inert', ''); el.setAttribute('aria-hidden', 'true'); }
+      else { el.removeAttribute('inert'); el.removeAttribute('aria-hidden'); }
+    });
+  }
+  function closeCdaRegen() {
+    cdaRegenMenu.hidden = true;
+    document.getElementById('cdaRegenBtn').setAttribute('aria-expanded', 'false');
+  }
+  function openCdaSend(trigger) {
+    if (openSheetEl) close(true);
+    closeCdaRegen();
+    cdaSendTrigger = trigger;
+    document.getElementById('cdaSubject').value = 'Commission Disbursement Authorization — ' + addr;
+    document.getElementById('cdaMessage').value = 'Hi,\n\nPlease find attached the Commission Disbursement Authorization for ' + addr + '.\nKindly review and confirm receipt so we can proceed to close on the scheduled COE date.\n\nReach out with any questions.\n\nThanks';
+    document.getElementById('cdaAttachment').textContent = cdaFileName();
+    cdaSendPage.hidden = false;
+    setCdaBackground(true);
+    document.getElementById('cdaSendBack').focus();
+  }
+  function closeCdaSend() {
+    cdaSendPage.hidden = true;
+    setCdaBackground(false);
+    if (cdaSendTrigger) cdaSendTrigger.focus();
+  }
+  function updateCdaRegenButton() {
+    document.getElementById('cdaRegenGo').textContent = (cdaDeleted ? 'Generate' : 'Regenerate') + ' — ' + cdaTransparency + ' + ' + cdaType;
+  }
+  document.getElementById('cdaSendBtn').addEventListener('click', function () { openCdaSend(this); });
+  document.getElementById('cdaSendBack').addEventListener('click', closeCdaSend);
+  document.getElementById('cdaSendCancel').addEventListener('click', closeCdaSend);
+  document.getElementById('cdaSendGo').addEventListener('click', function () {
+    closeCdaSend(); toast('CDA sent.');
+  });
+  document.getElementById('cdaRegenBtn').addEventListener('click', function () {
+    var opening = cdaRegenMenu.hidden;
+    cdaRegenMenu.hidden = !opening;
+    this.setAttribute('aria-expanded', String(opening));
+    if (opening) { updateCdaRegenButton(); cdaRegenMenu.querySelector('.cda-choice').focus(); }
+  });
+  document.addEventListener('click', function (e) {
+    var choice = e.target.closest('[data-regen-transparency],[data-regen-type]');
+    if (choice) {
+      var attr = choice.hasAttribute('data-regen-transparency') ? 'data-regen-transparency' : 'data-regen-type';
+      Array.prototype.forEach.call(cdaRegenMenu.querySelectorAll('[' + attr + ']'), function (button) { button.setAttribute('aria-checked', String(button === choice)); });
+      if (attr === 'data-regen-transparency') cdaTransparency = choice.getAttribute(attr);
+      else cdaType = choice.getAttribute(attr);
+      updateCdaRegenButton(); return;
+    }
+    if (!cdaRegenMenu.hidden && !e.target.closest('#cdaRegenMenu,#cdaRegenBtn')) closeCdaRegen();
+  });
+  document.getElementById('cdaRegenGo').addEventListener('click', function () {
+    var wasDeleted = cdaDeleted;
+    cdaDeleted = false; closeCdaRegen(); renderStatus();
+    toast(wasDeleted ? 'CDA generated.' : 'CDA regenerated.');
+  });
+  document.getElementById('cdaDeleteBtn').addEventListener('click', function () {
+    closeCdaRegen(); document.getElementById('cdaDeleteDialog').hidden = false; document.getElementById('cdaDeleteCancel').focus();
+  });
+  document.getElementById('cdaDeleteCancel').addEventListener('click', function () { document.getElementById('cdaDeleteDialog').hidden = true; document.getElementById('cdaDeleteBtn').focus(); });
+  document.getElementById('cdaDeleteConfirm').addEventListener('click', function () {
+    cdaDeleted = true; document.getElementById('cdaDeleteDialog').hidden = true; renderStatus(); toast('CDA deleted.');
+  });
+  document.getElementById('cdaDeleteDialog').addEventListener('click', function (e) { if (e.target === this) document.getElementById('cdaDeleteCancel').click(); });
+  document.addEventListener('click', function (e) {
+    var add = e.target.closest('[data-add-email]');
+    if (!add) return;
+    var kind = add.getAttribute('data-add-email'), input = document.getElementById(kind === 'to' ? 'cdaToInput' : 'cdaCcInput'), value = input.value.trim();
+    if (!value || input.validity.typeMismatch) { input.focus(); return; }
+    var chip = document.createElement('span'), remove = document.createElement('button'), icon = document.createElement('i');
+    chip.className = 'cda-chip'; chip.appendChild(document.createTextNode(value));
+    remove.type = 'button'; remove.setAttribute('aria-label', 'Remove ' + value);
+    icon.className = 'ph ph-x'; icon.setAttribute('aria-hidden', 'true'); remove.appendChild(icon); chip.appendChild(remove);
+    document.getElementById(kind === 'to' ? 'cdaToChips' : 'cdaCcChips').appendChild(chip); input.value = ''; input.focus();
+  });
+  document.addEventListener('click', function (e) { var remove = e.target.closest('.cda-chip button'); if (remove) remove.closest('.cda-chip').remove(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (!document.getElementById('cdaDeleteDialog').hidden) { document.getElementById('cdaDeleteCancel').click(); return; }
+    if (!cdaRegenMenu.hidden) { closeCdaRegen(); document.getElementById('cdaRegenBtn').focus(); return; }
+    if (!cdaSendPage.hidden) { e.preventDefault(); closeCdaSend(); }
   });
   var role = 'agent';
   function setRole(r) {
@@ -4092,7 +4253,7 @@ body { position:relative; gap:0; }
   });
   document.getElementById('moreBtn').addEventListener('click', function () { open(document.getElementById('moreSheet'), this); });
   document.getElementById('moreDetailed').addEventListener('click', function () { openDetailed(this); });
-  document.getElementById('moreCda').addEventListener('click', function () { open(document.getElementById('cdaSheet'), this); });
+  document.getElementById('moreCda').addEventListener('click', function () { openCdaSend(this); });
 
   /* ── status + action bar ────────────────────────────── */
   var STATUS = {
