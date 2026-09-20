@@ -1118,9 +1118,7 @@ button.ybd-r:active { opacity:.7; }
 .detail-scroll .card.sides { margin:0; }
 .detail-page:not(.editing) .addrow { display:none; }
 .detail-actions { flex:none; display:flex; align-items:center; gap:8px; padding:8px 16px calc(12px + env(safe-area-inset-bottom));
-  border-top:1px solid rgba(255,255,255,.12); background:rgba(8,8,10,.72);
-  backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%); }
-.screen.light .detail-actions { border-top-color:rgba(10,10,10,.08); background:rgba(255,255,255,.72); }
+  border-top:0; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; }
 .detail-actions .detail-prim { flex:1; min-height:46px; border:0; border-radius:999px; background:var(--primary); color:#fff;
   display:inline-flex; align-items:center; justify-content:center; gap:8px; font:600 15px/1 var(--font); cursor:pointer; }
 .detail-actions .detail-prim i,.detail-actions .detail-comment i { font-size:18px; }
