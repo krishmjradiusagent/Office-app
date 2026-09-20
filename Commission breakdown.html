@@ -1594,8 +1594,12 @@ body { position:relative; gap:0; }
     <!-- overflow sheet -->
     <div class="sheet" id="moreSheet" role="dialog" aria-modal="true" aria-labelledby="moreSheetT" hidden>
       <div class="grab" aria-hidden="true"></div>
-      <div class="sh-name" id="moreSheetT">More<span class="sh-sub" id="moreSub">Commission breakdown</span></div>
-      <a class="act" href="CDA Settings.html"><i class="ph ph-gear" aria-hidden="true"></i>Commission settings</a>
+      <div class="sh-name" id="moreSheetT">Other options<span class="sh-sub" id="moreSub">Commission breakdown</span></div>
+      <button class="act" type="button" id="moreDetailed"><i class="ph ph-list-magnifying-glass" aria-hidden="true"></i><span class="lbl"><b>Detailed breakdown</b><span>View every split, fee, and deduction</span></span></button>
+      <a class="act" id="moreWire" href="Wire instructions.html"><i class="ph ph-bank" aria-hidden="true"></i><span class="lbl"><b>Wire instructions</b><span>View or update payment details</span></span></a>
+      <button class="act" type="button" id="moreCda"><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="lbl"><b>CDA</b><span>View commission disbursement authorization</span></span></button>
+      <a class="act" href="CDA Settings.html"><i class="ph ph-gear" aria-hidden="true"></i><span class="lbl"><b>Commission settings</b><span>Manage plans, fees, and post-cap rules</span></span></a>
+      <a class="act" href="Implemented Home.html#commissionTracker"><i class="ph ph-chart-line-up" aria-hidden="true"></i><span class="lbl"><b>Commission tracker</b><span>Track commission approvals and status</span></span></a>
     </div>
 
     <!-- allocation sheet -->
@@ -2825,8 +2829,10 @@ body { position:relative; gap:0; }
     renderYbd();
     renderPostCapBanners();
   }
-  document.getElementById('moreSheetT').firstChild.textContent = addr;
-  document.getElementById('moreSub').textContent = 'Commission breakdown \u00b7 ' + closeTxt.toLowerCase();
+  document.getElementById('moreSub').textContent = addr + ' \u00b7 ' + closeTxt.toLowerCase();
+  var moreWireParams = new URLSearchParams(window.location.search);
+  moreWireParams.set('return', window.location.pathname.split('/').pop() || 'Commission breakdown.html');
+  document.getElementById('moreWire').href = 'Wire instructions.html?' + moreWireParams.toString();
   document.getElementById('activitySub').textContent = addr;
 
   function toast(m) { toastEl.textContent = m; toastEl.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove('on'); }, 2600); }
@@ -4043,6 +4049,8 @@ body { position:relative; gap:0; }
     setWires(b.getAttribute('data-setwires'));
   });
   document.getElementById('moreBtn').addEventListener('click', function () { open(document.getElementById('moreSheet'), this); });
+  document.getElementById('moreDetailed').addEventListener('click', function () { openDetailed(this); });
+  document.getElementById('moreCda').addEventListener('click', function () { open(document.getElementById('cdaSheet'), this); });
 
   /* ── status + action bar ────────────────────────────── */
   var STATUS = {
