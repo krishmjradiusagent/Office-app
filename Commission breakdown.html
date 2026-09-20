@@ -348,7 +348,10 @@ a.agentrow:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; b
 .prow .pk em { display:block; margin-top:1px; font:500 13px/1.3 var(--font); font-style:normal; color:var(--muted-foreground); }
 .prow.pay .pk { display:flex; align-items:center; gap:6px; flex-wrap:wrap; row-gap:2px; }
 .prow.pay { position:relative; }
-.pico.bank { color:var(--tint-indigo-fg); }
+.pico.bank { position:relative; width:22px; height:22px; align-items:center; justify-content:center; border:0; padding:0; border-radius:999px; background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); cursor:pointer; }
+.pico.bank::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.pico.bank:active { transform:scale(.94); }
+.pico.bank:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
 .prow.pay .ibtn { color:var(--tint-amber-fg); }
 .poptxt { font:500 13px/1.45 var(--font); color:var(--foreground); text-wrap:pretty; }
 /* editable post-split rows: dotted underline says "tap to edit"; swipe left uncovers Remove */
@@ -2361,8 +2364,16 @@ body { position:relative; gap:0; }
           k.appendChild(flags);
         }
         if (r.post && r.post.wire) {
-          var wc = document.createElement('span'); wc.className = 'pico bank';
-          var wi = document.createElement('i'); wi.className = 'ph ph-bank'; wi.setAttribute('role', 'img'); wi.setAttribute('aria-label', 'Paid by wire');
+          var wc = document.createElement('button'); wc.type = 'button'; wc.className = 'pico bank';
+          wc.setAttribute('aria-label', 'Open wire instructions for ' + r.k);
+          wc.addEventListener('click', function (event) {
+            event.stopPropagation();
+            var params = new URLSearchParams(window.location.search);
+            params.set('fee', r.k);
+            params.set('return', window.location.pathname.split('/').pop() || 'Commission breakdown.html');
+            window.location.href = 'Wire instructions.html?' + params.toString();
+          });
+          var wi = document.createElement('i'); wi.className = 'ph ph-bank'; wi.setAttribute('aria-hidden', 'true');
           wc.appendChild(wi); k.appendChild(wc);
         }
         if (r.post && r.post.info) {
@@ -5451,6 +5462,7 @@ body { position:relative; gap:0; }
   setRole('agent');
   renderCda();
   fitHead();
+  if (window.location.hash === '#detailed') openDetailed(null);
 })();
 </script>
 </body>
