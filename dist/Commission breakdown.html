@@ -1222,7 +1222,7 @@ button.ybd-r:active { opacity:.7; }
 .relationship-plan-row .pv { min-width:0; max-width:62%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
 .relationship-plan-row .ibtn { color:var(--muted-foreground); }
 .post-cap-host { position:relative; margin:10px 0 0; }
-.detail-scroll > .post-cap-host { margin:0 0 10px; }
+.relationship-stack .post-cap-host { margin:8px 0 4px; }
 .post-cap-banner { position:relative; overflow:visible; border:1px solid var(--tint-amber-border); border-radius:16px;
   background:linear-gradient(145deg,var(--tint-amber-bg),rgba(255,255,255,.025)); box-shadow:var(--shadow-sm); }
 .post-cap-summary { display:flex; align-items:center; gap:11px; width:100%; min-height:70px; padding:10px 12px;
@@ -1420,7 +1420,6 @@ body { position:relative; gap:0; }
           <div class="fin-row" data-editfinancial="price"><span><i class="ph ph-house-line fin-icon" aria-hidden="true"></i>Sale price</span><b id="finPrice">$1,150,000</b></div>
           <div class="fin-row" data-editfinancial="gross"><span><span class="fin-badge" data-mark="$" aria-hidden="true"><i class="ph ph-seal"></i></span>Gross commission</span><b id="finGross">$23,000</b></div>
         </div>
-        <div class="post-cap-host" id="postCapMain" hidden></div>
         <div class="commission-wallet" id="commissionWallet">
         <div class="ybd-card" id="ybdCard">
           <div class="ybd-lad" id="ybdLad"></div>
@@ -1439,7 +1438,6 @@ body { position:relative; gap:0; }
             <div class="fin-row"><span><i class="ph ph-house-line fin-icon" aria-hidden="true"></i>Sale price</span><b id="detailFinPrice">$1,150,000</b></div>
             <div class="fin-row"><span><span class="fin-badge" data-mark="$" aria-hidden="true"><i class="ph ph-seal"></i></span>Gross commission</span><b id="detailFinGross">$23,000</b></div>
           </div>
-          <div class="post-cap-host" id="postCapDetail" hidden></div>
           <div id="sec-sides">
       <div class="card sides">
         <div class="side">
@@ -2336,6 +2334,10 @@ body { position:relative; gap:0; }
           pop.appendChild(assigned);
           row.appendChild(key); row.appendChild(value); row.appendChild(pop); el.appendChild(row);
         });
+        var postCapHost = document.createElement('div');
+        postCapHost.className = 'post-cap-host'; postCapHost.id = o.id + '-post-cap';
+        postCapHost.setAttribute('data-post-cap-host', '');
+        el.appendChild(postCapHost); renderPostCapBanner(postCapHost);
         d.appendChild(el); return;
       }
       if (r.plan) {
@@ -2679,7 +2681,7 @@ body { position:relative; gap:0; }
 
   document.getElementById('s2Title').textContent = coopTitle;
 
-  var postCapOpen = { postCapMain:false, postCapDetail:false };
+  var postCapOpen = {};
   function activePostCapPlans() {
     var s = SCHED['Mark Perez'], plans = [];
     if (s.capped && postCapActiveFor(s, 'group')) plans.push({ kind:'group', plan:selectedPostCap('group') });
@@ -2742,8 +2744,7 @@ body { position:relative; gap:0; }
     banner.appendChild(body); host.appendChild(banner);
   }
   function renderPostCapBanners() {
-    renderPostCapBanner(document.getElementById('postCapMain'));
-    renderPostCapBanner(document.getElementById('postCapDetail'));
+    Array.prototype.forEach.call(document.querySelectorAll('[data-post-cap-host]'), renderPostCapBanner);
   }
   function closePostCapMenus(except) {
     Array.prototype.forEach.call(document.querySelectorAll('.post-cap-picker.open'), function (anchor) {
