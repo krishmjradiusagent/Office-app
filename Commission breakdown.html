@@ -2305,8 +2305,9 @@ Thanks</textarea></div>
         aBasis = basis * share,
         aGross = sideGross * share,
         aPre = preSplit * share,
+        commissionBeforeSplit = Math.max(0, aBasis - aPre),
         aDed = postDed * share,
-        splitAmt = s.flat != null ? Math.max(0, aBasis - s.flat) : aBasis * s.split / 100,
+        splitAmt = s.flat != null ? Math.max(0, commissionBeforeSplit - s.flat) : commissionBeforeSplit * s.split / 100,
         pc = s.capped && postCapActiveFor(s, 'group') ? postCapCharge('group', aGross) : 0,
         tpc = s.team && postCapActiveFor(s, 'team') ? postCapCharge('team', aGross) : 0,
         rows = [];
@@ -2326,22 +2327,24 @@ Thanks</textarea></div>
     rows.push({ head: 'Commission', cardhide: true });
     rows.push({ k: 'Sale price', v: cur(price), cardhide: true });
     rows.push({ k: 'Commission %', v: '2.0%', cardhide: true });
-    rows.push({ k: 'Gross commission', sub2: n > 1 ? pctLbl(share) + ' of this side after credits' : 'This side after credits', v: cur(aBasis), cardhide: true });
+    var basisDetails = DEDS.mine.filter(function (d) { return d.kind === 'credit' || d.kind === 'presplit'; }).map(function (d) {
+      return { k: d.name, v: neg(d.amt * share) };
+    });
+    rows.push({ k: 'Commission basis', sub2: n > 1 ? pctLbl(share) + ' of this side' : 'This side before deductions', v: cur(aGross), det: basisDetails });
+    rows.push({ k: 'Commission before split', sub2: 'After credits and pre-split deductions', v: cur(commissionBeforeSplit) });
     /* `ed` marks the rows a person actually sets. It is inert everywhere the
        chain is read-only — only the card's edit mode turns it into a target,
        and only on the reader's own chain. */
-    rows.push({ head: 'Agent split', cardhide: true });
     rows.push(s.flat != null
-      ? { k: a.me ? 'Agent' : firstName(a.name), cardk: a.me ? 'Your split' : firstName(a.name), badge: '$' + s.flat + ' flat', sub2: '$' + s.flat + ' flat instead of the split', v: cur(splitAmt) }
-      : { k: a.me ? 'Agent' : firstName(a.name), cardk: a.me ? 'Your split' : firstName(a.name), badge: s.split + '%', sub2: s.split + '%', v: cur(splitAmt) });
-    rows.push({ k: 'Brokerage', sub2: s.flat != null ? 'Remainder after capped agent amount' : (100 - s.split) + '%', v: cur(Math.max(0, aBasis - splitAmt)), cardhide: true });
+      ? { k: a.me ? 'Agent split' : firstName(a.name) + ' split', badge: '$' + s.flat + ' flat', sub2: '$' + s.flat + ' flat instead of the split', v: cur(splitAmt) }
+      : { k: a.me ? 'Agent split' : firstName(a.name) + ' split', badge: s.split + '%', sub2: s.split + '%', v: cur(splitAmt) });
+    rows.push({ k: 'Brokerage', sub2: s.flat != null ? 'Remainder after capped agent amount' : (100 - s.split) + '%', v: cur(Math.max(0, commissionBeforeSplit - splitAmt)), cardhide: true });
     /* `grp` buckets the chain into the card's three collapsible groups, and
        `amt` carries the raw figure its `v` string formats — a subtotal is
        summed from these, never parsed back out of "−$2,970". Both keys are
        inert in the lower breakdown, which reads the same chain. */
-    rows.push({ head: 'Deductions', cardhead: 'Plan fees', grp: 'plan' });
+    rows.push({ head: 'Post-split deductions', grp: 'post' });
     if (tpc) rows.push({ k: selectedPostCap('team').name, sub2: selectedPostCap('team').formula, v: neg(tpc), amt: tpc, psub: true, ed: 'fee:team', det: [{ k: 'Rule', v: selectedPostCap('team').formula }] });
-    if (aPre) rows.push({ k: 'Pre-split deductions', v: neg(aPre), amt: aPre });
     rows.push({ k: 'Radius fee', v: neg(radiusFee), amt: radiusFee, ed: 'fee:radius', det: [{ k: 'Rule', v: '$' + radiusFee + ' flat' }] });
     if (pc) rows.push({ k: selectedPostCap('group').name, sub2: selectedPostCap('group').formula, v: neg(pc), amt: pc, det: [
       { k: 'Rule', v: selectedPostCap('group').formula },
@@ -2349,7 +2352,6 @@ Thanks</textarea></div>
       { k: 'Percentage charge', v: cur(aGross * selectedPostCap('group').rate) },
       { k: 'Flat charge', v: cur(selectedPostCap('group').flat) }
     ] });
-    rows.push({ head: 'Post-split deductions', grp: 'post' });
     POSTDEDS.forEach(function (d) {
       rows.push({ k: d.n, pay: d.p, v: neg(d.a * share), amt: d.a * share, post: d, list: 'post', det: dedDet(d) });
     });
@@ -2364,7 +2366,7 @@ Thanks</textarea></div>
       rows.push({ k: d.n, pay: d.p, v: neg(d.a * share), amt: d.a * share, post: d, list: 'radius', det: dedDet(d) });
     });
     rows.push({ addpost: 'radius' });
-    var netA = Math.max(0, splitAmt - aPre - radiusFee - pc - tpc - aDed - aRad);
+    var netA = Math.max(0, splitAmt - radiusFee - pc - tpc - aDed - aRad);
     rows.push({ k: a.me ? 'Your payout' : 'Agent payout · ' + firstName(a.name), v: cur(netA), tot: true });
     return { net: netA, splitAmt: splitAmt, radius: radiusFee + pc, team: tpc, rows: rows };
   }
@@ -2379,7 +2381,7 @@ Thanks</textarea></div>
     net = sn;
     agentsPaid = ss;
     radiusNet = sr + PAYRADIUS.reduce(function (t, d) { return t + d.a; }, 0);
-    teamNet = (basis - ss) + st + 250;
+    teamNet = (basis - preSplit - ss) + st + 250;
     groupNet = teamNet * groupSplitPct / 100;
   }
   /* Team lead has downstream share and role fees. Group lead receives the
@@ -3568,10 +3570,14 @@ Thanks</textarea></div>
         if (!expandable) return;
         l.type = 'button';
         var did = 'ybdDD' + (detSeq++),
+            basisDisclosure = r.k === 'Commission basis',
             blk = ybdDetBlock(r.det, did);
+        if (basisDisclosure) blk.classList.add('basis-fees');
         l.setAttribute('aria-expanded', 'false');
         l.setAttribute('aria-controls', did);
-        var cc = document.createElement('i'); cc.className = 'ph ph-caret-right chev'; cc.setAttribute('aria-hidden', 'true');
+        var cc = document.createElement('i');
+        cc.className = basisDisclosure ? 'ph ph-plus expand-mark' : 'ph ph-caret-right chev';
+        cc.setAttribute('aria-hidden', 'true');
         l.appendChild(cc);
         host.appendChild(blk);
         l.addEventListener('click', function (e) {
@@ -3590,9 +3596,6 @@ Thanks</textarea></div>
       o.full.rows.forEach(function (r) {
         /* Payout already lives in the persistent floating summary. */
         if (r.tot && typeof r.v === 'string') return;
-        /* Plan plus commission basis now explain this result first. Repeating
-           the percentage split and split dollars adds no new information. */
-        if (r.cardk === 'Your split') return;
         if (r.head) {
           cur_ = r.grp ? { key: r.grp, label: r.cardhead || r.head, rows: [] } : null;
           if (cur_) groups.push(cur_);
@@ -3605,16 +3608,7 @@ Thanks</textarea></div>
       loose.forEach(function (r) { ybdFeeEl(r, det); });
       /* Commission ownership and Radius-payable fees are different concepts.
          Give each the same compact disclosure treatment and keep them adjacent. */
-      var mineParticipant = AG.mine.filter(function (a) { return a.me; })[0] || AG.mine[0],
-          basisShare = Math.max(0, Number(mineParticipant && mineParticipant.allocation != null ? mineParticipant.allocation : 100)) / 100,
-          basisFees = DEDS.mine.filter(function (d) { return d.kind === 'credit'; }).map(function (d) {
-            return { k:d.name, v:neg(d.amt * basisShare), amt:d.amt * basisShare };
-          }),
-          basisGroup = {
-            key: 'basis', label: 'Commission basis', itemLabel: 'fees',
-            amt: basis * basisShare, rows: basisFees
-          },
-          radiusGroup = groups.filter(function (g) { return g.key === 'radius'; })[0],
+      var radiusGroup = groups.filter(function (g) { return g.key === 'radius'; })[0],
           commissionGroup = null;
       if (radiusGroup && (role === 'agent' || role === 'group_agent' || role === 'group_lead_agent')) {
         commissionGroup = {
@@ -3637,7 +3631,6 @@ Thanks</textarea></div>
       groups.forEach(function (g) {
         g.amt = g.rows.reduce(function (t, r) { return t + (r.amt || 0); }, 0);
       });
-      if (basisGroup.rows.length) groups.unshift(basisGroup);
       if (commissionGroup) groups.splice(groups.indexOf(radiusGroup) + 1, 0, commissionGroup);
       /* anything needing attention reads above the groups, open or closed —
          a collapsed group must never be able to hide a problem */
