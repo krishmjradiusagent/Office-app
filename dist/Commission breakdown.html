@@ -6013,7 +6013,15 @@ Thanks</textarea></div>
   setRole('agent');
   renderCda();
   fitHead();
-  if (window.location.hash === '#detailed') openDetailed(null);
+  if (window.location.hash === '#detailed') {
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+    requestAnimationFrame(function () {
+      var sc = document.getElementById('scroll'), card = document.getElementById('ybdCard');
+      if (!sc || !card) return;
+      var pad = parseFloat(getComputedStyle(sc).paddingTop) || 0;
+      sc.scrollTop = Math.max(0, sc.scrollTop + card.getBoundingClientRect().top - sc.getBoundingClientRect().top - pad - 10);
+    });
+  }
 })();
 </script>
 </body>
