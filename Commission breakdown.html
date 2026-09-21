@@ -687,6 +687,27 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .sheet label:not(.fld) { display:block; font:600 13px/1.2 var(--font); color:var(--muted-foreground); }
 .sheet .note { margin:8px 10px 0; padding:11px 12px; border-radius:var(--radius-md); background:var(--muted); font:500 13px/1.45 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
 
+/* Commission tracker keeps one state visible. Design tweaks owns state switching. */
+.tracker-sheet .sh-name { display:flex; align-items:center; min-height:48px; padding-right:96px; }
+.tracker-progress { position:absolute; right:54px; top:50%; transform:translateY(-50%); color:var(--tint-amber-fg); font:500 15px/1 var(--font); font-variant-numeric:tabular-nums; }
+.tracker-progress.complete { padding:5px 9px; border:1px solid color-mix(in srgb,var(--tint-green-fg) 30%,transparent); border-radius:999px; background:var(--tint-green-bg); color:var(--tint-green-fg); }
+.tracker-list { padding:2px 10px 0; }
+.tracker-row { display:grid; grid-template-columns:28px minmax(0,1fr) auto; align-items:center; gap:8px; min-height:50px; color:var(--foreground); }
+.tracker-row .tracker-mark { width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; color:var(--tint-amber-fg); }
+.tracker-row .tracker-mark::before { content:''; width:18px; height:18px; border:2px solid currentColor; border-radius:999px; }
+.tracker-row.done { color:var(--muted-foreground); }
+.tracker-row.done .tracker-mark { color:var(--tint-green-fg); font-size:22px; }
+.tracker-row.done .tracker-mark::before { display:none; }
+.tracker-row .tracker-label { min-width:0; font:500 15px/1.3 var(--font); }
+.tracker-row .tracker-status { padding-left:8px; color:var(--tint-amber-fg); font:500 13px/1.2 var(--font); text-align:right; text-transform:none; }
+.tracker-row .tracker-status.released { color:var(--tint-green-fg); text-transform:uppercase; letter-spacing:.03em; }
+.tracker-banner { margin:8px 10px 4px; padding:12px 13px; border:1px solid color-mix(in srgb,var(--tint-amber-fg) 34%,transparent); border-radius:14px; background:color-mix(in srgb,var(--tint-amber-bg) 42%,var(--card)); }
+.tracker-banner.success { border-color:color-mix(in srgb,var(--tint-green-fg) 28%,transparent); background:color-mix(in srgb,var(--tint-green-bg) 38%,var(--card)); }
+.tracker-banner b { display:block; margin-bottom:4px; color:var(--foreground); font:600 15px/1.3 var(--font); }
+.tracker-banner p { margin:0; color:var(--tint-amber-fg); font:500 13px/1.45 var(--font); text-wrap:pretty; }
+.tracker-banner.success p { color:var(--tint-green-fg); }
+.tracker-banner p strong { color:var(--foreground); font-weight:650; }
+
 /* Reversible Skiper 22 experiment. The original edge-attached sheet rules
    above stay untouched; remove data-sheet-style="skiper22" to restore them.
    Visual reference: https://skiper-ui.com/v1/skiper22 */
@@ -1682,7 +1703,15 @@ Thanks</textarea></div>
       <a class="act" id="moreWire" href="Wire instructions.html"><i class="ph ph-bank" aria-hidden="true"></i><span class="lbl"><b>Wire instructions</b></span></a>
       <button class="act" type="button" id="moreCda"><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="lbl"><b>CDA</b></span></button>
       <a class="act" href="CDA Settings.html"><i class="ph ph-gear" aria-hidden="true"></i><span class="lbl"><b>Commission settings</b></span></a>
-      <a class="act" href="Implemented Home.html#commissionTracker"><i class="ph ph-chart-line-up" aria-hidden="true"></i><span class="lbl"><b>Commission tracker</b></span></a>
+      <button class="act" type="button" id="moreTracker"><i class="ph ph-chart-line-up" aria-hidden="true"></i><span class="lbl"><b>Commission tracker</b></span></button>
+    </div>
+
+    <!-- one tracker state at a time; switch variants from Design tweaks -->
+    <div class="sheet tracker-sheet" id="trackerSheet" role="dialog" aria-modal="true" aria-labelledby="trackerSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="sh-name" id="trackerSheetT" tabindex="-1">Commission tracker<span class="tracker-progress" id="trackerProgress" aria-live="polite">0/6</span></div>
+      <div class="tracker-list" id="trackerList"></div>
+      <div class="tracker-banner" id="trackerBanner" aria-live="polite"></div>
     </div>
 
     <!-- allocation sheet -->
@@ -1992,6 +2021,14 @@ Thanks</textarea></div>
       <button class="sp-b" type="button" data-setstatus="commission_received" aria-pressed="false">Commission received</button>
       <button class="sp-b" type="button" data-setstatus="paid" aria-pressed="false">Paid</button>
       <button class="sp-b" type="button" data-setstatus="returned" aria-pressed="false">Returned for edits</button>
+    </div>
+    <div class="sp-grp">
+      <span class="sp-k">Tracker state</span>
+      <div class="sp-row">
+        <button class="sp-b" type="button" data-settracker="zero" aria-pressed="true">0/6</button>
+        <button class="sp-b" type="button" data-settracker="partial" aria-pressed="false">Partial</button>
+        <button class="sp-b" type="button" data-settracker="paid" aria-pressed="false">Paid</button>
+      </div>
     </div>
     <div class="sp-grp">
       <span class="sp-k">Theme</span>
@@ -4254,6 +4291,71 @@ Thanks</textarea></div>
   document.getElementById('moreBtn').addEventListener('click', function () { open(document.getElementById('moreSheet'), this); });
   document.getElementById('moreDetailed').addEventListener('click', function () { openDetailed(this); });
   document.getElementById('moreCda').addEventListener('click', function () { openCdaSend(this); });
+  document.getElementById('moreTracker').addEventListener('click', function () {
+    close(true);
+    setTimeout(function () { open(document.getElementById('trackerSheet'), document.getElementById('moreBtn')); }, 300);
+  });
+
+  /* ── commission tracker ────────────────────────────── */
+  var trackerState = 'zero';
+  var TRACKER_LABELS = [
+    'Checklist compliant',
+    'Agent CDA approved',
+    'Team lead CDA approved',
+    'Group lead CDA approved',
+    'Commission received',
+    'Agent payment'
+  ];
+  var TRACKER_STATES = {
+    zero: {
+      progress: '0/6', checked: [],
+      pending: [0, 1, 2, 3, 4, 5],
+      title: 'What\u2019s holding up payment',
+      copy: 'Waiting on checklist compliance, Agent CDA approval, Team lead CDA approval, Group lead CDA approval and commission funds.'
+    },
+    partial: {
+      progress: '3/6', checked: [0, 3, 4],
+      pending: [1, 2, 5],
+      title: 'What\u2019s holding up payment',
+      copy: 'Waiting on Agent CDA approval and Team lead CDA approval.'
+    },
+    paid: {
+      progress: '100%', checked: [0, 1, 2, 3, 4, 5],
+      pending: [], released: 5,
+      title: 'Commission paid',
+      copy: 'Funds released to agent <strong>Aug 14, 2026</strong> via <strong>Payload</strong>.',
+      success: true
+    }
+  };
+  function renderTracker() {
+    var data = TRACKER_STATES[trackerState];
+    var progress = document.getElementById('trackerProgress');
+    var list = document.getElementById('trackerList');
+    var banner = document.getElementById('trackerBanner');
+    progress.textContent = data.progress;
+    progress.classList.toggle('complete', !!data.success);
+    list.innerHTML = TRACKER_LABELS.map(function (label, index) {
+      var done = data.checked.indexOf(index) !== -1;
+      var status = data.released === index ? 'RELEASED' : (data.pending.indexOf(index) !== -1 ? 'Pending' : '');
+      return '<div class="tracker-row' + (done ? ' done' : '') + '">' +
+        '<span class="tracker-mark" aria-hidden="true">' + (done ? '<i class="ph ph-check"></i>' : '') + '</span>' +
+        '<span class="tracker-label">' + label + '</span>' +
+        (status ? '<span class="tracker-status' + (data.released === index ? ' released' : '') + '">' + status + '</span>' : '') +
+      '</div>';
+    }).join('');
+    banner.className = 'tracker-banner' + (data.success ? ' success' : '');
+    banner.innerHTML = '<b>' + data.title + '</b><p>' + data.copy + '</p>';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-settracker]'), function (button) {
+      button.setAttribute('aria-pressed', String(button.getAttribute('data-settracker') === trackerState));
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var button = e.target.closest('[data-settracker]');
+    if (!button) return;
+    trackerState = button.getAttribute('data-settracker');
+    renderTracker();
+  });
+  renderTracker();
 
   /* ── status + action bar ────────────────────────────── */
   var STATUS = {
