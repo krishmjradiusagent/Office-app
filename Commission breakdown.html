@@ -1081,7 +1081,7 @@ button.ybd-r:active { opacity:.7; }
 /* 40px of ink, 44px of target: the row carries a centred pseudo-element so a
    tappable fee meets the touch floor without spending 4px per row on height.
    Same trick as .fb-edit. */
-.ybd-det .d { position:relative; display:flex; align-items:baseline; gap:10px; min-height:40px; padding:4px 0; border-left:0; }
+.ybd-det .d { position:relative; display:flex; align-items:center; gap:10px; min-height:40px; padding:4px 0; border-left:0; }
 .ybd-det button.d::before { content:''; position:absolute; left:0; right:0; top:50%;
   height:44px; transform:translateY(-50%); }
 .ybd-det .d span { flex:1; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:6px; row-gap:2px;
@@ -1101,6 +1101,14 @@ button.ybd-r:active { opacity:.7; }
 .ybd-det .d .pico { flex:none; display:inline-flex; color:var(--muted-foreground); }
 .ybd-det .d .pico i { font-size:15px; }
 .ybd-det .d .pico.warn { color:var(--tint-amber-fg); }
+.ybd-det .d span.ybd-fee-meta { flex:0 1 auto; min-width:0; display:inline-flex; align-items:center; gap:5px; flex-wrap:nowrap; }
+.ybd-det .d .paid-by { flex:none; display:inline-flex; align-items:center; gap:4px; min-height:20px; padding:2px 7px;
+  border-radius:999px; background:var(--muted); color:var(--muted-foreground); font:500 11px/1 var(--font); white-space:nowrap; }
+.ybd-det .d .paid-by i { font-size:12px; line-height:1; }
+.ybd-det .d .paid-by span { flex:none; min-width:0; display:inline; color:inherit; font:inherit; white-space:nowrap; }
+.ybd-det .d .private-fee { flex:none; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px;
+  border-radius:999px; background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); }
+.ybd-det .d .private-fee i { font-size:13px; line-height:1; }
 /* payout leads the card — the agent reads what they are paid before
    they read why. The chain below explains it and does not repeat it. */
 .ybd-det .d.lead { min-height:0; margin:10px 0; padding:0 0 11px; border-bottom:1px solid rgba(255,255,255,.08); }
@@ -1126,20 +1134,22 @@ button.ybd-r:active { opacity:.7; }
    normal inline flow they reflow together as one phrase. */
 .ybd-det .d.grp span, .ybd-det .d.sum span { display:block; }
 .ybd-det .d.grp span em, .ybd-det .d.sum span em { display:inline; }
-.ybd-det .d.grp span { font:600 15px/1.35 var(--font); }
+.ybd-det .d.grp span { font:500 14px/1.35 var(--font); }
 .ybd-det .d.grp { align-items:center; }
+.ybd-det .d.grp > span, .ybd-det .d.grp > b { color:var(--foreground); }
+/* Expanded fee items share the same quiet hierarchy as Credits and Referral:
+   muted 13px labels, foreground 13px amounts. */
+.ybd-det .d-fees .d > span { font:500 13px/1.35 var(--font); color:var(--muted-foreground); }
+.ybd-det .d-fees .d > b { font:500 13px/1.35 var(--font); color:var(--foreground); }
 .ybd-det .d.grp span em, .ybd-det .d.sum span em { font:500 13px/1.35 var(--font); font-style:normal;
   color:var(--muted-foreground); }
 .ybd-det .d.grp span em::before, .ybd-det .d.sum span em::before { content:'\00a0\00b7\00a0'; }
 /* everything that comes out, above the groups that break it down */
 .ybd-det .d.sum { margin:2px 0 4px; }
 .ybd-det .d.sum span { font:600 15px/1.35 var(--font); }
-.ybd-det .d-fees { margin:0 0 -4px; padding:0 0 0 12px; border-left:1px solid rgba(255,255,255,.08); }
-/* Credits and referrals explain Commission basis. Keep this supporting math
-   muted, so the bright basis total remains the visual anchor. */
-.ybd-det .d-fees.basis-fees .d span,
-.ybd-det .d-fees.basis-fees .d b { color:var(--muted-foreground); }
-.screen.light .ybd-det .d-fees { border-left-color:rgba(10,10,10,.09); }
+.ybd-det .d-fees { margin:0 0 2px; padding:0 0 4px; }
+.ybd-det .d-fees.basis-fees { margin:0; padding:1px 0; }
+.ybd-det .d-fees .d > .chev { display:none; }
 /* a collapsed group must never hide a problem */
 .ybd-issues { margin:6px 0 10px; padding:9px 11px; border-radius:var(--radius-md);
   background:rgba(245,158,11,.10); box-shadow:inset 0 0 0 1px rgba(245,158,11,.22); }
@@ -3522,6 +3532,22 @@ Thanks</textarea></div>
         /* one glyph, and only when something needs attention. Who pays it,
            whether it wires and what it is all moved into the row's detail. */
         if (r.post && r.post.flag) s.appendChild(ybdIco('ph-warning-circle', r.post.flag, 'warn'));
+        if (r.post && r.list === 'post') {
+          var meta = document.createElement('span'); meta.className = 'ybd-fee-meta';
+          var paid = document.createElement('span'); paid.className = 'paid-by';
+          paid.setAttribute('aria-label', 'Paid by ' + r.post.p);
+          var payerIcon = document.createElement('i'); payerIcon.className = 'ph ' + (PAYICON[r.post.p] || 'ph-user'); payerIcon.setAttribute('aria-hidden', 'true');
+          var payerLabel = document.createElement('span'); payerLabel.textContent = r.post.p;
+          paid.appendChild(payerIcon); paid.appendChild(payerLabel);
+          meta.appendChild(paid);
+          if (r.post.private) {
+            var privacy = document.createElement('span'); privacy.className = 'private-fee';
+            privacy.setAttribute('role', 'img'); privacy.setAttribute('aria-label', 'Private fee'); privacy.title = 'Private fee';
+            var lock = document.createElement('i'); lock.className = 'ph ph-lock-simple'; lock.setAttribute('aria-hidden', 'true');
+            privacy.appendChild(lock); meta.appendChild(privacy);
+          }
+          s.appendChild(meta);
+        }
         var a = document.createElement('b'); a.textContent = String(r.v).replace(/^[\u2212-]/, '');
         l.appendChild(s); l.appendChild(a);
         if (r.infosheet) {
