@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commission Breakdown — Flow Map</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<style>
+* { box-sizing:border-box; }
+body { margin:0; background:#0a0a0a; color:#FAFAFA; font-family:var(--font, system-ui); padding:32px 28px 80px; }
+a { color:#8fa0ff; }
+a:hover { color:#aab4ff; }
+h1 { font:700 26px/1.25 var(--font-hubot, var(--font)); letter-spacing:-.02em; margin:0 0 6px; }
+.lede { font:400 14px/1.55 var(--font); color:#A1A1A6; max-width:760px; margin:0 0 20px; }
+.note { display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border:1px solid #2a2a2e; border-radius:10px; background:#131316; max-width:760px; margin-bottom:28px; font:400 13px/1.55 var(--font); color:#c7c7cc; }
+.note i { flex:none; font-size:16px; color:#8fa0ff; margin-top:1px; }
+section.grp { margin-bottom:52px; }
+section.grp h2 { font:700 18px/1.3 var(--font-hubot, var(--font)); letter-spacing:-.01em; margin:0 0 4px; display:flex; align-items:center; gap:10px; }
+section.grp h2 .idx { font:700 12px/1 var(--font); color:#0a0a0a; background:#8fa0ff; border-radius:999px; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; }
+section.grp .desc { font:400 13px/1.5 var(--font); color:#8a8a90; margin:0 0 16px; max-width:720px; }
+.rowlbl { font:700 13px/1 var(--font); text-transform:uppercase; letter-spacing:.05em; color:#75757b; margin:22px 0 12px; }
+.rowlbl:first-child { margin-top:0; }
+.grid { display:flex; flex-wrap:wrap; gap:22px; }
+.card { flex:none; }
+.card .lbl { font:600 13px/1.3 var(--font); color:#FAFAFA; margin-bottom:2px; }
+.card .lbl .tag { font:600 10px/1 var(--font); text-transform:uppercase; letter-spacing:.04em; padding:3px 6px; border-radius:5px; margin-left:6px; background:#26262A; color:#A1A1A6; }
+.card .lbl .tag.pop { background:rgba(234,88,12,.18); color:#ffab6b; }
+.card .lbl .tag.ok { background:rgba(109,165,68,.2); color:#a9cf80; }
+.card .lbl .tag.warn { background:rgba(220,38,38,.2); color:#ff9d9d; }
+.card .sub { font:400 12px/1.4 var(--font); color:#75757b; margin-bottom:10px; max-width:220px; }
+.frame-wrap { width:230px; height:497px; overflow:hidden; border-radius:22px; border:1px solid #2a2a2e; background:#000; box-shadow:0 12px 30px rgba(0,0,0,.4); position:relative; }
+.frame-wrap iframe { width:390px; height:844px; border:0; transform:scale(0.5897); transform-origin:top left; pointer-events:none; }
+.dl { margin-top:8px; display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px; border:1px solid #2a2a2e; border-radius:999px; background:#161619; color:#c7c7cc; font:600 12px/1 var(--font); cursor:pointer; }
+.dl:hover { background:#1e1e22; color:#fff; }
+.dl:disabled { opacity:.5; cursor:default; }
+table.toasts { border-collapse:collapse; width:100%; max-width:900px; font:400 13px/1.5 var(--font); }
+table.toasts th, table.toasts td { text-align:left; padding:9px 12px; border-bottom:1px solid #232327; vertical-align:top; }
+table.toasts th { color:#75757b; font:600 11px/1 var(--font); text-transform:uppercase; letter-spacing:.05em; }
+table.toasts td.copy { color:#FAFAFA; }
+table.toasts td.when { color:#8a8a90; white-space:nowrap; }
+</style>
+</head>
+<body>
+
+<h1>Commission Breakdown — flow map</h1>
+<p class="lede">Every role, status, sheet, popup and toast in the Commission Breakdown flow, laid out together. Each card is <a href="Commission breakdown.html">Commission breakdown.html</a> embedded live and driven into that exact state — always matches the prototype, nothing redrawn.</p>
+<div class="note"><i class="ph ph-info"></i>Roles: <b>Mark Perez</b> (agent), <b>Andy Martin</b> (team lead), <b>Jessica Hall</b> (Radius auditing). Statuses: Awaiting agent confirmation → Awaiting team lead → Awaiting Radius auditing → Finalized, with Returned for edits as the loop-back.</div>
+
+<section class="grp" id="s1">
+  <h2><span class="idx">1</span>Role × status matrix</h2>
+  <p class="desc">The same breakdown, seen by each role at each stage. Action bar, banner color and available actions all change with status; math shown in the hero changes with role.</p>
+  <div id="s1body"></div>
+</section>
+
+<section class="grp" id="s2">
+  <h2><span class="idx">2</span>Edge cases</h2>
+  <p class="desc">States that don't fit the happy path: missing wire instructions blocking finalization, a CDA deleted after finalizing, and a co-op side with no Radius agent.</p>
+  <div class="grid" data-section></div>
+</section>
+
+<section class="grp" id="s3">
+  <h2><span class="idx">3</span>Popups &amp; sheets</h2>
+  <p class="desc">Every bottom-sheet in the flow, including the confirmation and return-for-edits popups the devs asked about.</p>
+  <div class="grid" data-section></div>
+</section>
+
+<section class="grp" id="s4">
+  <h2><span class="idx">4</span>Toast copy</h2>
+  <p class="desc">Every toast string in the flow (2.6s, bottom-anchored, non-blocking), plus three triggered live.</p>
+  <div class="grid" data-section style="margin-bottom:24px;"></div>
+  <table class="toasts">
+    <tr><th>Trigger</th><th>Copy</th></tr>
+    <tr><td class="when">Commission-rate info tap</td><td class="copy">2% total, both sides · split 50/50 with the co-op brokerage</td></tr>
+    <tr><td class="when">View CDA</td><td class="copy">Opens the CDA PDF</td></tr>
+    <tr><td class="when">Agent → Download CDA</td><td class="copy">PDF saved to your files</td></tr>
+    <tr><td class="when">Overflow → Open transaction</td><td class="copy">Opens the transaction</td></tr>
+    <tr><td class="when">Overflow → Download breakdown PDF</td><td class="copy">Downloading PDF of the breakdown</td></tr>
+    <tr><td class="when">CDA sheet → Regenerate</td><td class="copy">Regenerating the CDA from the current numbers.</td></tr>
+    <tr><td class="when">CDA sheet → Delete CDA</td><td class="copy">CDA deleted. Generate it again when the numbers are settled.</td></tr>
+    <tr><td class="when">CDA sheet → Reopen for edits</td><td class="copy">Reopened for edits — it needs confirming again.</td></tr>
+    <tr><td class="when">Auditor finalizes</td><td class="copy">Breakdown finalized. The CDA is generated and ready to send.</td></tr>
+    <tr><td class="when">Confirm (agent)</td><td class="copy">Confirmed. Your team lead is up next.</td></tr>
+    <tr><td class="when">Confirm (team lead / auditor)</td><td class="copy">Confirmed. Radius auditing is up next.</td></tr>
+    <tr><td class="when">Ghost → reopen a finalized breakdown</td><td class="copy">Reopened for edits — it needs confirming again.</td></tr>
+    <tr><td class="when">Return for edits, submitted</td><td class="copy">Returned to Radius auditing.</td></tr>
+    <tr><td class="when">Auditor → Send to escrow</td><td class="copy">CDA sent to escrow@pacifictitle.com</td></tr>
+    <tr><td class="when">Switching the prototype's role switcher</td><td class="copy">Viewing as [role]</td></tr>
+    <tr><td class="when">Allocation preset unchanged</td><td class="copy">Allocation unchanged.</td></tr>
+    <tr><td class="when">Allocation preset changed</td><td class="copy">Allocation saved — both sides recalculated.</td></tr>
+    <tr><td class="when">Agent's commission plan changed</td><td class="copy">[Agent] is now on [Plan name].</td></tr>
+    <tr><td class="when">Agent(s) added to a side</td><td class="copy">[Name] added to the [side]. / [N] agents added to the [side].</td></tr>
+    <tr><td class="when">Fee removed</td><td class="copy">[Fee] removed — net recalculated.</td></tr>
+    <tr><td class="when">Fee added / updated (credit or referral)</td><td class="copy">[Name] added — net recalculated. / [Name] updated — net recalculated.</td></tr>
+    <tr><td class="when">Pre-split deduction added / updated</td><td class="copy">[Name] added — basis recalculated. / [Name] updated — basis recalculated.</td></tr>
+    <tr><td class="when">Pre-split deduction removed</td><td class="copy">[Name] removed — basis recalculated.</td></tr>
+    <tr><td class="when">Tapping a fee not paid by wire</td><td class="copy">[Fee] is taken off the top of this side before the splits.</td></tr>
+    <tr><td class="when">Wire instructions added for a fee</td><td class="copy">Wire instructions added for [fee].</td></tr>
+    <tr><td class="when">Comment posted</td><td class="copy">Comment posted.</td></tr>
+  </table>
+</section>
+
+<script>
+function el(tag, attrs, children) {
+  var n = document.createElement(tag);
+  for (var k in attrs || {}) n.setAttribute(k, attrs[k]);
+  (children || []).forEach(function (c) { n.appendChild(c); });
+  return n;
+}
+function runSteps(win, doc, steps, i) {
+  i = i || 0;
+  if (!steps || i >= steps.length) return;
+  var s = steps[i];
+  try {
+    if (s.click) { var t = doc.querySelector(s.click); if (t) t.click(); }
+    else if (s.set) {
+      var f = doc.querySelector(s.set);
+      if (f) { f.value = s.value; f.dispatchEvent(new win.Event('input', { bubbles: true })); }
+    }
+  } catch (e) {}
+  setTimeout(function () { runSteps(win, doc, steps, i + 1); }, s.wait || 140);
+}
+function cardInto(container, spec) {
+  var wrap = el('div', { class: 'card' });
+  var lbl = el('div', { class: 'lbl' });
+  lbl.textContent = spec.label;
+  if (spec.tag) { var t = el('span', { class: 'tag ' + (spec.tagClass || '') }); t.textContent = spec.tag; lbl.appendChild(t); }
+  wrap.appendChild(lbl);
+  if (spec.sub) { var sb = el('div', { class: 'sub' }); sb.textContent = spec.sub; wrap.appendChild(sb); }
+  var fw = el('div', { class: 'frame-wrap' });
+  var ifr = el('iframe', { src: 'Commission breakdown.html', loading: 'lazy' });
+  ifr.addEventListener('load', function () {
+    try { ifr.contentDocument.body.style.padding = '0'; } catch (e) {}
+    try { ifr.contentWindow.addEventListener('scroll', function () { ifr.contentWindow.scrollTo(0, 0); }); } catch (e) {}
+    try { runSteps(ifr.contentWindow, ifr.contentDocument, spec.steps); } catch (e) {}
+  });
+  fw.appendChild(ifr);
+  wrap.appendChild(fw);
+  var btn = el('button', { class: 'dl', type: 'button' });
+  btn.textContent = 'Download PNG';
+  btn.addEventListener('click', function () {
+    btn.disabled = true; btn.textContent = 'Capturing…';
+    var doc = ifr.contentDocument;
+    var target = (doc && (doc.querySelector('.phone') || doc.body));
+    if (!target) { btn.textContent = 'Not ready'; setTimeout(function () { btn.disabled = false; btn.textContent = 'Download PNG'; }, 1500); return; }
+    htmlToImage.toPng(target, { pixelRatio: 2 }).then(function (dataUrl) {
+      var a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = spec.label.replace(/[^a-z0-9]+/gi, '-') + '.png';
+      a.click();
+      btn.disabled = false; btn.textContent = 'Download PNG';
+    }).catch(function (e) {
+      btn.disabled = false; btn.textContent = 'Download failed';
+      setTimeout(function () { btn.textContent = 'Download PNG'; }, 1800);
+    });
+  });
+  wrap.appendChild(btn);
+  container.appendChild(wrap);
+}
+function card(sectionId, spec) { cardInto(document.querySelector('#' + sectionId + ' [data-section]'), spec); }
+
+/* 1 — role x status matrix, grouped by role */
+var ROLES = [
+  { key: 'agent', name: 'Agent — Mark Perez' },
+  { key: 'team_lead', name: 'Team Lead — Andy Martin' },
+  { key: 'auditor', name: 'Auditor — Jessica Hall' }
+];
+var STATUSES = [
+  { key: 'draft', name: 'Awaiting agent confirmation' },
+  { key: 'agent_confirmed', name: 'Awaiting team lead' },
+  { key: 'lead_confirmed', name: 'Awaiting Radius auditing' },
+  { key: 'processed', name: 'Finalized' },
+  { key: 'returned', name: 'Returned for edits' }
+];
+var s1body = document.getElementById('s1body');
+ROLES.forEach(function (role) {
+  var h = el('div', { class: 'rowlbl' }); h.textContent = role.name;
+  s1body.appendChild(h);
+  var g = el('div', { class: 'grid' });
+  s1body.appendChild(g);
+  STATUSES.forEach(function (st) {
+    var steps = [];
+    if (role.key !== 'agent') steps.push({ click: '[data-setrole="' + role.key + '"]' });
+    if (st.key !== 'draft') steps.push({ click: '[data-setstatus="' + st.key + '"]' });
+    cardInto(g, { label: st.name, steps: steps });
+  });
+});
+
+/* 2 — edge cases */
+card('s2', { label: 'Wire instructions missing', sub: 'Blocks finalization — the default state.', steps: [] });
+card('s2', { label: 'CDA deleted after finalizing', sub: 'Finalized, CDA removed — action bar explains it.', steps: [{ click: '[data-setstatus="processed"]' }, { click: '#cdaMoreBtn' }, { click: '#cdaDelete' }] });
+card('s2', { label: 'No Radius agent, co-op side', sub: 'Buying side pays its own agent — see the note under Agents.', steps: [{ click: '[data-sec="sides"]' }] });
+
+/* 3 — popups & sheets */
+card('s3', { label: 'Confirmation pop-up', tag: 'popup', tagClass: 'ok', sub: '"Confirm your commission" — the confirm sheet.', steps: [{ click: '#primBtn' }] });
+card('s3', { label: 'Return-for-edits pop-up', tag: 'popup', tagClass: 'warn', sub: 'Team lead requests changes with a required note.', steps: [{ click: '[data-setrole="team_lead"]' }, { click: '[data-setstatus="agent_confirmed"]' }, { click: '#ghostBtn' }] });
+card('s3', { label: 'CDA options sheet', tag: 'sheet', sub: 'View / Regenerate / Reopen / Delete.', steps: [{ click: '[data-setstatus="processed"]' }, { click: '#cdaMoreBtn' }] });
+card('s3', { label: 'Overflow "more" sheet', tag: 'sheet', steps: [{ click: '#moreBtn' }] });
+card('s3', { label: 'Allocation sheet', tag: 'sheet', sub: '50/50, 60/40, 70/30 presets.', steps: [{ click: '[data-sec="sides"]' }, { click: '.side' }, { click: '[data-alloc="mine"]' }] });
+card('s3', { label: 'Add credit or referral', tag: 'sheet', steps: [{ click: '[data-sec="sides"]' }, { click: '.side' }, { click: '[data-addded="mine|credit"]' }] });
+card('s3', { label: 'Add agent sheet', tag: 'sheet', steps: [{ click: '[data-sec="sides"]' }, { click: '.side' }, { click: '[data-addagent="Listing side"]' }] });
+card('s3', { label: 'Net commission info sheet', tag: 'sheet', steps: [{ click: '[data-sec="sides"]' }, { click: '.side' }, { click: '[data-infosheet="Net"]' }] });
+
+/* 4 — three toasts triggered live */
+card('s4', { label: 'Info toast', sub: 'Tapping the commission-rate info glyph.', steps: [{ click: '.hinfo' }] });
+card('s4', { label: 'Success toast — allocation', sub: 'Switching the allocation preset.', steps: [{ click: '[data-sec="sides"]' }, { click: '.side' }, { click: '[data-alloc="mine"]' }, { click: '[data-allocset="60"]' }, { click: '#allocSheet .foot .prim, #allocSheet .prim' }] });
+card('s4', { label: 'Success toast — finalize', sub: 'Auditor finalizes the breakdown.', steps: [{ click: '[data-setrole="auditor"]' }, { click: '[data-setstatus="lead_confirmed"]' }, { click: '#primBtn' }] });
+</script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fee Type — Radius</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<link rel="stylesheet" href="assets/list-page.css">
+<style>
+.scroll { padding-top:12px; }
+.pg-titlewrap { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.pg-subtitle { font:400 13px/1.4 var(--font); color:var(--muted-foreground); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.screen { position:relative; }
+.fab { position:absolute; right:20px; bottom:calc(20px + env(safe-area-inset-bottom)); width:56px; height:56px; border-radius:999px; border:0; background:var(--primary); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 6px 16px rgba(90,95,242,0.45); cursor:pointer; z-index:5; transition:transform 140ms ease; }
+.fab:active { transform:scale(0.96); }
+.ft-row { display:flex; align-items:center; gap:10px; padding:14px 2px; border-top:1px solid var(--border); cursor:pointer; transition:transform 160ms cubic-bezier(0.23,1,0.32,1), background 140ms ease; }
+.ft-row:first-child { border-top:0; }
+.ft-row:active { background:var(--muted); transform:scale(0.99); }
+.ft-row:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; border-radius:var(--radius-sm); }
+.ft-content { flex:1; min-width:0; }
+.ft-chev { flex:none; font-size:16px; color:var(--muted-foreground); opacity:.7; }
+.ft-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.ft-name { font:600 15px/1.3 var(--font); }
+.ft-amt { font:600 15px/1.2 var(--font); font-variant-numeric:tabular-nums; flex:none; }
+.ft-meta { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; }
+.ft-badge { font:600 11px/1 var(--font); padding:4px 7px; border-radius:999px; }
+.ft-badge.flat { background:rgba(90,95,242,0.14); color:#c3c6ff; }
+.ft-badge.pct { background:rgba(109,165,68,0.14); color:#8fce6a; }
+.ft-badge.pre { background:rgba(90,95,242,0.14); color:#c3c6ff; }
+.ft-badge.post { background:rgba(234,88,12,0.16); color:#ffab6b; }
+.ft-badge.cap { background:rgba(234,88,12,0.16); color:#ffab6b; }
+.ft-tag { font:500 12px/1 var(--font); color:var(--muted-foreground); }
+.ft-vis { margin-left:auto; font:600 12px/1 var(--font); color:#8fce6a; }
+
+/* full-screen sheet (shared pattern) */
+.sheet { position:absolute; inset:0; background:var(--background); z-index:30; display:flex; flex-direction:column; transform:translateY(100%); transition:transform 280ms cubic-bezier(0.23,1,0.32,1); }
+.sheet.show { transform:translateY(0); }
+.sheet.closing { transition:transform 200ms cubic-bezier(0.23,1,0.32,1); }
+.sheet[hidden] { display:none; }
+.sheet-head { display:flex; align-items:center; gap:12px; padding:calc(16px + env(safe-area-inset-top)) 16px 12px; border-bottom:1px solid var(--border); flex:none; }
+.sheet-titlewrap { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.sheet-title { margin:0; font:700 17px/1.3 var(--font-hubot); letter-spacing:var(--tracking-tight); }
+.sheet-subtitle { font:400 12px/1.3 var(--font); color:var(--muted-foreground); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sheet-x { position:relative; width:36px; height:36px; border-radius:999px; border:0; background:var(--muted); color:var(--foreground); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; flex:none; font-size:16px; transition:transform 140ms ease; }
+.sheet-x::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.sheet-x:active { transform:scale(.94); }
+.sheet-scroll { flex:1; min-height:0; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:18px; }
+.fld { display:flex; flex-direction:column; gap:8px; }
+.fld > label { font:600 13px/1.3 var(--font); }
+.fld input[type="text"], .fld input[type="number"] { height:44px; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--muted); color:var(--foreground); font:500 15px/1 var(--font); width:100%; }
+.fld input::placeholder { color:var(--muted-foreground); }
+.curr { display:flex; align-items:center; gap:4px; height:44px; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--muted); }
+.curr span { color:var(--muted-foreground); font:500 15px/1 var(--font); }
+.curr input { border:0; background:transparent; flex:1; min-width:0; padding:0; height:auto; font:500 15px/1 var(--font); color:var(--foreground); }
+.dd-btn { display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--muted); color:var(--foreground); font:500 15px/1 var(--font); cursor:pointer; width:100%; text-align:left; transition:transform 140ms ease; }
+.dd-btn:active { transform:scale(.98); }
+.dd-btn i { color:var(--muted-foreground); font-size:16px; transition:transform 150ms ease; }
+.dd-btn.open i { transform:rotate(180deg); }
+.dd-list { display:flex; flex-direction:column; max-height:0; opacity:0; transform:scaleY(0.96); transform-origin:top; overflow:hidden; pointer-events:none; border:1px solid transparent; border-radius:var(--radius-md); background:var(--card); transition:max-height 200ms cubic-bezier(0.23,1,0.32,1), opacity 160ms ease, transform 160ms cubic-bezier(0.23,1,0.32,1), border-color 160ms ease; }
+.dd-list.open { max-height:400px; opacity:1; transform:scaleY(1); pointer-events:auto; border-color:var(--border); }
+.dd-item { display:flex; align-items:center; justify-content:space-between; width:100%; padding:12px; border:0; border-top:1px solid var(--border); background:transparent; color:inherit; font:500 15px/1.3 var(--font); text-align:left; cursor:pointer; transition:background 120ms ease; }
+.dd-item:first-child { border-top:0; }
+.dd-item:active { background:var(--muted); }
+.dd-item i { color:var(--muted-foreground); font-size:16px; }
+.fld-help { font:400 12px/1.5 var(--font); color:var(--muted-foreground); }
+.sw-row { display:flex; align-items:flex-start; gap:12px; padding:12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--muted); }
+.sw-row .sw-body { flex:1; min-width:0; }
+.sw-row .sw-body b { display:block; font:600 14px/1.3 var(--font); }
+.sw-row .sw-body p { margin:2px 0 0; font:400 12px/1.4 var(--font); color:var(--muted-foreground); }
+.st-sw { position:relative; flex:none; width:44px; height:26px; border-radius:999px; background:var(--border); border:0; cursor:pointer; transition:background 180ms ease; padding:0; margin-top:2px; }
+.st-sw i { position:absolute; top:2px; left:2px; width:22px; height:22px; border-radius:999px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.3); transition:transform 220ms cubic-bezier(0.23,1,0.32,1); }
+.st-sw[aria-checked="true"] { background:var(--success); }
+.st-sw[aria-checked="true"] i { transform:translateX(18px); }
+.st-sw:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.tier-row { display:flex; gap:8px; align-items:center; }
+.tier-row .curr { flex:1; }
+.tier-x { flex:none; width:36px; height:36px; border-radius:999px; border:0; background:var(--muted); color:var(--muted-foreground); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+.tier-add { height:40px; border:1px dashed var(--border); border-radius:var(--radius-md); background:transparent; color:var(--muted-foreground); font:600 13px/1 var(--font); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+.sheet-foot { flex:none; display:flex; align-items:center; gap:10px; padding:10px 16px calc(14px + env(safe-area-inset-bottom)); background:linear-gradient(to top, rgba(10,10,10,.92), rgba(10,10,10,.72)); backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%); box-shadow:inset 0 1px 0 rgba(255,255,255,.07); }
+.sheet-foot .prim { flex:1; min-height:46px; border:0; border-radius:999px; background:var(--primary); color:#fff; font:600 15px/1 var(--font); display:inline-flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; transition:transform 140ms ease; }
+.sheet-foot .prim i, .sheet-foot .prim .prim-label { transition:filter 160ms ease, opacity 160ms ease; }
+.sheet-foot .prim.morphing i, .sheet-foot .prim.morphing .prim-label { filter:blur(2px); opacity:.35; }
+.sheet-foot .prim.pop { transition:transform 220ms cubic-bezier(0.23,1,0.32,1); transform:scale(1.04); }
+.sheet-foot .prim:active { transform:scale(.98); }
+.sheet-foot .prim:disabled { opacity:.45; cursor:default; }
+.sheet-foot .ghost { position:relative; flex:none; min-height:46px; padding:0 16px; border:0; border-radius:999px; background:rgba(255,255,255,.07); box-shadow:inset 0 0 0 1px rgba(255,255,255,.14); color:var(--foreground); font:600 15px/1 var(--font); cursor:pointer; }
+.sheet-foot .ghost:active { transform:scale(.98); }
+.sheet-foot .prim:focus-visible, .sheet-foot .ghost:focus-visible { outline:2px solid var(--ring); outline-offset:3px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen" data-screen-label="Fee Type">
+    <div class="statusbar"><span>9:41</span>
+      <div class="sb-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="5" width="3" height="7" rx="1"/><rect x="9" y="2.5" width="3" height="9.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity="0.7"/></svg>
+        <svg width="20" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor"><rect x="1" y="1" width="17" height="10" rx="3"/><rect x="3" y="3" width="11" height="6" rx="1.5" fill="currentColor" stroke="none"/><path d="M20 4v4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div class="pg-head">
+      <a href="CDA Settings.html" class="back-btn" aria-label="Back to CDA Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </a>
+      <div class="pg-titlewrap">
+        <h1>Fee Type</h1>
+        <div class="pg-subtitle">Reusable deductions for CDA calculations.</div>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div class="gcard" id="feeList"></div>
+    </div>
+    <button class="fab" type="button" id="addFeeBtn" aria-label="Add fee"><i class="ph ph-plus"></i></button>
+
+    <div class="sheet" id="feeSheet" hidden>
+      <div class="sheet-head">
+        <div class="sheet-titlewrap">
+          <h2 class="sheet-title" id="feeTitle">Add Fee Type</h2>
+          <div class="sheet-subtitle">Define a reusable CDA deduction.</div>
+        </div>
+        <button class="sheet-x" id="feeClose" aria-label="Close"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="sheet-scroll">
+        <div class="fld">
+          <label>Fee Name</label>
+          <input type="text" id="fFeeName" placeholder="e.g., Transaction Coordinator Fee">
+        </div>
+        <div class="fld">
+          <label>Fee Type</label>
+          <button class="dd-btn" id="ddFeeType"><span id="ddFeeTypeVal">Flat</span><i class="ph ph-caret-down"></i></button>
+          <div class="dd-list" id="ddFeeTypeList">
+            <div class="dd-item" data-val="flat">Flat<i class="ph ph-check" hidden></i></div>
+            <div class="dd-item" data-val="pct">Percentage<i class="ph ph-check" hidden></i></div>
+          </div>
+        </div>
+        <div class="fld">
+          <label id="amtLabel">Fee Amount</label>
+          <div class="curr"><span id="amtPrefix">$</span><input type="number" id="fAmount" placeholder="500"></div>
+        </div>
+        <div class="fld" id="basisFld" hidden>
+          <label>Percentage Basis</label>
+          <button class="dd-btn" id="ddBasis"><span id="ddBasisVal">Gross Commission</span><i class="ph ph-caret-down"></i></button>
+          <div class="dd-list" id="ddBasisList">
+            <div class="dd-item" data-val="gross">Gross Commission<i class="ph ph-check" hidden></i></div>
+            <div class="dd-item" data-val="grossPost">Gross Commission Post Deduction<i class="ph ph-check" hidden></i></div>
+          </div>
+        </div>
+        <div class="fld">
+          <label>Timing</label>
+          <button class="dd-btn" id="ddTiming"><span id="ddTimingVal">Pre-Split</span><i class="ph ph-caret-down"></i></button>
+          <div class="dd-list" id="ddTimingList">
+            <div class="dd-item" data-val="pre">Pre-Split<i class="ph ph-check" hidden></i></div>
+            <div class="dd-item" data-val="post">Post-Split<i class="ph ph-check" hidden></i></div>
+          </div>
+        </div>
+        <div class="fld">
+          <label>Applies To</label>
+          <button class="dd-btn" id="ddApplies"><span id="ddAppliesVal">Team</span><i class="ph ph-caret-down"></i></button>
+          <div class="dd-list" id="ddAppliesList">
+            <div class="dd-item" data-val="Agent">Agent<i class="ph ph-check" hidden></i></div>
+            <div class="dd-item" data-val="Team">Team<i class="ph ph-check" hidden></i></div>
+            <div class="dd-item" data-val="Both">Both<i class="ph ph-check" hidden></i></div>
+          </div>
+        </div>
+        <div class="sw-row">
+          <button class="st-sw" id="swCap" role="switch" aria-checked="false" aria-label="Contributes to cap"><i></i></button>
+          <div class="sw-body"><b>Contributes to cap</b><p>Calculated in background, not shown on CDA.</p></div>
+        </div>
+        <div class="sw-row">
+          <button class="st-sw" id="swSliding" role="switch" aria-checked="false" aria-label="Enable sliding scale"><i></i></button>
+          <div class="sw-body"><b>Sliding scale</b><p>Apply different percentages based on commission tiers.</p></div>
+        </div>
+        <div class="fld" id="tiersFld" hidden>
+          <label>Scale Tiers</label>
+          <div id="tierRows" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <button class="tier-add" type="button" id="addTierBtn"><i class="ph ph-plus"></i>Add Tier</button>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="prim" id="feeSaveBtn" type="button" disabled><i class="ph ph-floppy-disk" id="feeSaveIcon"></i><span class="prim-label" id="feeSaveLabel">Save Fee Type</span></button>
+        <button class="ghost" id="feeCancel" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var fees = [
+  { id:1, name:'TC Fee', type:'flat', amount:500, basis:'gross', timing:'pre', appliesTo:'Team', cap:false, sliding:false, tiers:[], createdBy:'You', groupTag:false, agents:0 },
+  { id:2, name:'RM Fee', type:'flat', amount:300, basis:'gross', timing:'post', appliesTo:'Agent', cap:true, sliding:false, tiers:[], createdBy:'You', groupTag:false, agents:3 },
+  { id:3, name:'E&O Fee', type:'flat', amount:125, basis:'gross', timing:'post', appliesTo:'Agent', cap:false, sliding:false, tiers:[], createdBy:'Group: West', groupTag:false, agents:4 },
+  { id:4, name:'Compliance Review', type:'flat', amount:250, basis:'gross', timing:'pre', appliesTo:'Both', cap:false, sliding:false, tiers:[], createdBy:'You', groupTag:false, agents:0 },
+  { id:5, name:'Marketing Fee', type:'pct', amount:1.5, basis:'gross', timing:'post', appliesTo:'Team', cap:true, sliding:false, tiers:[], createdBy:'Group: East', groupTag:false, agents:0 },
+  { id:6, name:'Tiered Brokerage Fee', type:'pct', amount:0, basis:'grossPost', timing:'pre', appliesTo:'Both', cap:true, sliding:true, tiers:[{upTo:8000,pct:65},{upTo:null,pct:100}], createdBy:'Group: West', groupTag:false, agents:0 }
+];
+var nextId = 7;
+var editingId = null;
+var lastFocused = null;
+
+function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+
+function rowHTML(f){
+  var typeBadge = '<span class="ft-badge ' + (f.type === 'pct' ? 'pct' : 'flat') + '">' + (f.type === 'pct' ? 'Percentage' : 'Flat') + '</span>';
+  var timingBadge = '<span class="ft-badge ' + (f.timing === 'pre' ? 'pre' : 'post') + '">' + (f.timing === 'pre' ? 'Pre-Split' : 'Post-Split') + '</span>';
+  var capBadge = f.cap ? '<span class="ft-badge cap">Cap</span>' : '';
+  var tag = (f.agents ? f.agents + ' agents' : f.appliesTo) + ' &middot; ' + (f.createdBy === 'You' ? 'You' : esc(f.createdBy));
+  var amtDisplay = f.sliding ? 'Sliding scale' : (f.type === 'pct' ? f.amount + '%' : '$' + f.amount.toLocaleString());
+  return '<div class="ft-row" data-row="' + f.id + '" role="button" tabindex="0">' +
+    '<div class="ft-content">' +
+      '<div class="ft-top"><span class="ft-name">' + esc(f.name) + '</span><span class="ft-amt">' + amtDisplay + '</span></div>' +
+      '<div class="ft-meta">' + typeBadge + timingBadge + capBadge + '<span class="ft-tag">' + tag + '</span><span class="ft-vis">Visible</span></div>' +
+    '</div>' +
+    '<i class="ph ph-caret-right ft-chev"></i>' +
+  '</div>';
+}
+
+function renderList(){
+  var el = document.getElementById('feeList');
+  el.innerHTML = fees.map(rowHTML).join('');
+  el.querySelectorAll('.ft-row').forEach(function(row){
+    function activate(){
+      var fee = fees.find(function(f){ return f.id === Number(row.getAttribute('data-row')); });
+      openFeeSheet(fee, row);
+    }
+    row.addEventListener('click', activate);
+    row.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
+  });
+}
+
+function wireDropdown(btnId, listId, onSelect){
+  var btn = document.getElementById(btnId), list = document.getElementById(listId);
+  btn.addEventListener('click', function(){
+    var isOpen = list.classList.contains('open');
+    document.querySelectorAll('.dd-list.open').forEach(function(l){ l.classList.remove('open'); });
+    document.querySelectorAll('.dd-btn.open').forEach(function(b){ b.classList.remove('open'); });
+    if (!isOpen) { list.classList.add('open'); btn.classList.add('open'); }
+  });
+  list.querySelectorAll('.dd-item').forEach(function(item){
+    item.addEventListener('click', function(){
+      onSelect(item.getAttribute('data-val'), item.textContent.trim());
+      list.classList.remove('open');
+      btn.classList.remove('open');
+    });
+  });
+}
+function setDDCheck(listId, val){
+  document.querySelectorAll('#' + listId + ' .dd-item').forEach(function(item){
+    var on = item.getAttribute('data-val') === val;
+    item.classList.toggle('sel', on);
+    var i = item.querySelector('i'); if (i) i.hidden = !on;
+  });
+}
+
+var fType = 'flat', fBasis = 'gross', fTiming = 'pre', fApplies = 'Team', fCap = false, fSliding = false, fTiers = [];
+
+wireDropdown('ddFeeType', 'ddFeeTypeList', function(val, label){
+  fType = val;
+  document.getElementById('ddFeeTypeVal').textContent = label;
+  setDDCheck('ddFeeTypeList', val);
+  updateFeeTypeUI();
+});
+wireDropdown('ddBasis', 'ddBasisList', function(val, label){
+  fBasis = val;
+  document.getElementById('ddBasisVal').textContent = label;
+  setDDCheck('ddBasisList', val);
+});
+wireDropdown('ddTiming', 'ddTimingList', function(val, label){
+  fTiming = val;
+  document.getElementById('ddTimingVal').textContent = label;
+  setDDCheck('ddTimingList', val);
+});
+wireDropdown('ddApplies', 'ddAppliesList', function(val, label){
+  fApplies = val;
+  document.getElementById('ddAppliesVal').textContent = label;
+  setDDCheck('ddAppliesList', val);
+});
+
+function updateFeeTypeUI(){
+  var isPct = fType === 'pct';
+  document.getElementById('amtLabel').textContent = isPct ? 'Percentage' : 'Fee Amount';
+  document.getElementById('amtPrefix').textContent = isPct ? '%' : '$';
+  document.getElementById('basisFld').hidden = !isPct;
+  validateFee();
+}
+
+document.getElementById('swCap').addEventListener('click', function(){
+  fCap = this.getAttribute('aria-checked') !== 'true';
+  this.setAttribute('aria-checked', String(fCap));
+});
+document.getElementById('swSliding').addEventListener('click', function(){
+  fSliding = this.getAttribute('aria-checked') !== 'true';
+  this.setAttribute('aria-checked', String(fSliding));
+  document.getElementById('tiersFld').hidden = !fSliding;
+  if (fSliding && fTiers.length === 0) { fTiers = [{ upTo: 8000, pct: 65 }, { upTo: null, pct: 100 }]; }
+  renderTiers();
+});
+
+function renderTiers(){
+  var wrap = document.getElementById('tierRows');
+  wrap.innerHTML = '';
+  fTiers.forEach(function(tier, i){
+    var row = document.createElement('div');
+    row.className = 'tier-row';
+    var label = tier.upTo === null ? 'Above previous' : ('Up to $' + tier.upTo);
+    row.innerHTML =
+      '<div class="curr"><span>$</span><input type="number" data-i="' + i + '" data-f="upTo" placeholder="' + (tier.upTo === null ? 'No limit' : '') + '" value="' + (tier.upTo === null ? '' : tier.upTo) + '" ' + (tier.upTo === null ? 'disabled' : '') + '></div>' +
+      '<div class="curr"><input type="number" data-i="' + i + '" data-f="pct" placeholder="65" value="' + tier.pct + '"><span>%</span></div>' +
+      (fTiers.length > 1 ? '<button type="button" class="tier-x" data-remove="' + i + '"><i class="ph ph-x"></i></button>' : '');
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('input').forEach(function(inp){
+    inp.addEventListener('input', function(){
+      var i = Number(this.getAttribute('data-i')), f = this.getAttribute('data-f');
+      fTiers[i][f] = this.value === '' ? null : Number(this.value);
+    });
+  });
+  wrap.querySelectorAll('[data-remove]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      fTiers.splice(Number(this.getAttribute('data-remove')), 1);
+      renderTiers();
+    });
+  });
+}
+document.getElementById('addTierBtn').addEventListener('click', function(){
+  var last = fTiers[fTiers.length - 1];
+  if (last) last.upTo = last.upTo || 10000;
+  fTiers.push({ upTo: null, pct: 100 });
+  renderTiers();
+});
+
+function validateFee(){
+  var name = document.getElementById('fFeeName').value.trim();
+  var amt = document.getElementById('fAmount').value;
+  var valid = name.length > 0 && amt !== '' && Number(amt) >= 0;
+  document.getElementById('feeSaveBtn').disabled = !valid;
+}
+document.getElementById('fFeeName').addEventListener('input', validateFee);
+document.getElementById('fAmount').addEventListener('input', validateFee);
+
+function openFeeSheet(fee, triggerEl){
+  editingId = fee ? fee.id : null;
+  document.getElementById('feeTitle').textContent = fee ? 'Edit Fee Type' : 'Add Fee Type';
+  document.getElementById('fFeeName').value = fee ? fee.name : '';
+  fType = fee ? fee.type : 'flat';
+  fBasis = fee ? fee.basis : 'gross';
+  fTiming = fee ? fee.timing : 'pre';
+  fApplies = fee ? fee.appliesTo : 'Team';
+  fCap = fee ? fee.cap : false;
+  fSliding = fee ? fee.sliding : false;
+  fTiers = fee && fee.tiers.length ? JSON.parse(JSON.stringify(fee.tiers)) : [];
+  document.getElementById('ddFeeTypeVal').textContent = fType === 'pct' ? 'Percentage' : 'Flat';
+  setDDCheck('ddFeeTypeList', fType);
+  document.getElementById('ddBasisVal').textContent = fBasis === 'grossPost' ? 'Gross Commission Post Deduction' : 'Gross Commission';
+  setDDCheck('ddBasisList', fBasis);
+  document.getElementById('ddTimingVal').textContent = fTiming === 'pre' ? 'Pre-Split' : 'Post-Split';
+  setDDCheck('ddTimingList', fTiming);
+  document.getElementById('ddAppliesVal').textContent = fApplies;
+  setDDCheck('ddAppliesList', fApplies);
+  document.getElementById('fAmount').value = fee ? fee.amount : '';
+  document.getElementById('swCap').setAttribute('aria-checked', String(fCap));
+  document.getElementById('swSliding').setAttribute('aria-checked', String(fSliding));
+  document.getElementById('tiersFld').hidden = !fSliding;
+  updateFeeTypeUI();
+  renderTiers();
+  validateFee();
+  showSheet('feeSheet', triggerEl);
+}
+function closeFeeSheet(){ hideSheet('feeSheet'); editingId = null; }
+document.getElementById('addFeeBtn').addEventListener('click', function(){ openFeeSheet(null, this); });
+document.getElementById('feeClose').addEventListener('click', closeFeeSheet);
+document.getElementById('feeCancel').addEventListener('click', closeFeeSheet);
+document.getElementById('feeSaveBtn').addEventListener('click', function(){
+  var btn = this;
+  playPrimSuccess(btn, 'feeSaveIcon', 'feeSaveLabel', 'ph ph-check-circle', 'Saved', function(){
+    var data = {
+      name: document.getElementById('fFeeName').value.trim(),
+      type: fType, basis: fBasis, timing: fTiming, appliesTo: fApplies,
+      amount: Number(document.getElementById('fAmount').value) || 0,
+      cap: fCap, sliding: fSliding, tiers: fSliding ? fTiers : []
+    };
+    if (editingId) {
+      Object.assign(fees.find(function(f){ return f.id === editingId; }), data);
+    } else {
+      fees.push(Object.assign({ id: nextId++, createdBy: 'You', groupTag: false, agents: 0 }, data));
+    }
+    renderList();
+    closeFeeSheet();
+  });
+});
+
+function sheetKeyHandler(e){
+  var openSheet = document.querySelector('.sheet.show');
+  if (!openSheet) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeFeeSheet(); return; }
+  if (e.key === 'Tab') {
+    var focusables = Array.prototype.slice.call(openSheet.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])')).filter(function(el){ return !el.disabled && el.offsetParent !== null; });
+    if (!focusables.length) return;
+    var first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+}
+function showSheet(id, triggerEl){
+  lastFocused = triggerEl || document.activeElement;
+  var el = document.getElementById(id);
+  if (el._hideTimer) { clearTimeout(el._hideTimer); el._hideTimer = null; }
+  el.classList.remove('closing');
+  el.hidden = false;
+  requestAnimationFrame(function(){ el.classList.add('show'); });
+  document.addEventListener('keydown', sheetKeyHandler);
+  setTimeout(function(){ var f = el.querySelector('.sheet-x'); if (f) f.focus(); }, 300);
+}
+function hideSheet(id){
+  var el = document.getElementById(id);
+  if (el._hideTimer) clearTimeout(el._hideTimer);
+  el.classList.add('closing');
+  el.classList.remove('show');
+  document.removeEventListener('keydown', sheetKeyHandler);
+  el._hideTimer = setTimeout(function(){ el.hidden = true; el.classList.remove('closing'); el._hideTimer = null; if (lastFocused) lastFocused.focus(); }, 200);
+}
+function playPrimSuccess(btn, iconId, labelId, toIcon, toLabel, onDone){
+  var icon = document.getElementById(iconId), label = document.getElementById(labelId);
+  var fromIconClass = icon.className, fromLabel = label.textContent;
+  btn.classList.add('morphing');
+  setTimeout(function(){
+    icon.className = toIcon;
+    label.textContent = toLabel;
+    btn.classList.remove('morphing');
+    btn.classList.add('pop');
+    setTimeout(function(){ btn.classList.remove('pop'); }, 220);
+  }, 160);
+  setTimeout(function(){
+    onDone();
+    setTimeout(function(){ icon.className = fromIconClass; label.textContent = fromLabel; }, 200);
+  }, 340);
+}
+
+renderList();
+</script>
+</body>
+</html>

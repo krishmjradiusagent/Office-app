@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wiring Payment — Radius</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<link rel="stylesheet" href="assets/list-page.css">
+<style>
+.scroll { padding-top:12px; }
+.sh-tabs { margin-top:12px; }
+.pg-titlewrap { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.pg-subtitle { font:400 13px/1.4 var(--font); color:var(--muted-foreground); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.screen { position:relative; }
+.wr-row { display:flex; align-items:center; gap:10px; padding:14px 2px; border-top:1px solid var(--border); cursor:pointer; transition:transform 160ms cubic-bezier(0.23,1,0.32,1), background 140ms ease; }
+.wr-row:first-child { border-top:0; }
+.wr-row:active { background:var(--muted); transform:scale(0.99); }
+.wr-row:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; border-radius:var(--radius-sm); }
+.wr-body { flex:1; min-width:0; }
+.wr-name { font:600 15px/1.3 var(--font); }
+.wr-detail { font:400 13px/1.5 var(--font); color:var(--muted-foreground); margin-top:3px; }
+.wr-status { flex:none; font:600 12px/1 var(--font); padding:5px 9px; border-radius:999px; background:rgba(109,165,68,0.14); color:#8fce6a; }
+.wr-search { display:flex; align-items:center; gap:8px; height:38px; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-md); color:var(--muted-foreground); font:400 14px/1 var(--font); margin-bottom:10px; }
+.wr-search i { font-size:16px; }
+.wr-add { position:relative; height:32px; padding:0 12px; border:0; border-radius:999px; background:var(--primary); color:#fff; font:600 13px/1 var(--font); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:transform 140ms ease; }
+.wr-add:active { transform:scale(.96); }
+.wr-sec-head { display:flex; align-items:center; justify-content:space-between; margin:20px 0 8px; }
+.wr-sec-head:first-child { margin-top:0; }
+.wr-sec-head h2 { margin:0; font:700 15px/1.3 var(--font-hubot); }
+.wr-del { position:relative; flex:none; width:36px; height:36px; border-radius:999px; border:0; background:transparent; color:var(--muted-foreground); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; transition:transform 140ms ease, background 140ms ease; }
+.wr-del::before { content:''; position:absolute; inset:-4px; }
+.wr-del:active { transform:scale(.9); background:var(--muted); }
+
+/* full-screen sheet */
+.sheet { position:absolute; inset:0; background:var(--background); z-index:30; display:flex; flex-direction:column; transform:translateY(100%); transition:transform 280ms cubic-bezier(0.23,1,0.32,1); }
+.sheet.show { transform:translateY(0); }
+.sheet.closing { transition:transform 200ms cubic-bezier(0.23,1,0.32,1); }
+.sheet[hidden] { display:none; }
+.sheet-head { display:flex; align-items:center; gap:12px; padding:calc(16px + env(safe-area-inset-top)) 16px 12px; border-bottom:1px solid var(--border); flex:none; }
+.sheet-titlewrap { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.sheet-title { margin:0; font:700 17px/1.3 var(--font-hubot); letter-spacing:var(--tracking-tight); }
+.sheet-subtitle { font:400 12px/1.3 var(--font); color:var(--muted-foreground); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sheet-x { position:relative; width:36px; height:36px; border-radius:999px; border:0; background:var(--muted); color:var(--foreground); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; flex:none; font-size:16px; transition:transform 140ms ease; }
+.sheet-x::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.sheet-x:active { transform:scale(.94); }
+.sheet-scroll { flex:1; min-height:0; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:16px; }
+.fld { display:flex; flex-direction:column; gap:8px; }
+.fld > label { font:600 13px/1.3 var(--font); }
+.fld > label .req { color:#ff8080; margin-left:2px; }
+.fld input[type="text"], .fld input[type="email"], .fld input[type="tel"], .fld input[type="number"] { height:44px; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--muted); color:var(--foreground); font:500 15px/1 var(--font); width:100%; }
+.fld input::placeholder { color:var(--muted-foreground); }
+.fld textarea { padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--muted); color:var(--foreground); font:500 15px/1.4 var(--font); width:100%; min-height:64px; resize:vertical; font-family:var(--font); }
+.fld textarea::placeholder { color:var(--muted-foreground); }
+.split-row { display:flex; gap:10px; }
+.split-row .fld { flex:1; min-width:0; }
+.dd-btn { display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--muted); color:var(--foreground); font:500 15px/1 var(--font); cursor:pointer; width:100%; text-align:left; transition:transform 140ms ease; }
+.dd-btn:active { transform:scale(.98); }
+.dd-btn i { color:var(--muted-foreground); font-size:16px; transition:transform 150ms ease; }
+.dd-btn.open i { transform:rotate(180deg); }
+.dd-list { display:flex; flex-direction:column; max-height:0; opacity:0; transform:scaleY(0.96); transform-origin:top; overflow:hidden; pointer-events:none; border:1px solid transparent; border-radius:var(--radius-md); background:var(--card); transition:max-height 200ms cubic-bezier(0.23,1,0.32,1), opacity 160ms ease, transform 160ms cubic-bezier(0.23,1,0.32,1), border-color 160ms ease; }
+.dd-list.open { max-height:400px; opacity:1; transform:scaleY(1); pointer-events:auto; border-color:var(--border); }
+.dd-item { display:flex; align-items:center; justify-content:space-between; width:100%; padding:12px; border:0; border-top:1px solid var(--border); background:transparent; color:inherit; font:500 15px/1.3 var(--font); text-align:left; cursor:pointer; transition:background 120ms ease; }
+.dd-item:first-child { border-top:0; }
+.dd-item:active { background:var(--muted); }
+.dd-item i { color:var(--muted-foreground); font-size:16px; }
+.fld-help { font:400 12px/1.5 var(--font); color:var(--muted-foreground); }
+.sheet-foot { flex:none; display:flex; align-items:center; gap:10px; padding:10px 16px calc(14px + env(safe-area-inset-bottom)); background:linear-gradient(to top, rgba(10,10,10,.92), rgba(10,10,10,.72)); backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%); box-shadow:inset 0 1px 0 rgba(255,255,255,.07); }
+.sheet-foot .prim { flex:1; min-height:46px; border:0; border-radius:999px; background:var(--primary); color:#fff; font:600 15px/1 var(--font); display:inline-flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; transition:transform 140ms ease; }
+.sheet-foot .prim i, .sheet-foot .prim .prim-label { transition:filter 160ms ease, opacity 160ms ease; }
+.sheet-foot .prim.morphing i, .sheet-foot .prim.morphing .prim-label { filter:blur(2px); opacity:.35; }
+.sheet-foot .prim.pop { transition:transform 220ms cubic-bezier(0.23,1,0.32,1); transform:scale(1.04); }
+.sheet-foot .prim:active { transform:scale(.98); }
+.sheet-foot .prim:disabled { opacity:.45; cursor:default; }
+.sheet-foot .ghost { position:relative; flex:none; min-height:46px; padding:0 16px; border:0; border-radius:999px; background:rgba(255,255,255,.07); box-shadow:inset 0 0 0 1px rgba(255,255,255,.14); color:var(--foreground); font:600 15px/1 var(--font); cursor:pointer; }
+.sheet-foot .ghost:active { transform:scale(.98); }
+
+/* confirm modal */
+.confirm-scrim { position:absolute; inset:0; background:rgba(0,0,0,.5); z-index:40; display:flex; align-items:center; justify-content:center; padding:24px; opacity:0; pointer-events:none; transition:opacity 200ms ease; }
+.confirm-scrim.show { opacity:1; pointer-events:auto; }
+.confirm-scrim[hidden] { display:flex; }
+.confirm-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-card); padding:20px; width:100%; max-width:300px; transform:scale(.95); opacity:0; transition:transform 200ms cubic-bezier(0.23,1,0.32,1), opacity 200ms ease; }
+.confirm-scrim.show .confirm-card { transform:scale(1); opacity:1; }
+.confirm-title { font:700 16px/1.3 var(--font-hubot); margin:0 0 6px; }
+.confirm-body { font:400 13px/1.5 var(--font); color:var(--muted-foreground); margin:0 0 16px; }
+.confirm-actions { display:flex; gap:10px; }
+.confirm-actions button { flex:1; height:42px; border-radius:999px; font:600 14px/1 var(--font); cursor:pointer; transition:transform 140ms ease; border:0; }
+.confirm-actions button:active { transform:scale(.97); }
+.confirm-cancel { border:1px solid var(--border) !important; background:transparent; color:var(--foreground); }
+.confirm-danger { background:var(--destructive); color:#fff; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen" data-screen-label="Wiring Payment">
+    <div class="statusbar"><span>9:41</span>
+      <div class="sb-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="5" width="3" height="7" rx="1"/><rect x="9" y="2.5" width="3" height="9.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity="0.7"/></svg>
+        <svg width="20" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor"><rect x="1" y="1" width="17" height="10" rx="3"/><rect x="3" y="3" width="11" height="6" rx="1.5" fill="currentColor" stroke="none"/><path d="M20 4v4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div class="pg-head">
+      <a href="CDA Settings.html" class="back-btn" aria-label="Back to CDA Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </a>
+      <div class="pg-titlewrap">
+        <h1>Wiring Payment</h1>
+        <div class="pg-subtitle">Payment details for team, vendors &amp; yourself.</div>
+      </div>
+    </div>
+
+    <div class="sh-tabs" role="tablist" aria-label="Wiring visibility">
+      <button class="sh-tab" role="tab" data-val="shared" aria-selected="false">Shared</button>
+      <button class="sh-tab" role="tab" data-val="private" aria-selected="true">Private</button>
+    </div>
+
+    <div class="scroll">
+      <div class="wr-sec-head"><h2>Team Wire</h2></div>
+      <div class="gcard" id="teamWireList"></div>
+
+      <div class="wr-sec-head"><h2>My Wire</h2></div>
+      <div class="gcard" id="myWireList"></div>
+
+      <div class="wr-sec-head"><h2>Private Recipients</h2><button class="wr-add" type="button" id="addRecipientBtn"><i class="ph ph-plus"></i>Add</button></div>
+      <div class="wr-search"><i class="ph ph-magnifying-glass"></i>Search recipients&hellip;</div>
+      <div class="gcard" id="privateList"></div>
+    </div>
+
+    <!-- Add/Edit Wire -->
+    <div class="sheet" id="wireSheet" hidden>
+      <div class="sheet-head">
+        <div class="sheet-titlewrap">
+          <h2 class="sheet-title" id="wireTitle">Add Wire Instructions</h2>
+          <div class="sheet-subtitle">Recipient and bank details.</div>
+        </div>
+        <button class="sheet-x" id="wireClose" aria-label="Close"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="sheet-scroll">
+        <div class="fld">
+          <label>Account Holder / Recipient Name<span class="req">*</span></label>
+          <input type="text" id="fName" placeholder="e.g., John Doe">
+        </div>
+        <div class="fld">
+          <label>Email</label>
+          <input type="email" id="fEmail" placeholder="name@example.com">
+        </div>
+        <div class="fld">
+          <label>Phone</label>
+          <input type="tel" id="fPhone" placeholder="(555) 555-5555">
+        </div>
+        <div class="fld">
+          <label>Street</label>
+          <input type="text" id="fStreet" placeholder="Street">
+        </div>
+        <div class="fld">
+          <label>Address Line 2</label>
+          <input type="text" id="fStreet2" placeholder="Address line 2 (optional)">
+        </div>
+        <div class="split-row">
+          <div class="fld"><label>City</label><input type="text" id="fCity" placeholder="City"></div>
+          <div class="fld"><label>State</label><input type="text" id="fState" placeholder="State"></div>
+          <div class="fld"><label>ZIP</label><input type="text" id="fZip" placeholder="ZIP"></div>
+        </div>
+        <div class="fld">
+          <label>Bank Name<span class="req">*</span></label>
+          <input type="text" id="fBank" placeholder="e.g., Chase Bank">
+        </div>
+        <div class="fld">
+          <label>Routing Number (ABA)<span class="req">*</span></label>
+          <input type="text" id="fRouting" placeholder="9-digit ABA number" maxlength="9" inputmode="numeric">
+        </div>
+        <div class="fld">
+          <label>Account Number<span class="req">*</span></label>
+          <input type="text" id="fAccount" placeholder="Account number">
+        </div>
+        <div class="fld">
+          <label>Account Type</label>
+          <button class="dd-btn" id="ddAcctType"><span id="ddAcctTypeVal">Checking</span><i class="ph ph-caret-down"></i></button>
+          <div class="dd-list" id="ddAcctTypeList">
+            <div class="dd-item" data-val="Checking">Checking<i class="ph ph-check" hidden></i></div>
+            <div class="dd-item" data-val="Savings">Savings<i class="ph ph-check" hidden></i></div>
+          </div>
+        </div>
+        <div class="fld">
+          <label>Special Instructions / Memo</label>
+          <textarea id="fMemo" placeholder="Optional memo or reference"></textarea>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="prim" id="wireSaveBtn" type="button" disabled><i class="ph ph-floppy-disk" id="wireSaveIcon"></i><span class="prim-label" id="wireSaveLabel">Save Instructions</span></button>
+        <button class="ghost" id="wireCancel" type="button">Cancel</button>
+      </div>
+    </div>
+
+    <div class="confirm-scrim" id="confirmScrim" hidden>
+      <div class="confirm-card">
+        <h3 class="confirm-title">Delete payment instruction?</h3>
+        <p class="confirm-body" id="confirmBody">This recipient's wire details will be removed.</p>
+        <div class="confirm-actions">
+          <button class="confirm-cancel" type="button" id="confirmCancel">Cancel</button>
+          <button class="confirm-danger" type="button" id="confirmOk">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var teamWire = [{ id:'team', name:'Radius Brokerage LLC', bank:'JPMorgan Chase', account:'874512309', routing:'021000021', type:'Checking', status:'Complete' }];
+var myWire = [{ id:'my', name:'Ila Corcoran', bank:'Bank of America', account:'552093481', routing:'121000358', type:'Checking', status:'Complete' }];
+var privateRecipients = [
+  { id:1, name:'Sandra Martinez', bank:'Chase', account:'199384720', routing:'322271627', type:'Checking', status:'Complete' },
+  { id:2, name:'Marcus Lee', bank:'', account:'', routing:'', type:'Checking', status:'Complete', street:'455 Valencia St', city:'San Francisco', state:'CA' }
+];
+var nextId = 3;
+var editingType = null, editingId = null, deleteTargetId = null, lastFocused = null;
+
+function esc(s){ return String(s || '').replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+function detailLine(w){
+  if (w.bank) return esc(w.bank) + (w.account ? ' &middot; Acct ' + esc(w.account) : '') + (w.routing ? ' &middot; Routing ' + esc(w.routing) : '');
+  var addr = [w.street, w.city, w.state].filter(Boolean).join(', ');
+  return addr || 'No bank details yet';
+}
+function rowHTML(w, kind){
+  return '<div class="wr-row" data-id="' + w.id + '" data-kind="' + kind + '" role="button" tabindex="0">' +
+    '<div class="wr-body"><div class="wr-name">' + esc(w.name) + '</div><div class="wr-detail">' + detailLine(w) + '</div></div>' +
+    '<span class="wr-status">' + esc(w.status) + '</span>' +
+    (kind === 'private' ? '<button class="wr-del" type="button" data-del="' + w.id + '" aria-label="Delete"><i class="ph ph-trash"></i></button>' : '') +
+  '</div>';
+}
+function renderAll(){
+  document.getElementById('teamWireList').innerHTML = teamWire.map(function(w){ return rowHTML(w, 'team'); }).join('');
+  document.getElementById('myWireList').innerHTML = myWire.map(function(w){ return rowHTML(w, 'my'); }).join('');
+  document.getElementById('privateList').innerHTML = privateRecipients.map(function(w){ return rowHTML(w, 'private'); }).join('');
+  document.querySelectorAll('.wr-row').forEach(function(row){
+    function activate(e){
+      if (e.target.closest('[data-del]')) return;
+      var kind = row.getAttribute('data-kind'), id = row.getAttribute('data-id');
+      var list = kind === 'team' ? teamWire : kind === 'my' ? myWire : privateRecipients;
+      var item = list.find(function(w){ return String(w.id) === id; });
+      openWireSheet(kind, item, row);
+    }
+    row.addEventListener('click', activate);
+    row.addEventListener('keydown', function(e){ if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('button')) { e.preventDefault(); activate(e); } });
+  });
+  document.querySelectorAll('[data-del]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      deleteTargetId = Number(btn.getAttribute('data-del'));
+      var rec = privateRecipients.find(function(w){ return w.id === deleteTargetId; });
+      document.getElementById('confirmBody').textContent = '"' + rec.name + '"\u2019s wire details will be removed.';
+      showConfirm(btn);
+    });
+  });
+}
+
+function wireDropdown(btnId, listId, onSelect){
+  var btn = document.getElementById(btnId), list = document.getElementById(listId);
+  btn.addEventListener('click', function(){
+    var isOpen = list.classList.contains('open');
+    document.querySelectorAll('.dd-list.open').forEach(function(l){ l.classList.remove('open'); });
+    document.querySelectorAll('.dd-btn.open').forEach(function(b){ b.classList.remove('open'); });
+    if (!isOpen) { list.classList.add('open'); btn.classList.add('open'); }
+  });
+  list.querySelectorAll('.dd-item').forEach(function(item){
+    item.addEventListener('click', function(){
+      onSelect(item.getAttribute('data-val'), item.textContent.trim());
+      list.classList.remove('open');
+      btn.classList.remove('open');
+    });
+  });
+}
+function setDDCheck(listId, val){
+  document.querySelectorAll('#' + listId + ' .dd-item').forEach(function(item){
+    var on = item.getAttribute('data-val') === val;
+    item.classList.toggle('sel', on);
+    var i = item.querySelector('i'); if (i) i.hidden = !on;
+  });
+}
+var wAcctType = 'Checking';
+wireDropdown('ddAcctType', 'ddAcctTypeList', function(val){ wAcctType = val; document.getElementById('ddAcctTypeVal').textContent = val; setDDCheck('ddAcctTypeList', val); });
+
+function validateWire(){
+  var name = document.getElementById('fName').value.trim();
+  var bank = document.getElementById('fBank').value.trim();
+  var routing = document.getElementById('fRouting').value.trim();
+  var account = document.getElementById('fAccount').value.trim();
+  document.getElementById('wireSaveBtn').disabled = !(name && bank && routing && account);
+}
+['fName','fBank','fRouting','fAccount'].forEach(function(id){ document.getElementById(id).addEventListener('input', validateWire); });
+
+function openWireSheet(kind, item, triggerEl){
+  editingType = kind; editingId = item ? item.id : null;
+  document.getElementById('wireTitle').textContent = item ? 'Edit Wire Instructions' : 'Add Wire Instructions';
+  document.getElementById('fName').value = item ? item.name || '' : '';
+  document.getElementById('fEmail').value = item ? item.email || '' : '';
+  document.getElementById('fPhone').value = item ? item.phone || '' : '';
+  document.getElementById('fStreet').value = item ? item.street || '' : '';
+  document.getElementById('fStreet2').value = item ? item.street2 || '' : '';
+  document.getElementById('fCity').value = item ? item.city || '' : '';
+  document.getElementById('fState').value = item ? item.state || '' : '';
+  document.getElementById('fZip').value = item ? item.zip || '' : '';
+  document.getElementById('fBank').value = item ? item.bank || '' : '';
+  document.getElementById('fRouting').value = item ? item.routing || '' : '';
+  document.getElementById('fAccount').value = item ? item.account || '' : '';
+  document.getElementById('fMemo').value = item ? item.memo || '' : '';
+  wAcctType = item ? item.type || 'Checking' : 'Checking';
+  document.getElementById('ddAcctTypeVal').textContent = wAcctType;
+  setDDCheck('ddAcctTypeList', wAcctType);
+  validateWire();
+  showSheet('wireSheet', triggerEl);
+}
+function closeWireSheet(){ hideSheet('wireSheet'); editingType = null; editingId = null; }
+document.getElementById('wireClose').addEventListener('click', closeWireSheet);
+document.getElementById('wireCancel').addEventListener('click', closeWireSheet);
+document.getElementById('addRecipientBtn').addEventListener('click', function(){ openWireSheet('private', null, this); });
+document.getElementById('wireSaveBtn').addEventListener('click', function(){
+  var btn = this;
+  playPrimSuccess(btn, 'wireSaveIcon', 'wireSaveLabel', 'ph ph-check-circle', 'Saved', function(){
+    var data = {
+      name: document.getElementById('fName').value.trim(),
+      email: document.getElementById('fEmail').value.trim(),
+      phone: document.getElementById('fPhone').value.trim(),
+      street: document.getElementById('fStreet').value.trim(),
+      street2: document.getElementById('fStreet2').value.trim(),
+      city: document.getElementById('fCity').value.trim(),
+      state: document.getElementById('fState').value.trim(),
+      zip: document.getElementById('fZip').value.trim(),
+      bank: document.getElementById('fBank').value.trim(),
+      routing: document.getElementById('fRouting').value.trim(),
+      account: document.getElementById('fAccount').value.trim(),
+      memo: document.getElementById('fMemo').value.trim(),
+      type: wAcctType, status: 'Complete'
+    };
+    var list = editingType === 'team' ? teamWire : editingType === 'my' ? myWire : privateRecipients;
+    if (editingId) {
+      Object.assign(list.find(function(w){ return w.id === editingId; }), data);
+    } else {
+      list.push(Object.assign({ id: nextId++ }, data));
+    }
+    renderAll();
+    closeWireSheet();
+  });
+});
+
+function showConfirm(triggerEl){
+  lastFocused = triggerEl;
+  var scrim = document.getElementById('confirmScrim');
+  scrim.hidden = false;
+  requestAnimationFrame(function(){ scrim.classList.add('show'); });
+}
+function hideConfirm(){
+  var scrim = document.getElementById('confirmScrim');
+  scrim.classList.remove('show');
+  setTimeout(function(){ scrim.hidden = true; if (lastFocused) lastFocused.focus(); }, 200);
+}
+document.getElementById('confirmCancel').addEventListener('click', hideConfirm);
+document.getElementById('confirmOk').addEventListener('click', function(){
+  privateRecipients = privateRecipients.filter(function(w){ return w.id !== deleteTargetId; });
+  renderAll();
+  hideConfirm();
+});
+
+document.querySelectorAll('.sh-tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('.sh-tab').forEach(function(t){ t.setAttribute('aria-selected','false'); });
+    this.setAttribute('aria-selected','true');
+  });
+});
+
+function sheetKeyHandler(e){
+  var openSheet = document.querySelector('.sheet.show');
+  if (!openSheet) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeWireSheet(); return; }
+  if (e.key === 'Tab') {
+    var focusables = Array.prototype.slice.call(openSheet.querySelectorAll('button, input, textarea, [tabindex]:not([tabindex="-1"])')).filter(function(el){ return !el.disabled && el.offsetParent !== null; });
+    if (!focusables.length) return;
+    var first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+}
+function showSheet(id, triggerEl){
+  lastFocused = triggerEl || document.activeElement;
+  var el = document.getElementById(id);
+  if (el._hideTimer) { clearTimeout(el._hideTimer); el._hideTimer = null; }
+  el.classList.remove('closing');
+  el.hidden = false;
+  requestAnimationFrame(function(){ el.classList.add('show'); });
+  document.addEventListener('keydown', sheetKeyHandler);
+  setTimeout(function(){ var f = el.querySelector('.sheet-x'); if (f) f.focus(); }, 300);
+}
+function hideSheet(id){
+  var el = document.getElementById(id);
+  if (el._hideTimer) clearTimeout(el._hideTimer);
+  el.classList.add('closing');
+  el.classList.remove('show');
+  document.removeEventListener('keydown', sheetKeyHandler);
+  el._hideTimer = setTimeout(function(){ el.hidden = true; el.classList.remove('closing'); el._hideTimer = null; if (lastFocused) lastFocused.focus(); }, 200);
+}
+function playPrimSuccess(btn, iconId, labelId, toIcon, toLabel, onDone){
+  var icon = document.getElementById(iconId), label = document.getElementById(labelId);
+  var fromIconClass = icon.className, fromLabel = label.textContent;
+  btn.classList.add('morphing');
+  setTimeout(function(){
+    icon.className = toIcon;
+    label.textContent = toLabel;
+    btn.classList.remove('morphing');
+    btn.classList.add('pop');
+    setTimeout(function(){ btn.classList.remove('pop'); }, 220);
+  }, 160);
+  setTimeout(function(){
+    onDone();
+    setTimeout(function(){ icon.className = fromIconClass; label.textContent = fromLabel; }, 200);
+  }, 340);
+}
+
+renderAll();
+</script>
+</body>
+</html>

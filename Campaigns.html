@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaigns — Radius</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<link rel="stylesheet" href="assets/list-page.css">
+<style>
+/* campaigns page — additions on top of list-page.css */
+/* iOS-26 style glass chrome */
+.screen { position:relative; overflow:hidden; } /* clip the parked keyboard/dock to the phone */
+.phone { overflow:hidden; }
+.statusbar { position:absolute; top:0; left:0; right:0; z-index:14; }
+.pg-head { position:absolute; top:0; left:0; right:0; z-index:13; padding:calc(44px + env(safe-area-inset-top)) 16px 10px; background:linear-gradient(to bottom, rgba(10,10,10,.86), rgba(10,10,10,.62)); backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%); box-shadow:inset 0 -1px 0 rgba(255,255,255,.07); }
+.scroll { padding-top:calc(44px + env(safe-area-inset-top) + 62px); padding-bottom:calc(108px + env(safe-area-inset-bottom)); }
+.pg-head .back-btn, .pg-head .hd-btn { width:36px; height:36px; border-radius:999px; background:rgba(255,255,255,.08); box-shadow:inset 0 0 0 1px rgba(255,255,255,.10), inset 0 1px 0 rgba(255,255,255,.14); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); transition:transform 140ms ease, background 140ms ease; }
+.pg-head .back-btn { margin-left:0; }
+.pg-head .back-btn::before, .pg-head .hd-btn::before { content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%); }
+.pg-head .back-btn { position:relative; }
+.pg-head .back-btn:hover, .pg-head .hd-btn:hover { background:rgba(255,255,255,.13); }
+.pg-head .hd-btn i { font-size:19px; }
+.pg-head .hd-btn .dot { top:6px; right:6px; border-color:#141416; }
+.pg-head h1 { font-size:20px; }
+.pg-head .count { padding:6px 10px; background:rgba(255,255,255,.09); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); }
+/* floating glass plus */
+.fab { flex:none; width:56px; height:56px; border-radius:999px; border:0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; color:#fff; background:color-mix(in oklch, var(--primary) 86%, transparent); box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 1px 0 rgba(255,255,255,.34), 0 10px 30px rgba(90,95,242,.40); backdrop-filter:blur(30px) saturate(180%); -webkit-backdrop-filter:blur(30px) saturate(180%); transition:transform 160ms cubic-bezier(.23,1,.32,1), background 160ms ease; }
+.fab i { font-size:26px; }
+.fab:hover { background:var(--primary); }
+.fab:active { transform:scale(.94); }
+.fab:focus-visible { outline:2px solid var(--ring); outline-offset:3px; }
+@supports not (backdrop-filter: blur(1px)) { .pg-head { background:rgba(14,14,16,.96); } }
+
+.screen { position:relative; --tint-amber-bg:rgba(234,88,12,.16); --tint-amber-fg:#f2a678; --tint-red-fg:#f0a0a0; --tint-indigo-fg:#aab0ff; --tint-green-fg:#a9cf80; --tint-violet-bg:rgba(107,75,171,.22); --tint-violet-fg:#c9b3f5; --tint-gold-bg:rgba(217,165,20,.18); --tint-gold-fg:#f0cf6a; --tint-red-bg:rgba(220,38,38,.18); --tint-indigo-bg:rgba(90,95,242,.18); --tint-green-bg:rgba(109,165,68,.18); }
+.pg-head .count { margin-left:0; }
+.scroll { scrollbar-width:none; }
+.scroll::-webkit-scrollbar { display:none; }
+.pg-head .hd-btn { position:relative; width:44px; height:44px; border-radius:999px; border:0; background:transparent; color:var(--foreground); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; flex:none; }
+.pg-head .hd-btn:first-of-type { margin-left:auto; }
+.pg-head .hd-btn i { font-size:22px; }
+.pg-head .hd-btn:active { transform:scale(.94); }
+.pg-head .hd-btn:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.pg-head .hd-btn .dot { position:absolute; top:9px; right:9px; width:8px; height:8px; border-radius:999px; background:var(--primary); border:2px solid var(--background); }
+.pg-head .hd-btn .dot[hidden] { display:none; }
+/* overview strip */
+/* overview — swipeable metric cards */
+.ov { flex:none; padding:0 0 14px; }
+.sh-tabs { margin:0; }
+/* stacked deck — the cards behind peek above the front one */
+.deck { position:relative; margin-top:24px; touch-action:pan-y; }
+.deck .ghost { position:absolute; left:0; right:0; top:0; border-radius:var(--radius-card); background:var(--muted); border:1px solid var(--border); transition:transform 300ms cubic-bezier(.23,1,.32,1), left 300ms cubic-bezier(.23,1,.32,1), right 300ms cubic-bezier(.23,1,.32,1); }
+.deck .g1 { left:10px; right:10px; height:44px; transform:translateY(-11px); }
+.deck .g2 { left:22px; right:22px; height:40px; transform:translateY(-20px); filter:brightness(.94); }
+.deck.drag .g1 { transform:translateY(-7px); left:6px; right:6px; }
+.deck.drag .g2 { transform:translateY(-15px); left:16px; right:16px; }
+.dots { display:flex; justify-content:center; gap:5px; padding:11px 0 0; }
+.pdot { position:relative; width:6px; height:6px; padding:0; border:0; border-radius:999px; background:var(--border); cursor:pointer; transition:width 240ms cubic-bezier(.23,1,.32,1), background 240ms ease; }
+.pdot::before { content:''; position:absolute; left:-7px; right:-7px; top:50%; height:44px; transform:translateY(-50%); }
+.pdot[aria-current="true"] { width:18px; background:var(--primary); }
+.pdot:focus-visible { outline:2px solid var(--ring); outline-offset:3px; }
+.mcard { position:relative; z-index:1; transition:transform 300ms cubic-bezier(.23,1,.32,1), opacity 200ms ease; }
+.mcard.rise { animation:mrise 300ms cubic-bezier(.23,1,.32,1); }
+@keyframes mrise { from { transform:translateY(-9px) scale(.96); opacity:.55; } to { transform:none; opacity:1; } }
+.mcard { margin:0; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-card); box-shadow:var(--shadow-sm); padding:13px 18px 0; display:flex; flex-direction:column; gap:10px; text-align:left; color:var(--foreground); font-family:var(--font); }
+.mcard .mh { display:flex; align-items:center; gap:9px; font:500 13px/1.2 var(--font); color:var(--muted-foreground); white-space:nowrap; }
+.mcard .tile { width:24px; height:24px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:14px; flex:none; background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); transition:background 260ms ease, color 260ms ease; }
+.mcard .ovf { margin-left:auto; font-size:18px; color:var(--muted-foreground); }
+.mcard .mv { display:flex; align-items:center; gap:10px; font:700 30px/1 var(--font-hubot); letter-spacing:-.03em; font-variant-numeric:tabular-nums; }
+.delta { display:inline-flex; align-items:center; gap:4px; height:24px; padding:0 10px 0 8px; border-radius:999px; font:600 13px/1 var(--font); letter-spacing:0; font-variant-numeric:tabular-nums; }
+.delta i { font-size:13px; }
+.delta.up { background:var(--tint-green-bg); color:var(--tint-green-fg); }
+.delta.down { background:var(--tint-red-bg); color:var(--tint-red-fg); }
+.mcard .mc { display:block; height:60px; }
+.mcard .sp { display:block; height:60px; overflow:visible; color:var(--tint-indigo-fg); transition:color 260ms ease; }
+.mcard .mf { display:flex; align-items:baseline; gap:6px; margin:0 -18px; padding:11px 18px 12px; border-top:1px solid var(--border); font:500 13px/1.2 var(--font); color:var(--muted-foreground); white-space:nowrap; }
+.mcard .mf b { font:600 14px/1.2 var(--font); color:var(--foreground); font-variant-numeric:tabular-nums; }
+.mcard .mf.swap { animation:mfade 260ms ease; }
+@keyframes mfade { from { opacity:.25; } to { opacity:1; } }
+/* the table — one card, aligned columns, sticky header */
+.tbl .gcard { background:transparent; border:0; box-shadow:none; padding:0; display:flex; flex-direction:column; gap:12px; overflow:visible; }
+.row { position:relative; display:flex; flex-direction:column; width:100%; padding:14px 15px 14px; border:0; border-radius:var(--radius-card); background:var(--card); box-shadow:inset 0 0 0 1px var(--border), var(--shadow-sm); color:var(--foreground); text-align:left; font-family:var(--font); cursor:pointer; transition:transform 160ms cubic-bezier(.23,1,.32,1); }
+.row:active { transform:scale(.985); }
+.row:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+
+.row[data-paused] { opacity:.7; }
+.rl { display:flex; align-items:flex-start; gap:10px; }
+.nm { flex:1; min-width:0; font:600 15px/1.35 var(--font); letter-spacing:-.01em; text-wrap:pretty; }
+.pill { flex:none; margin-top:1px; display:inline-flex; align-items:center; gap:4px; height:22px; padding:0 9px 0 7px; border-radius:999px; font:600 12px/1 var(--font); white-space:nowrap; }
+.pill i { font-size:13px; }
+.pill.warn { color:var(--tint-amber-fg); background:var(--tint-amber-bg); }
+.pill.off { color:var(--muted-foreground); background:var(--muted); }
+.pill.sent { color:var(--tint-indigo-fg); background:var(--tint-indigo-bg); }
+.rt { margin-top:5px; font:500 13px/1.4 var(--font); color:var(--muted-foreground); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* the divider IS the progress track */
+.track { display:block; position:relative; margin-top:16px; height:2px; border-radius:999px; background:var(--border); color:var(--primary); }
+.track i { display:block; height:100%; width:var(--p); border-radius:999px; background:currentColor; }
+.track s { position:absolute; top:-3px; left:50%; width:1px; height:8px; background:var(--muted-foreground); opacity:.7; }
+.specs { display:flex; padding-top:14px; }
+.specs > span { flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; padding-left:14px; border-left:1px solid var(--border); }
+.specs > span:first-child { padding-left:0; border-left:0; }
+.specs b { font:600 17px/1 var(--font); letter-spacing:-.015em; font-variant-numeric:tabular-nums; }
+.specs em { font:500 12px/1 var(--font); font-style:normal; color:var(--muted-foreground); }
+/* bottom action bar — the two kinds of outbound */
+/* sheets */
+.scrim { position:absolute; inset:0; background:rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity 240ms ease; z-index:20; }
+.scrim.on { opacity:1; pointer-events:auto; }
+.sheet { position:absolute; left:0; right:0; bottom:0; z-index:21; background:var(--card); border:1px solid var(--border); border-bottom:0; border-radius:22px 22px 0 0; padding:8px 12px calc(24px + env(safe-area-inset-bottom)); transform:translateY(103%); transition:transform 300ms cubic-bezier(.32,.72,0,1); box-shadow:0 -12px 40px rgba(0,0,0,.45); }
+.sheet.on { transform:none; }
+.sheet .grab { width:38px; height:4px; border-radius:999px; background:var(--muted-foreground); opacity:.4; margin:0 auto 10px; }
+.sheet .sh-name { font:700 17px/1.2 var(--font); letter-spacing:-.01em; padding:6px 10px 12px; border-bottom:1px solid var(--border); margin-bottom:6px; }
+.sheet .sh-sub { display:block; font:500 13px/1.3 var(--font); color:var(--muted-foreground); margin-top:4px; font-variant-numeric:tabular-nums; }
+.sheet .act { display:flex; align-items:center; gap:12px; width:100%; min-height:48px; padding:0 10px; border:0; background:transparent; color:var(--foreground); font:500 15px/1 var(--font); text-align:left; border-radius:var(--radius-lg); cursor:pointer; }
+.sheet .act i { font-size:20px; color:var(--muted-foreground); width:24px; text-align:center; }
+.sheet .act:active { background:var(--muted); }
+.sheet .act:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
+.sheet .act.del, .sheet .act.del i { color:var(--tint-red-fg); }
+.sheet .act .n { margin-left:auto; flex:none; min-width:32px; text-align:right; font:500 13px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.sheet .act .ck { flex:none; width:20px; margin-left:10px; font-size:18px; color:var(--primary); text-align:center; }
+.sheet .act[aria-pressed="false"] .ck { visibility:hidden; }
+.sheet .act[aria-pressed="true"] { background:var(--muted); }
+.sheet .act[aria-pressed="true"] .n { color:var(--foreground); }
+.sheet .sep { height:1px; background:var(--border); margin:6px 10px; }
+.sheet a.act, .sheet a.act:hover { text-decoration:none; color:var(--foreground); }
+.sheet .act.two { align-items:flex-start; padding-top:12px; padding-bottom:12px; }
+.sheet .act.two i { margin-top:2px; }
+.sheet .act .lbl { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.sheet .act .lbl b { font:600 15px/1.2 var(--font); }
+.sheet .act .lbl span { font:400 13px/1.4 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
+.sheet .act.two .chev { margin-left:auto; font-size:16px; color:var(--muted-foreground); width:auto; }
+.sheet [hidden] { display:none !important; }
+/* status pills — they filter the list below them */
+.fbar { display:flex; gap:7px; margin:18px 0 12px; overflow-x:auto; scrollbar-width:none; }
+.fbar::-webkit-scrollbar { display:none; }
+.fpill { position:relative; flex:none; display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 13px; border-radius:999px; border:1px solid var(--border); background:transparent; color:var(--muted-foreground); font:500 13px/1 var(--font); cursor:pointer; white-space:nowrap; transition:background 160ms ease, color 160ms ease, border-color 160ms ease; }
+.fpill::before { content:''; position:absolute; left:0; right:0; top:50%; height:44px; transform:translateY(-50%); }
+.fpill .fn { font:600 12px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.fpill[aria-pressed="true"] { background:var(--muted); border-color:transparent; color:var(--foreground); font-weight:600; }
+.fpill[aria-pressed="true"] .fn { color:var(--foreground); }
+.fpill[data-val="waiting"] .fn { color:var(--tint-amber-fg); }
+.fpill:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.tbl + .tbl { margin-top:12px; }
+/* section headings */
+.sec-head { align-items:baseline; margin:26px 0 10px; }
+.ov .sec-head { margin:0 0 10px; }
+.mcard .mh { overflow:hidden; }
+.mcard .mh #mTitle { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.mcard .mh .per { margin-left:auto; flex:none; font:500 12px/1 var(--font); color:var(--muted-foreground); }
+.mcard .mh .ovf { margin-left:10px; }
+.sec-head h2 { font:600 17px/1.2 var(--font); letter-spacing:-.015em; text-transform:none; color:var(--foreground); }
+.sec-head .n { flex:none; font:600 13px/1 var(--font); color:var(--muted-foreground); padding:5px 9px; border-radius:999px; background:var(--muted); font-variant-numeric:tabular-nums; }
+.ov .sec-head .scope { flex:none; font:500 13px/1 var(--font); color:var(--muted-foreground); }
+/* ── head: title row · search row · segmented ───────────── */
+.pg-head { display:block; }
+.pg-head .hrow { display:flex; align-items:center; gap:8px; }
+
+/* search — iOS: field takes the title row's place, keyboard rises */
+.srchrow { display:none; align-items:center; gap:10px; height:44px; }
+.pg-head[data-search="on"] .hrow { display:none; }
+.pg-head[data-search="on"] .srchrow { display:flex; }
+.srchfield { flex:1; min-width:0; display:flex; align-items:center; gap:8px; height:36px; padding:0 10px; border-radius:var(--radius-md); background:rgba(255,255,255,.10); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); }
+.srchfield i { flex:none; font-size:17px; color:var(--muted-foreground); }
+.srchfield input { flex:1; min-width:0; border:0; background:transparent; color:var(--foreground); font:400 15px/1 var(--font); }
+.srchfield input:focus { outline:none; }
+.srchfield input::placeholder { color:var(--muted-foreground); }
+.srchfield input::-webkit-search-cancel-button { display:none; }
+.sx { flex:none; width:24px; height:24px; border:0; background:transparent; color:var(--muted-foreground); font-size:17px; display:none; align-items:center; justify-content:center; cursor:pointer; }
+.srchfield.has .sx { display:inline-flex; }
+.scancel { flex:none; height:44px; padding:0 2px; border:0; background:transparent; color:var(--primary); font:500 15px/1 var(--font); cursor:pointer; }
+.scancel:focus-visible, .sx:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+
+/* ── dock — the two kinds of outbound, plus the new button ── */
+.dock { position:absolute; left:0; right:0; bottom:0; z-index:13; display:flex; align-items:center; gap:10px; padding:18px 16px calc(14px + env(safe-area-inset-bottom)); background:linear-gradient(to top, rgba(10,10,10,.92) 45%, rgba(10,10,10,0)); pointer-events:none; transition:transform 300ms cubic-bezier(.32,.72,0,1); }
+.dock > * { pointer-events:auto; }
+.dock .sh-tabs { flex:1; min-width:0; margin:0; height:56px; padding:5px; border-radius:999px; background:rgba(12,12,14,.62); box-shadow:inset 0 0 0 1px rgba(255,255,255,.07), inset 0 1px 0 rgba(255,255,255,.09), 0 10px 30px rgba(0,0,0,.55); backdrop-filter:blur(30px) saturate(180%); -webkit-backdrop-filter:blur(30px) saturate(180%); }
+.dock .sh-tab { height:46px; border-radius:999px; font-size:15px; }
+.dock .sh-tab[aria-selected="true"] { background:rgba(46,46,52,.85); color:var(--foreground); box-shadow:inset 0 0 0 1px rgba(255,255,255,.10), inset 0 1px 0 rgba(255,255,255,.14), 0 2px 8px rgba(0,0,0,.45); }
+.dock .sh-tab::before { height:56px; }
+.screen[data-kb="on"] .dock { transform:translateY(100%); }
+
+/* ── keyboard ───────────────────────────────────────────── */
+.kb { position:absolute; left:0; right:0; bottom:0; z-index:15; padding:8px 3px calc(6px + env(safe-area-inset-bottom)); background:rgba(28,28,32,.96); box-shadow:inset 0 1px 0 rgba(255,255,255,.07); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); transform:translateY(100%); transition:transform 300ms cubic-bezier(.32,.72,0,1); }
+.screen[data-kb="on"] .kb { transform:none; }
+/* a bottom sheet is never shown over the keyboard, whatever opened it */
+.screen:has(.sheet.on) .kb, .screen:has(.scrim.on) .kb { transform:translateY(100%); }
+.kb[hidden] { display:none !important; }
+.kbrow { display:flex; gap:6px; justify-content:center; margin-bottom:8px; }
+.kbrow.r2 { padding:0 18px; }
+.kbrow:last-child { margin-bottom:0; }
+.key { flex:1; min-width:0; height:42px; border:0; border-radius:5px; background:#6B6B70; color:#fff; font:400 21px/1 var(--font); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 0 rgba(0,0,0,.35); }
+.key.mod { flex:1.4; background:#48484D; font-size:16px; }
+.key.sp { flex:5; font-size:15px; }
+.key.go { flex:2.2; background:var(--primary); font:600 15px/1 var(--font); }
+.key:active { background:#8A8A90; }
+.key:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+
+/* ── one-time blast intro ───────────────────────────────── */
+.sec-head .headact { position:relative; margin-left:auto; display:inline-flex; align-items:center; gap:6px; min-height:32px; padding:0 12px; border:0; border-radius:999px; background:var(--tint-indigo-bg); color:#ccceff; font:600 13px/1 var(--font); cursor:pointer; white-space:nowrap; }
+.sec-head .headact::before { content:''; position:absolute; left:0; right:0; top:50%; height:44px; transform:translateY(-50%); }
+.sec-head .headact i { font-size:14px; }
+.sec-head .headact:active { transform:scale(.97); }
+.sec-head .headact:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.empty .oncebtn { max-width:240px; }
+.empty .ghostbtn { margin-top:10px; max-width:240px; width:100%; min-height:44px; display:inline-flex; align-items:center; justify-content:center; gap:8px; border:1px solid var(--input); border-radius:999px; background:transparent; color:var(--foreground); font:600 15px/1 var(--font); cursor:pointer; }
+.empty .ghostbtn:active { transform:scale(.98); }
+.empty .ghostbtn:focus-visible, .empty .xlink:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.empty .xlink { margin-top:14px; display:inline-flex; align-items:center; gap:7px; min-height:44px; padding:0 6px; border:0; background:transparent; color:#aab0ff; font:600 14px/1 var(--font); cursor:pointer; }
+.empty .xlink b { font-weight:700; font-variant-numeric:tabular-nums; }
+.empty .xlink i { font-size:15px; }
+.oncebtn { margin-top:14px; width:100%; min-height:46px; display:inline-flex; align-items:center; justify-content:center; gap:8px; border:0; border-radius:999px; background:var(--primary); color:#fff; font:600 15px/1 var(--font); cursor:pointer; transition:transform 160ms cubic-bezier(.23,1,.32,1); }
+.oncebtn i { font-size:18px; }
+.oncebtn:active { transform:scale(.98); }
+.oncebtn:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.orow { position:relative; display:flex; align-items:center; gap:12px; width:100%; padding:14px 15px; border:0; border-radius:var(--radius-card); background:var(--card); box-shadow:inset 0 0 0 1px var(--border), var(--shadow-sm); color:var(--foreground); text-align:left; font-family:var(--font); cursor:pointer; transition:transform 160ms cubic-bezier(.23,1,.32,1); }
+.orow:active { transform:scale(.985); }
+.orow:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+.orow .oic { flex:none; width:34px; height:34px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-size:17px; background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); }
+.orow .obd { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+.orow .nm2 { font:600 15px/1.3 var(--font); letter-spacing:-.01em; }
+.orow .sub { font:500 13px/1.3 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.orow .owhen { flex:none; display:flex; align-items:center; gap:6px; font:500 13px/1 var(--font); color:var(--muted-foreground); font-variant-numeric:tabular-nums; }
+.orow .owhen i { font-size:15px; }
+
+/* ── row overflow ⋮ ─────────────────────────────────────── */
+.rowwrap { position:relative; }
+.rowwrap .row .rl { padding-right:40px; }
+.rmore { position:absolute; top:7px; right:7px; width:44px; height:44px; border:0; border-radius:999px; background:transparent; color:var(--muted-foreground); font-size:20px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:background 160ms ease; }
+.rmore:active { background:var(--muted); }
+.rmore:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
+
+/* toast */
+.toast { position:absolute; left:20px; right:20px; bottom:calc(84px + env(safe-area-inset-bottom)); z-index:30; background:var(--popover,#26262A); color:var(--foreground); border-radius:var(--radius-lg); padding:12px 14px; font:500 13px/1.3 var(--font); box-shadow:0 6px 24px rgba(0,0,0,.45); opacity:0; transform:translateY(10px); transition:opacity 160ms ease, transform 160ms ease; pointer-events:none; }
+.toast.on { opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce) {
+  .sheet, .scrim, .toast, .row, .stat, .orow, .dock, .kb, .fab, .mcard, .deck .ghost, .pdot, .rmore, .key { transition:none; animation:none; }
+}
+</style>
+</head>
+<body>
+
+<button type="button" id="devDataToggle" onclick="(function(){document.body.classList.toggle('dev-nodata');var on=document.body.classList.contains('dev-nodata');this.textContent=on?'Show data':'No data';window.__refreshStates&&window.__refreshStates();}).call(this)" style="position:fixed;top:8px;right:8px;z-index:99999;font:12px/1.2 -apple-system,sans-serif;padding:6px 10px;border-radius:999px;background:#111;color:#fff;border:0;cursor:pointer;opacity:.85">No data</button>
+<style>body.dev-nodata .rowwrap,body.dev-nodata .orow{display:none!important}</style>
+
+<div class="phone">
+  <div class="screen" data-screen-label="Campaigns">
+    <div class="statusbar"><span>9:41</span>
+      <div class="sb-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="5" width="3" height="7" rx="1"/><rect x="9" y="2.5" width="3" height="9.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity="0.7"/></svg>
+        <svg width="20" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor"><rect x="1" y="1" width="17" height="10" rx="3"/><rect x="3" y="3" width="11" height="6" rx="1.5" fill="currentColor" stroke="none"/><path d="M20 4v4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div class="pg-head" id="pgHead">
+      <div class="hrow">
+        <a href="Implemented Home.html" class="back-btn" aria-label="Back to home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </a>
+        <h1>Campaigns</h1>
+        <span class="count" id="count" aria-label="16 campaigns">16</span>
+        <button class="hd-btn" type="button" id="srchBtn" aria-label="Search campaigns" aria-expanded="false"><i class="ph ph-magnifying-glass" aria-hidden="true"></i></button>
+        <button class="hd-btn" type="button" aria-label="Activity" data-toast="Opens campaign activity"><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i></button>
+      </div>
+      <div class="srchrow">
+        <div class="srchfield" id="srchField">
+          <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+          <input type="search" id="srch" placeholder="Search campaigns" aria-label="Search campaigns" autocomplete="off">
+          <button class="sx" type="button" id="srchClear" aria-label="Clear search"><i class="ph ph-x-circle" aria-hidden="true"></i></button>
+        </div>
+        <button class="scancel" type="button" id="srchCancel">Cancel</button>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div class="ov" data-tab="rules">
+        <div class="deck" id="deck">
+        <span class="ghost g2" aria-hidden="true"></span>
+        <span class="ghost g1" aria-hidden="true"></span>
+        <div class="mcard" id="mcard">
+          <span class="mh"><span class="tile"><i class="ph ph-users-three" id="mIcon" aria-hidden="true"></i></span><span id="mTitle">Contacts in a campaign</span><span class="per">Past 7 days</span><i class="ph ph-dots-three ovf" aria-hidden="true"></i></span>
+          <span class="mv"><span id="mVal">14,337</span><span class="delta up" id="mDelta"><i class="ph ph-trend-up" aria-hidden="true"></i>+412</span></span>
+          <span class="mc">
+            <svg class="sp" id="mChart" viewBox="0 0 260 60" width="100%" height="60" aria-hidden="true">
+              <defs><linearGradient id="mFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".30"></stop><stop offset="1" stop-color="currentColor" stop-opacity="0"></stop></linearGradient></defs>
+              <path id="mArea" fill="url(#mFade)"></path>
+              <polyline id="mLine" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"></polyline>
+              <g id="mDots"></g>
+            </svg>
+          </span>
+          <span class="mf" id="mFoot"><b>1,102</b>shared with the team</span>
+        </div>
+        </div>
+        <div class="dots" id="dots" role="group" aria-label="Metric">
+          <button class="pdot" type="button" data-i="0" aria-current="true" aria-label="Contacts in a campaign"></button>
+          <button class="pdot" type="button" data-i="1" aria-current="false" aria-label="Replies per message"></button>
+          <button class="pdot" type="button" data-i="2" aria-current="false" aria-label="Messages"></button>
+          <button class="pdot" type="button" data-i="3" aria-current="false" aria-label="Appointments"></button>
+          <button class="pdot" type="button" data-i="4" aria-current="false" aria-label="Opted out"></button>
+        </div>
+      </div>
+
+      <div class="fbar" id="fbar" data-tab="rules" data-filter="status" role="group" aria-label="Filter by status">
+        <button class="fpill" type="button" data-val="running" aria-pressed="true">Running<span class="fn">15</span></button>
+        <button class="fpill" type="button" data-val="paused" aria-pressed="false">Paused<span class="fn">1</span></button>
+      </div>
+
+      <div class="grp tbl" data-tab="rules" data-status-group="waiting" data-table>
+        <div class="gcard" role="list">
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running waiting" data-attention data-name="Spring sellers — Inland Empire" data-playbook="1" data-aud="1532" data-rate="6.3" data-hit="1" data-rep="96" data-rule="Tags is “farm-2026” · Owns property" aria-label="Spring sellers — Inland Empire. Waiting on you. 6.3% reply rate, 96 replies from 1,532 contacts.">
+          <span class="rl"><span class="nm">Spring sellers — Inland Empire</span></span>
+          <span class="rt">Tags is “farm-2026” · Owns property</span>
+          <span class="track" title="6.3% of a 6.0% target"><i style="--p:53%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>6.3%</b><em>reply rate</em></span>
+            <span><b>96</b><em>replies</em></span>
+            <span><b>1,532</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Spring sellers — Inland Empire"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running waiting" data-attention data-name="Referral ask after closing" data-playbook="1" data-aud="268" data-rate="15.3" data-hit="1" data-rep="41" data-rule="Status is Closed · Closed after 1 Apr" aria-label="Referral ask after closing. Waiting on you. 15.3% reply rate, 41 replies from 268 contacts.">
+          <span class="rl"><span class="nm">Referral ask after closing</span></span>
+          <span class="rt">Status is Closed · Closed after 1 Apr</span>
+          <span class="track" title="15.3% of a 6.0% target"><i style="--p:100%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>15.3%</b><em>reply rate</em></span>
+            <span><b>41</b><em>replies</em></span>
+            <span><b>268</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Referral ask after closing"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        </div>
+      </div>
+
+      <div class="grp tbl" data-tab="rules" data-status-group="running" data-table>
+        <div class="gcard" role="list">
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Follow up to initial contact" data-playbook="1" data-aud="1378" data-rate="4.6" data-hit="0" data-rep="64" data-rule="Status is New Client · No contact 14d+" aria-label="Follow up to initial contact. Running. 4.6% reply rate, 64 replies from 1,378 contacts.">
+          <span class="rl"><span class="nm">Follow up to initial contact</span></span>
+          <span class="rt">Status is New Client · No contact 14d+</span>
+          <span class="track" title="4.6% of a 6.0% target"><i style="--p:38%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>4.6%</b><em>reply rate</em></span>
+            <span><b>64</b><em>replies</em></span>
+            <span><b>1,378</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Follow up to initial contact"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Website enquiries, same day" data-playbook="1" data-aud="246" data-rate="7.3" data-hit="1" data-rep="18" data-rule="Source is web_form · Created today" aria-label="Website enquiries, same day. Running. 7.3% reply rate, 18 replies from 246 contacts.">
+          <span class="rl"><span class="nm">Website enquiries, same day</span></span>
+          <span class="rt">Source is web_form · Created today</span>
+          <span class="track" title="7.3% of a 6.0% target"><i style="--p:61%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>7.3%</b><em>reply rate</em></span>
+            <span><b>18</b><em>replies</em></span>
+            <span><b>246</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Website enquiries, same day"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Zillow leads, first touch" data-playbook="0" data-aud="892" data-rate="3.5" data-hit="0" data-rep="31" data-rule="Source is zillow · Unworked" aria-label="Zillow leads, first touch. Running. 3.5% reply rate, 31 replies from 892 contacts.">
+          <span class="rl"><span class="nm">Zillow leads, first touch</span></span>
+          <span class="rt">Source is zillow · Unworked</span>
+          <span class="track" title="3.5% of a 6.0% target"><i style="--p:29%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>3.5%</b><em>reply rate</em></span>
+            <span><b>31</b><em>replies</em></span>
+            <span><b>892</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Zillow leads, first touch"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Open house sign-ins" data-playbook="1" data-aud="318" data-rate="6.9" data-hit="1" data-rep="22" data-rule="Source is open_house · Last 30 days" aria-label="Open house sign-ins. Running. 6.9% reply rate, 22 replies from 318 contacts.">
+          <span class="rl"><span class="nm">Open house sign-ins</span></span>
+          <span class="rt">Source is open_house · Last 30 days</span>
+          <span class="track" title="6.9% of a 6.0% target"><i style="--p:58%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>6.9%</b><em>reply rate</em></span>
+            <span><b>22</b><em>replies</em></span>
+            <span><b>318</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Open house sign-ins"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Buyers with no tour in 21 days" data-playbook="1" data-aud="634" data-rate="6.2" data-hit="1" data-rep="39" data-rule="Client type is buyer · Status is Active" aria-label="Buyers with no tour in 21 days. Running. 6.2% reply rate, 39 replies from 634 contacts.">
+          <span class="rl"><span class="nm">Buyers with no tour in 21 days</span></span>
+          <span class="rt">Client type is buyer · Status is Active</span>
+          <span class="track" title="6.2% of a 6.0% target"><i style="--p:52%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>6.2%</b><em>reply rate</em></span>
+            <span><b>39</b><em>replies</em></span>
+            <span><b>634</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Buyers with no tour in 21 days"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Rate-drop watchers" data-playbook="0" data-aud="1204" data-rate="3.2" data-hit="0" data-rep="38" data-rule="Tags is “rate-watch” · Not closed" aria-label="Rate-drop watchers. Running. 3.2% reply rate, 38 replies from 1,204 contacts.">
+          <span class="rl"><span class="nm">Rate-drop watchers</span></span>
+          <span class="rt">Tags is “rate-watch” · Not closed</span>
+          <span class="track" title="3.2% of a 6.0% target"><i style="--p:27%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>3.2%</b><em>reply rate</em></span>
+            <span><b>38</b><em>replies</em></span>
+            <span><b>1,204</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Rate-drop watchers"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Renters turning buyer" data-playbook="1" data-aud="421" data-rate="3.6" data-hit="0" data-rep="15" data-rule="Lease ends within 90 days" aria-label="Renters turning buyer. Running. 3.6% reply rate, 15 replies from 421 contacts.">
+          <span class="rl"><span class="nm">Renters turning buyer</span></span>
+          <span class="rt">Lease ends within 90 days</span>
+          <span class="track" title="3.6% of a 6.0% target"><i style="--p:30%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>3.6%</b><em>reply rate</em></span>
+            <span><b>15</b><em>replies</em></span>
+            <span><b>421</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Renters turning buyer"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Pre-approval nudge" data-playbook="1" data-aud="512" data-rate="8.6" data-hit="1" data-rep="44" data-rule="Buyer · No lender on file" aria-label="Pre-approval nudge. Running. 8.6% reply rate, 44 replies from 512 contacts.">
+          <span class="rl"><span class="nm">Pre-approval nudge</span></span>
+          <span class="rt">Buyer · No lender on file</span>
+          <span class="track" title="8.6% of a 6.0% target"><i style="--p:72%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>8.6%</b><em>reply rate</em></span>
+            <span><b>44</b><em>replies</em></span>
+            <span><b>512</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Pre-approval nudge"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Valuation offer — 92 zip" data-playbook="1" data-aud="786" data-rate="7.8" data-hit="1" data-rep="61" data-rule="Owns property · Owned 5y+" aria-label="Valuation offer — 92 zip. Running. 7.8% reply rate, 61 replies from 786 contacts.">
+          <span class="rl"><span class="nm">Valuation offer — 92 zip</span></span>
+          <span class="rt">Owns property · Owned 5y+</span>
+          <span class="track" title="7.8% of a 6.0% target"><i style="--p:65%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>7.8%</b><em>reply rate</em></span>
+            <span><b>61</b><em>replies</em></span>
+            <span><b>786</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Valuation offer — 92 zip"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Neighbourhood report, monthly" data-playbook="1" data-aud="2140" data-rate="5.5" data-hit="0" data-rep="118" data-rule="Owns property · Opted in" aria-label="Neighbourhood report, monthly. Running. 5.5% reply rate, 118 replies from 2,140 contacts.">
+          <span class="rl"><span class="nm">Neighbourhood report, monthly</span></span>
+          <span class="rt">Owns property · Opted in</span>
+          <span class="track" title="5.5% of a 6.0% target"><i style="--p:46%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>5.5%</b><em>reply rate</em></span>
+            <span><b>118</b><em>replies</em></span>
+            <span><b>2,140</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Neighbourhood report, monthly"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Listing alerts, saved search" data-playbook="1" data-aud="1860" data-rate="3.8" data-hit="0" data-rep="71" data-rule="Has saved search · Active buyer" aria-label="Listing alerts, saved search. Running. 3.8% reply rate, 71 replies from 1,860 contacts.">
+          <span class="rl"><span class="nm">Listing alerts, saved search</span></span>
+          <span class="rt">Has saved search · Active buyer</span>
+          <span class="track" title="3.8% of a 6.0% target"><i style="--p:32%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>3.8%</b><em>reply rate</em></span>
+            <span><b>71</b><em>replies</em></span>
+            <span><b>1,860</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Listing alerts, saved search"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Post-close, 12-month check-in" data-playbook="0" data-aud="412" data-rate="13.1" data-hit="1" data-rep="54" data-rule="Status is Closed · Closed 12m+ ago" aria-label="Post-close, 12-month check-in. Running. 13.1% reply rate, 54 replies from 412 contacts.">
+          <span class="rl"><span class="nm">Post-close, 12-month check-in</span></span>
+          <span class="rt">Status is Closed · Closed 12m+ ago</span>
+          <span class="track" title="13.1% of a 6.0% target"><i style="--p:100%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>13.1%</b><em>reply rate</em></span>
+            <span><b>54</b><em>replies</em></span>
+            <span><b>412</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Post-close, 12-month check-in"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="running" data-name="Anniversary of purchase" data-playbook="1" data-aud="690" data-rate="8.4" data-hit="1" data-rep="58" data-rule="Closed · Anniversary this month" aria-label="Anniversary of purchase. Running. 8.4% reply rate, 58 replies from 690 contacts.">
+          <span class="rl"><span class="nm">Anniversary of purchase</span></span>
+          <span class="rt">Closed · Anniversary this month</span>
+          <span class="track" title="8.4% of a 6.0% target"><i style="--p:70%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>8.4%</b><em>reply rate</em></span>
+            <span><b>58</b><em>replies</em></span>
+            <span><b>690</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Anniversary of purchase"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        </div>
+      </div>
+
+      <div class="grp tbl" data-tab="rules" data-status-group="paused" data-table>
+        <div class="gcard" role="list">
+        <div class="rowwrap"><button class="row" type="button" data-row data-kind="rules" data-status="paused" data-paused data-name="Cold list, last attempt" data-playbook="0" data-aud="1044" data-rate="2" data-hit="0" data-rep="21" data-rule="No contact 12m+ · Never replied" aria-label="Cold list, last attempt. Paused. 2% reply rate, 21 replies from 1,044 contacts.">
+          <span class="rl"><span class="nm">Cold list, last attempt</span></span>
+          <span class="rt">No contact 12m+ · Never replied</span>
+          <span class="track" title="2% of a 6.0% target"><i style="--p:17%"></i><s aria-hidden="true"></s></span>
+          <span class="specs">
+            <span><b>2%</b><em>reply rate</em></span>
+            <span><b>21</b><em>replies</em></span>
+            <span><b>1,044</b><em>contacts</em></span>
+          </span>
+        </button>
+          <button class="rmore" type="button" aria-label="More for Cold list, last attempt"><i class="ph ph-dots-three-vertical" aria-hidden="true"></i></button>
+        </div>
+        </div>
+      </div>
+
+      <div class="tbl" data-tab="once" hidden>
+        <div class="sec-head"><h2>One-off messages</h2><span class="n">2</span><button class="headact" type="button" data-new="once"><i class="ph ph-plus" aria-hidden="true"></i>New message</button></div>
+        <div class="gcard" role="list">
+          <button class="orow" type="button" data-once-name="Open house this Saturday" aria-label="Open house this Saturday. Sent to 214 clients, 9 replies, Tuesday.">
+            <span class="oic" aria-hidden="true"><i class="ph ph-paper-plane-tilt"></i></span>
+            <span class="obd"><span class="nm2">Open house this Saturday</span><span class="sub">Sent to 214 clients · 9 replies</span></span>
+            <span class="owhen">Tue<i class="ph ph-caret-right" aria-hidden="true"></i></span>
+          </button>
+          <button class="orow" type="button" data-once-name="Rate update for buyers" aria-label="Rate update for buyers. Sent to 1,860 clients, 42 replies, 28 August.">
+            <span class="oic" aria-hidden="true"><i class="ph ph-paper-plane-tilt"></i></span>
+            <span class="obd"><span class="nm2">Rate update for buyers</span><span class="sub">Sent to 1,860 clients · 42 replies</span></span>
+            <span class="owhen">28 Aug<i class="ph ph-caret-right" aria-hidden="true"></i></span>
+          </button>
+        </div>
+        <div class="empty" id="onceEmpty" hidden>
+          <span class="e-ic"><i class="ph ph-paper-plane-tilt"></i></span>
+          <span class="e-t">No one-off messages yet</span>
+          <span class="e-d">Pick a group of clients and Mel drafts the message. It goes out once and never joins a campaign.</span>
+          <button class="oncebtn" type="button" data-new="once"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i>New message</button>
+        </div>
+      </div>
+
+      <div class="empty" id="campEmpty" data-tab="rules" hidden>
+        <span class="e-ic"><i class="ph ph-megaphone"></i></span>
+        <span class="e-t">No campaigns yet</span>
+        <span class="e-d">A campaign keeps talking to everyone who matches — Mel writes each message and hands you the replies.</span>
+        <button class="oncebtn" type="button" data-new="rules"><i class="ph ph-plus" aria-hidden="true"></i>New campaign</button>
+        <button class="xlink" type="button" id="toOnce" hidden>You have <b id="xOnce">2</b> one-off messages<i class="ph ph-arrow-right" aria-hidden="true"></i></button>
+      </div>
+
+      <div class="empty" id="firstRun" hidden>
+        <span class="e-ic"><i class="ph ph-megaphone"></i></span>
+        <span class="e-t">Nothing is going out yet</span>
+        <span class="e-d">Start a campaign that keeps talking to a group as they match, or send one message once. Mel writes both.</span>
+        <button class="oncebtn" type="button" data-new="rules"><i class="ph ph-plus" aria-hidden="true"></i>New campaign</button>
+        <button class="ghostbtn" type="button" data-new="once"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i>Send a one-off message</button>
+      </div>
+
+      <div class="empty" id="empty" hidden>
+        <span class="e-ic"><i class="ph ph-megaphone"></i></span>
+        <span class="e-t">Nothing here</span>
+        <span class="e-d">No campaigns match this filter.</span>
+      </div>
+    </div>
+
+    <div class="dock">
+      <div class="sh-tabs" data-filter="kind" role="tablist" aria-label="Kind of outbound">
+        <button class="sh-tab" role="tab" data-val="rules" aria-selected="true">AI campaigns</button>
+        <button class="sh-tab" role="tab" data-val="once" aria-selected="false">One-time blast</button>
+      </div>
+      <button class="fab" type="button" id="fab" aria-label="New outbound" aria-haspopup="dialog">
+        <i class="ph ph-plus" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="kb" id="kb" aria-hidden="true" hidden>
+      <div class="kbrow"><button class="key" type="button" tabindex="-1">q</button><button class="key" type="button" tabindex="-1">w</button><button class="key" type="button" tabindex="-1">e</button><button class="key" type="button" tabindex="-1">r</button><button class="key" type="button" tabindex="-1">t</button><button class="key" type="button" tabindex="-1">y</button><button class="key" type="button" tabindex="-1">u</button><button class="key" type="button" tabindex="-1">i</button><button class="key" type="button" tabindex="-1">o</button><button class="key" type="button" tabindex="-1">p</button></div>
+      <div class="kbrow r2"><button class="key" type="button" tabindex="-1">a</button><button class="key" type="button" tabindex="-1">s</button><button class="key" type="button" tabindex="-1">d</button><button class="key" type="button" tabindex="-1">f</button><button class="key" type="button" tabindex="-1">g</button><button class="key" type="button" tabindex="-1">h</button><button class="key" type="button" tabindex="-1">j</button><button class="key" type="button" tabindex="-1">k</button><button class="key" type="button" tabindex="-1">l</button></div>
+      <div class="kbrow"><button class="key mod" type="button" tabindex="-1" data-k="shift" aria-label="Shift"><i class="ph ph-arrow-up" aria-hidden="true"></i></button><button class="key" type="button" tabindex="-1">z</button><button class="key" type="button" tabindex="-1">x</button><button class="key" type="button" tabindex="-1">c</button><button class="key" type="button" tabindex="-1">v</button><button class="key" type="button" tabindex="-1">b</button><button class="key" type="button" tabindex="-1">n</button><button class="key" type="button" tabindex="-1">m</button><button class="key mod" type="button" tabindex="-1" data-k="back" aria-label="Delete"><i class="ph ph-backspace" aria-hidden="true"></i></button></div>
+      <div class="kbrow"><button class="key mod" type="button" tabindex="-1" data-k="num">123</button><button class="key sp" type="button" tabindex="-1" data-k="space">space</button><button class="key go" type="button" tabindex="-1" data-k="go">Search</button></div>
+    </div>
+
+    <div class="scrim" id="scrim"></div>
+
+    <div class="sheet" id="newSheet" role="dialog" aria-modal="true" aria-labelledby="newSheetT" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="sh-name" id="newSheetT">New outbound</div>
+      <a class="act two" href="New campaign.html"><i class="ph ph-repeat" aria-hidden="true"></i><span class="lbl"><b>Add campaign rule</b><span>Mel keeps sending as people match the filters</span></span><i class="ph ph-caret-right chev" aria-hidden="true"></i></a>
+      <a class="act two" href="Send once.html?state=empty"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i><span class="lbl"><b>One-time blast</b><span>One message to a list, going out now</span></span><i class="ph ph-caret-right chev" aria-hidden="true"></i></a>
+    </div>
+
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shName" hidden>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="sh-name" id="shName">Campaign<span class="sh-sub" id="shSub"></span></div>
+      <button class="act" type="button" data-act="edit"><i class="ph ph-pencil-simple" aria-hidden="true"></i><span id="editLbl">Edit</span></button>
+      <button class="act" type="button" data-act="playbook" data-for="rules"><i class="ph ph-book-open-text" aria-hidden="true"></i><span id="pbLbl">View playbook</span></button>
+      <button class="act" type="button" data-act="pause" data-for="rules"><i class="ph ph-pause" aria-hidden="true"></i><span id="pauseLbl">Pause</span></button>
+      <button class="act" type="button" data-act="dup"><i class="ph ph-copy" aria-hidden="true"></i>Duplicate</button>
+      <div class="sep" aria-hidden="true"></div>
+      <button class="act del" type="button" data-act="del"><i class="ph ph-trash" aria-hidden="true"></i>Delete</button>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="assets/list-page.js"></script>
+<script>
+(function(){
+  var toastEl=document.getElementById('toast'), tt;
+  function toast(m){ toastEl.textContent=m; toastEl.classList.add('on'); clearTimeout(tt); tt=setTimeout(function(){ toastEl.classList.remove('on'); },2600); }
+  var TARGET=6.0;
+
+  /* tab-scoped chrome */
+  function syncTab(){
+    var sel=document.querySelector('.sh-tab[aria-selected="true"]');
+    var val=sel?sel.getAttribute('data-val'):'rules';
+    [].forEach.call(document.querySelectorAll('[data-tab]:not(.grp)'),function(el){ el.hidden=el.getAttribute('data-tab')!==val; });
+    if(val==='once'&&fbar){ var onp=fbar.querySelector('[aria-pressed="true"]'); if(onp) onp.click(); }
+    else if(fbar&&!fbar.querySelector('[aria-pressed="true"]')) fbar.querySelector('[data-val="running"]').click();
+    /* the blast tab has no [data-row] rows, so the shared filter's count and
+       empty state do not describe it — own them here. */
+    var cEl=document.getElementById('count'), eEl=document.getElementById('empty');
+    if(val==='once'){
+      var sent=document.querySelectorAll('.orow').length;
+      if(cEl){ cEl.textContent=sent; cEl.setAttribute('aria-label',sent+' sent messages'); }
+      if(eEl) eEl.hidden=true;
+      [].forEach.call(document.querySelectorAll('.grp'),function(g){ g.hidden=true; });
+    } else if(cEl){
+      var live=[].slice.call(document.querySelectorAll('[data-row][data-kind="rules"]')).filter(function(r){ return !r.hidden; }).length;
+      cEl.textContent=live; cEl.setAttribute('aria-label',live+' campaigns');
+    }
+
+  }
+  document.querySelector('.sh-tabs').addEventListener('click',function(){ setTimeout(syncTab,0); });
+  document.addEventListener('click',function(ev){ if(ev.target.closest('.fpill')) setTimeout(syncTab,0); });
+  document.querySelector('.sh-tabs').addEventListener('keydown',function(){ setTimeout(syncTab,0); });
+  syncTab();
+
+  /* status pills (list-page.js owns the actual filtering via data-filter="status") */
+  var fbar=document.getElementById('fbar'), scrim=document.getElementById('scrim');
+  function hasSt(r,s){ return (r.getAttribute('data-status')||'').split(' ').indexOf(s)>-1; }
+  function pillCounts(){
+    var rows=[].slice.call(document.querySelectorAll('[data-row][data-kind="rules"]'));
+    [].forEach.call(fbar.querySelectorAll('.fpill'),function(b){
+      var v=b.getAttribute('data-val');
+      b.querySelector('.fn').textContent=rows.filter(function(r){ return hasSt(r,v); }).length;
+    });
+  }
+  pillCounts();
+  document.addEventListener('click',function(ev){
+    if(ev.target.closest('[data-resolve]')){ var c=fbar.querySelector('[data-val="running"]'); if(c&&c.getAttribute('aria-pressed')!=='true') c.click(); document.querySelector('.scroll').scrollTop=0; }
+  });
+  var h=(location.hash||'').replace('#','');
+  if(h==='paused'||h==='running'){ var c0=fbar.querySelector('[data-val="'+h+'"]'); if(c0&&c0.getAttribute('aria-pressed')!=='true') c0.click(); }
+
+  /* generic toasts */
+  document.addEventListener('click',function(ev){ var b=ev.target.closest('[data-toast]'); if(b) toast(b.getAttribute('data-toast')); });
+
+  /* row → action sheet */
+  var sheet=document.getElementById('sheet'), cur=null, lastFocus=null;
+
+  /* a sheet is never shown over the keyboard — drop it, whatever opened */
+  function dropKb(){
+    if(window.soCloseSearch) window.soCloseSearch();
+    var sc=document.querySelector('.screen'), kbEl=document.getElementById('kb');
+    if(sc) sc.removeAttribute('data-kb');
+    if(kbEl){ kbEl.setAttribute('aria-hidden','true'); kbEl.hidden=true; }
+    var a=document.activeElement; if(a&&a.tagName==='INPUT') a.blur();
+  }
+
+  /* fab → pick what kind of outbound */
+  var newSheet=document.getElementById('newSheet');
+  document.getElementById('fab').addEventListener('click',function(){
+    dropKb();
+    lastFocus=this; newSheet.hidden=false;
+    requestAnimationFrame(function(){ newSheet.classList.add('on'); scrim.classList.add('on'); });
+    newSheet.querySelector('.act').focus();
+  });
+  function closeNew(){ newSheet.classList.remove('on'); scrim.classList.remove('on'); setTimeout(function(){ newSheet.hidden=true; },300); if(lastFocus) lastFocus.focus(); }
+  newSheet.addEventListener('click',function(ev){
+    if(ev.target.closest('a.act')) closeNew();
+  });
+  function openSheet(row){
+    dropKb();
+    cur=row; lastFocus=row;
+    var once=row.getAttribute('data-kind')==='once', paused=row.hasAttribute('data-paused'), pb=row.getAttribute('data-playbook')==='1';
+    var aud=Number(row.getAttribute('data-aud')).toLocaleString('en-US'), rep=row.getAttribute('data-rep'), rate=row.getAttribute('data-rate');
+    document.getElementById('shName').firstChild.textContent=row.getAttribute('data-name');
+    document.getElementById('shSub').textContent=(once?'Sent to '+aud:aud+' in audience')+' · '+rep+' replies · '+rate+'%';
+    document.getElementById('editLbl').textContent=once?'Edit and send again':'Edit';
+    document.getElementById('pbLbl').textContent=pb?'View playbook':'Upload playbook';
+    document.querySelector('[data-act="playbook"] i').className='ph '+(pb?'ph-book-open-text':'ph-upload-simple');
+    document.getElementById('pauseLbl').textContent=paused?'Resume':'Pause';
+    document.querySelector('[data-act="pause"] i').className='ph '+(paused?'ph-play':'ph-pause');
+    [].forEach.call(sheet.querySelectorAll('[data-for="rules"]'),function(a){ a.hidden=once; });
+    sheet.hidden=false;
+    requestAnimationFrame(function(){ sheet.classList.add('on'); scrim.classList.add('on'); });
+    sheet.querySelector('.act').focus();
+  }
+  function closeSheet(){ sheet.classList.remove('on'); scrim.classList.remove('on'); setTimeout(function(){ sheet.hidden=true; },300); if(lastFocus) lastFocus.focus(); cur=null; }
+  document.addEventListener('click',function(ev){
+    var m=ev.target.closest('.rmore');
+    if(m){ var wrap=m.closest('.rowwrap'), row=wrap&&wrap.querySelector('.row'); if(row) openSheet(row); else console.warn('[rmore] no row in wrapper'); return; }
+    var r=ev.target.closest('.row');
+    if(r){ location.href='New campaign.html?c='+encodeURIComponent(r.getAttribute('data-name')||''); return; }
+    var o=ev.target.closest('.orow');
+    if(o){ location.href='Send once.html?state=report'; return; }
+    if(ev.target.closest('.oncebtn')) location.href='Send once.html?state=empty';
+  });
+
+  /* ── search: iOS field + on-screen keyboard ── */
+  (function(){
+    var screenEl=document.querySelector('.screen'), head=document.getElementById('pgHead');
+    var btn=document.getElementById('srchBtn'), field=document.getElementById('srchField');
+    var inp=document.getElementById('srch'), clr=document.getElementById('srchClear');
+    var cancel=document.getElementById('srchCancel'), kb=document.getElementById('kb');
+    if(!screenEl||!head||!btn||!inp||!kb){ console.warn('[search] missing nodes'); return; }
+    var shift=false;
+    function openS(){
+      head.setAttribute('data-search','on'); btn.setAttribute('aria-expanded','true');
+      kb.hidden=false; screenEl.setAttribute('data-kb','on'); kb.setAttribute('aria-hidden','false');
+      inp.focus(); inp.select();
+    }
+    function closeS(){
+      head.removeAttribute('data-search'); btn.setAttribute('aria-expanded','false');
+      screenEl.removeAttribute('data-kb'); kb.setAttribute('aria-hidden','true'); kb.hidden=true;
+      inp.value=''; paint(); filter(); btn.focus();
+    }
+    function paint(){ field.classList.toggle('has', inp.value.length>0); }
+    function filter(){
+      var q=inp.value.trim().toLowerCase();
+      [].forEach.call(document.querySelectorAll('.rowwrap'),function(w){
+        var row=w.querySelector('.row'); if(!row) return;
+        var hay=((row.getAttribute('data-name')||'')+' '+(row.getAttribute('data-rule')||'')).toLowerCase();
+        w.setAttribute('data-hidesearch', String(q!=='' && hay.indexOf(q)<0));
+        w.style.display = (q!=='' && hay.indexOf(q)<0) ? 'none' : '';
+      });
+      var none=document.getElementById('empty'), any=false;
+      [].forEach.call(document.querySelectorAll('.rowwrap'),function(w){ if(w.style.display!=='none') any=true; });
+      if(none && q!=='') none.hidden=any;
+    }
+    btn.addEventListener('click',openS);
+    cancel.addEventListener('click',closeS);
+    window.soCloseSearch=function(){ if(screenEl.getAttribute('data-kb')==='on'||head.getAttribute('data-search')==='on') closeS(); };
+    clr.addEventListener('click',function(){ inp.value=''; paint(); filter(); inp.focus(); });
+    inp.addEventListener('input',function(){ paint(); filter(); });
+    inp.addEventListener('keydown',function(e){ if(e.key==='Escape') closeS(); });
+    kb.addEventListener('pointerdown',function(e){ e.preventDefault(); });
+    kb.addEventListener('click',function(e){
+      var k=e.target.closest('.key'); if(!k) return;
+      var role=k.getAttribute('data-k');
+      if(role==='back') inp.value=inp.value.slice(0,-1);
+      else if(role==='space') inp.value+=' ';
+      else if(role==='go'){ inp.blur(); screenEl.removeAttribute('data-kb'); kb.setAttribute('aria-hidden','true'); kb.hidden=true; return; }
+      else if(role==='shift'){ shift=!shift; k.style.background=shift?'#E8E8ED':''; k.style.color=shift?'#1C1C20':''; return; }
+      else if(role==='num'){ toast('Number keys are not wired in this prototype'); return; }
+      else { var ch=k.textContent.trim(); inp.value+= shift?ch.toUpperCase():ch; if(shift){ shift=false; var sk=kb.querySelector('[data-k="shift"]'); if(sk){ sk.style.background=''; sk.style.color=''; } } }
+      paint(); filter();
+    });
+  })();
+  scrim.addEventListener('click',function(){ if(cur) closeSheet(); else if(newSheet.classList.contains('on')) closeNew(); else scrim.classList.remove('on'); });
+  document.addEventListener('keydown',function(ev){ if(ev.key!=='Escape') return; if(cur) closeSheet(); else if(newSheet.classList.contains('on')) closeNew(); });
+  function resync(){
+    [].forEach.call(document.querySelectorAll('.grp'),function(g){
+      var vis=[].slice.call(g.querySelectorAll('[data-row]')).filter(function(r){ return !r.hidden; });
+      g.hidden = vis.length===0;
+      var n=g.querySelector('.sec-head .n'); if(n) n.textContent=vis.length;
+    });
+    pillCounts();
+  }
+  function setStatus(row,st){
+    row.setAttribute('data-status', st==='waiting' ? 'running waiting' : st);
+    if(st==='paused') row.setAttribute('data-paused',''); else row.removeAttribute('data-paused');
+    if(st==='waiting') row.setAttribute('data-attention',''); else row.removeAttribute('data-attention');
+    row.setAttribute('aria-label', row.getAttribute('aria-label').replace(/(Running|Waiting on you|Paused)\./, (st==='waiting'?'Waiting on you':st==='paused'?'Paused':'Running')+'.'));
+    var g=document.querySelector('.grp[data-status-group="'+st+'"] .gcard');
+    if(g && row.parentNode!==g) g.appendChild(row);
+    resync();
+  }
+  sheet.addEventListener('click',function(ev){
+    var a=ev.target.closest('.act'); if(!a||!cur) return;
+    var act=a.getAttribute('data-act'), name=cur.getAttribute('data-name'), row=cur;
+    closeSheet();
+    if(act==='edit'){ location.href = row.getAttribute('data-kind')==='once' ? 'Send once.html?state=report' : 'New campaign.html?c='+encodeURIComponent(name); }
+    else if(act==='playbook'){ if(row.getAttribute('data-playbook')==='1') location.href='Playbook.html'; else toast('Add a script, listing sheet, or your notes'); }
+    else if(act==='dup') toast('Duplicated “'+name+'” as a draft');
+    else if(act==='del'){
+      var wrap=row.closest('.rowwrap');
+      if(wrap) wrap.remove();
+      toast('Deleted “'+name+'”');
+      if(window.__refreshStates) window.__refreshStates();
+    }
+    else if(act==='pause'){
+      var paused=row.hasAttribute('data-paused');
+      setStatus(row, paused ? (row.getAttribute('data-prev')||'running') : (row.setAttribute('data-prev','running'),'paused'));
+      toast(paused?'Campaign resumed':'Paused — nothing sends until you resume');
+      var on=fbar.querySelector('[aria-pressed="true"]'); if(on){ on.click(); on.click(); }
+    }
+  });
+  /* one card, metric chips */
+  var METRICS=[
+    {name:'Contacts in a campaign',icon:'users-three',val:14337,dec:0,suf:'',delta:'+412',dir:'up',foot:'<b>1,102</b>shared with the team',bg:'--tint-indigo-bg',fg:'--tint-indigo-fg',s:[52,58,63,72,80,86,100]},
+    {name:'Replies per message',icon:'chats-circle',val:5.8,dec:1,suf:'%',delta:'+0.4',dir:'up',foot:'<b>6.0%</b>reply-rate target',bg:'--tint-green-bg',fg:'--tint-green-fg',s:[88,70,81,59,72,44,63]},
+    {name:'Messages sent by Mel',icon:'paper-plane-tilt',val:4180,dec:0,suf:'',delta:'−6%',dir:'down',foot:'<b>597</b>messages a day',bg:'--tint-violet-bg',fg:'--tint-violet-fg',s:[54,92,71,86,62,31,40]},
+    {name:'Appointments booked',icon:'calendar-check',val:68,dec:0,suf:'',delta:'+5',dir:'up',foot:'<b>12</b>booked this week',bg:'--tint-gold-bg',fg:'--tint-gold-fg',s:[38,60,48,90,66,26,52]},
+    {name:'Opted out',icon:'user-minus',val:0.4,dec:1,suf:'%',delta:'−0.1',dir:'up',foot:'<b>31</b>opted out in 30 days',bg:'--muted',fg:'--muted-foreground',s:[30,20,45,25,15,34,19]}
+  ];
+  var W=260,H=60,N=7,CX=[],mCur=null,curY=[],raf=0;
+  function toY(s){ var mn=Math.min.apply(null,s),mx=Math.max.apply(null,s),sp=(mx-mn)||1; return s.map(function(v){ return 52-((v-mn)/sp)*44; }); }
+  var lineEl=document.getElementById('mLine'), areaEl=document.getElementById('mArea'), dotsEl=document.getElementById('mDots'), chartEl=document.getElementById('mChart');
+  for(var d0=0;d0<N;d0++){ var c0=document.createElementNS('http://www.w3.org/2000/svg','circle'); c0.setAttribute('r',d0===N-1?3.6:2.8); c0.setAttribute('fill',d0===N-1?'currentColor':'var(--card)'); c0.setAttribute('stroke','currentColor'); c0.setAttribute('stroke-width','1.8'); dotsEl.appendChild(c0); }
+  /* the sparkline spans the card's content width — its user space IS its pixel width, so it never gets letterboxed */
+  function measure(){
+    var w=Math.round(chartEl.getBoundingClientRect().width)||260;
+    if(w===W && CX.length) return false;
+    W=w; chartEl.setAttribute('viewBox','0 0 '+W+' '+H);
+    CX=[]; for(var q=0;q<N;q++) CX.push(+(q*(W-8)/(N-1)+4).toFixed(1));
+    [].forEach.call(dotsEl.children,function(c,i){ c.setAttribute('cx',CX[i]); });
+    return true;
+  }
+  function paint(ys){
+    lineEl.setAttribute('points', ys.map(function(y,i){ return CX[i]+','+y.toFixed(1); }).join(' '));
+    areaEl.setAttribute('d','M'+CX[0]+' '+ys[0].toFixed(1)+' '+ys.slice(1).map(function(y,i){ return 'L'+CX[i+1]+' '+y.toFixed(1); }).join(' ')+' L'+CX[N-1]+' '+H+' L'+CX[0]+' '+H+' Z');
+    [].forEach.call(dotsEl.children,function(c,i){ c.setAttribute('cy',ys[i].toFixed(1)); });
+  }
+  function fmt(v,dec,suf){ return v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+suf; }
+  function show(i){
+    if(i===mCur) return;
+    var m=METRICS[i], from=curY.slice(), to=toY(m.s), t0=performance.now(), dur=420;
+    var fromVal=mCur===null?0:METRICS[mCur].val, toVal=m.val;
+    document.getElementById('mIcon').className='ph ph-'+m.icon;
+    document.getElementById('mTitle').textContent=m.name;
+    document.querySelector('.mcard .tile').style.cssText='background:var('+m.bg+');color:var('+m.fg+')';
+    chartEl.style.color='var('+m.fg+')';
+    var dl=document.getElementById('mDelta');
+    dl.className='delta '+m.dir; dl.innerHTML='<i class="ph ph-trend-'+m.dir+'" aria-hidden="true"></i>'+m.delta;
+    var ft=document.getElementById('mFoot'); ft.innerHTML=m.foot; ft.classList.remove('swap'); void ft.offsetWidth; ft.classList.add('swap');
+    var vEl=document.getElementById('mVal');
+    cancelAnimationFrame(raf);
+    (function step(now){
+      var p=Math.min(1,(now-t0)/dur), ez=1-Math.pow(1-p,3);
+      paint(to.map(function(y,k){ return from.length? from[k]+(y-from[k])*ez : y; }));
+      vEl.textContent=fmt(fromVal+(toVal-fromVal)*ez, m.dec, m.suf);
+      if(p<1) raf=requestAnimationFrame(step); else { curY=to; vEl.textContent=fmt(toVal,m.dec,m.suf); }
+    })(performance.now());
+    mCur=i;
+    var mc=document.getElementById('mcard'); mc.classList.remove('rise'); void mc.offsetWidth; mc.classList.add('rise');
+    [].forEach.call(document.querySelectorAll('#dots .pdot'),function(b,n){ b.setAttribute('aria-current',String(n===i)); });
+  }
+  document.getElementById('dots').addEventListener('click',function(ev){ var b=ev.target.closest('.pdot'); if(b) show(+b.getAttribute('data-i')); });
+  /* swipe the deck — the next card rises out of the stack */
+  (function(){
+    var deck=document.getElementById('deck'), card=document.getElementById('mcard');
+    var sx=0,sy=0,dx=0,on=false,axis=null;
+    deck.addEventListener('pointerdown',function(e){ if(e.pointerType==='mouse'&&e.button!==0) return; sx=e.clientX; sy=e.clientY; dx=0; on=true; axis=null; });
+    window.addEventListener('pointermove',function(e){
+      if(!on) return;
+      var mx=e.clientX-sx, my=e.clientY-sy;
+      if(axis===null){ if(Math.abs(mx)<6&&Math.abs(my)<6) return; axis=Math.abs(mx)>Math.abs(my)?'x':'y'; if(axis==='y'){ on=false; return; } deck.classList.add('drag'); card.classList.remove('rise'); card.style.transition='none'; }
+      dx=mx;
+      card.style.transform='translateX('+(mx*.5)+'px)';
+      card.style.opacity=String(1-Math.min(.3,Math.abs(mx)/600));
+    });
+    window.addEventListener('pointerup',function(){
+      if(!on) return; on=false; deck.classList.remove('drag');
+      card.style.transition=''; card.style.transform=''; card.style.opacity='';
+      if(Math.abs(dx)>44) show((mCur+(dx<0?1:METRICS.length-1))%METRICS.length);
+      dx=0;
+    });
+  })();
+  /* ── empty states, driven by what is actually in the list ── */
+  (function(){
+    var $=function(id){ return document.getElementById(id); };
+    function tabVal(){ var t=document.querySelector('.sh-tab[aria-selected="true"]'); return t?t.getAttribute('data-val'):'rules'; }
+    function refresh(){
+      var nCamp=document.querySelectorAll('.rowwrap .row[data-kind="rules"]').length,
+          nOnce=document.querySelectorAll('.orow').length,
+          val=tabVal(), fab=document.querySelector('.fab'),
+          ov=document.querySelector('.ov[data-tab="rules"]'), fb=$('fbar'),
+          onceTbl=document.querySelector('.tbl[data-tab="once"]'),
+          cEl=$('count');
+
+      if(ov) ov.hidden = nCamp===0 || val!=='rules';
+      if(fb) fb.hidden = nCamp===0 || val!=='rules';
+      if(nCamp===0){
+        [].forEach.call(document.querySelectorAll('.grp'),function(g){ g.hidden=true; });
+        if($('empty')) $('empty').hidden=true;
+      }
+      if(onceTbl){
+        onceTbl.querySelector('.gcard').hidden = nOnce===0;
+        onceTbl.querySelector('.sec-head').hidden = nOnce===0;
+        onceTbl.querySelector('.sec-head .n').textContent = nOnce;
+      }
+
+      var firstRun = nCamp===0 && nOnce===0;
+      $('firstRun').hidden = !firstRun;
+      $('campEmpty').hidden = firstRun || nCamp>0 || val!=='rules';
+      $('onceEmpty').hidden = firstRun || nOnce>0 || val!=='once';
+      $('toOnce').hidden = nOnce===0;
+      $('xOnce').textContent = nOnce;
+      if(firstRun) document.querySelector('.dock .sh-tabs').hidden=true;
+
+      /* one CTA only: the empty state owns it, so the floating plus steps aside */
+      if(fab) fab.hidden = firstRun || (val==='rules'&&nCamp===0) || (val==='once'&&nOnce===0);
+
+      if(cEl && val==='rules' && nCamp===0){ cEl.textContent='0'; cEl.setAttribute('aria-label','no campaigns'); }
+      if(cEl && val==='once'){ cEl.textContent=nOnce; cEl.setAttribute('aria-label',nOnce+' one-off messages'); }
+    }
+    window.__refreshStates=refresh;
+    $('toOnce').addEventListener('click',function(){
+      var t=document.querySelector('.sh-tab[data-val="once"]'); if(t) t.click();
+      document.querySelector('.scroll').scrollTop=0; setTimeout(refresh,10);
+    });
+    document.querySelector('.sh-tabs').addEventListener('click',function(){ setTimeout(refresh,10); });
+    document.addEventListener('click',function(ev){ if(ev.target.closest('.fpill')) setTimeout(refresh,10); });
+    refresh();
+  })();
+
+  measure(); curY=toY(METRICS[0].s); paint(curY); mCur=0;
+  window.addEventListener('resize',function(){ if(measure()&&curY.length) paint(curY); });
+  document.querySelector('.sh-tabs').addEventListener('click',function(){ setTimeout(function(){ if(measure()&&curY.length) paint(curY); },0); });
+})();
+</script>
+</body>
+</html>
