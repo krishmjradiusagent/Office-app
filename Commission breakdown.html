@@ -2347,7 +2347,7 @@ Thanks</textarea></div>
     rows.push({ head: 'Commission', cardhide: true });
     rows.push({ k: 'Sale price', v: cur(price), cardhide: true });
     rows.push({ k: 'Commission %', v: '2.0%', cardhide: true });
-    var basisDetails = DEDS.mine.filter(function (d) { return d.kind === 'credit' || d.kind === 'presplit'; }).map(function (d) {
+    var basisDetails = DEDS.mine.filter(function (d) { return d.kind === 'credit'; }).map(function (d) {
       return { k: d.name, v: neg(d.amt * share) };
     });
     rows.push({ k: 'Gross commission after deduction', sub2: 'After credits and pre-split deductions', v: cur(commissionBeforeSplit) });
@@ -3428,7 +3428,23 @@ Thanks</textarea></div>
   }
   /* the map from a chain row to the sheet that owns it — null means the number
      is derived or set by the plan, so there is nothing to open */
+  function ybdPreSplitGroup() {
+    var participant = role === 'agent' || role === 'group_agent' || role === 'group_lead_agent',
+        agent = AG.mine.filter(function (a) { return a.me; })[0] || AG.mine[0],
+        share = participant && agent ? Math.max(0, Number(agent.allocation == null ? 100 / (AG.mine.length || 1) : agent.allocation)) / 100 : 1;
+    return {
+      key: 'pre', label: 'Pre-split deductions', showEmpty: true,
+      sideContext: !participant,
+      rows: DEDS.mine.filter(function (d) { return d.kind === 'presplit'; }).map(function (d) {
+        var amount = d.amt * share;
+        return { k: d.name, v: neg(amount), amt: amount, preDed: participant ? d.id : null,
+          det: [{ k: participant ? 'Your share' : 'Side deduction', v: cur(amount) },
+                { k: 'Paid to', v: d.payee || 'Not specified' }] };
+      })
+    };
+  }
   function ybdFullTarget(r) {
+    if (r.preDed) return { 'data-editded': 'mine|' + r.preDed };
     /* three seeded deductions carry no id, so there is no sheet to open for
        them — they stay locked rather than becoming a target that does nothing */
     if (r.post && r.list) return r.post.id ? { 'data-editpost': r.post.id, 'data-list': r.list } : null;
@@ -3685,6 +3701,7 @@ Thanks</textarea></div>
          second "pre-split" subtotal from these groups: that made the screen
          look as if the same fees were removed twice even though the final
          agent net only subtracts them once. */
+      groups.unshift(ybdPreSplitGroup());
       groups.forEach(function (g) {
         g.amt = g.rows.reduce(function (t, r) { return t + (r.amt || 0); }, 0);
       });
@@ -3703,7 +3720,7 @@ Thanks</textarea></div>
         det.appendChild(iss);
       }
       groups.forEach(function (g) {
-        if (!g.rows.length) return;
+        if (!g.rows.length && !g.showEmpty) return;
         var open = !!ybdGrp[g.key],
             gid = 'ybdG' + g.key,
             gb = document.createElement('button');
@@ -3721,6 +3738,11 @@ Thanks</textarea></div>
         var box = document.createElement('div');
         box.className = 'd-fees' + (g.key === 'basis' ? ' basis-fees' : ''); box.id = gid; box.hidden = !open;
         g.rows.forEach(function (r) { ybdFeeEl(r, box); });
+        if (g.showEmpty && (!g.rows.length || g.sideContext)) {
+          var note = document.createElement('p'); note.className = 'ybd-note';
+          note.textContent = !g.rows.length ? 'No pre-split deductions' : 'Side deductions already included before team and group commission.';
+          box.appendChild(note);
+        }
         gb.addEventListener('click', function (e) {
           e.stopPropagation();
           var now = gb.getAttribute('aria-expanded') !== 'true';
