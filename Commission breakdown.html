@@ -7,6 +7,11 @@
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
 <link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/colors.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/typography.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/radius.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/radius-ui-design-system-c7220bb1-3534-4549-94e9-dd1c4d80b981/components/components.css">
 <link rel="stylesheet" href="assets/list-page.css">
 <style>
 /* commission breakdown — mobile. Glass chrome (head + action bar) over solid cards,
@@ -682,9 +687,9 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .sheet .foot .prim:focus-visible { outline:2px solid var(--ring); outline-offset:3px; }
 .sheet .foot .full-link { flex:none; min-height:46px; padding:0 14px; border-radius:999px; border:1px solid var(--border); color:var(--foreground); text-decoration:none; display:inline-flex; align-items:center; justify-content:center; font:600 14px/1 var(--font); }
 .activity-compose { flex:none; position:relative; display:flex; align-items:flex-end; gap:8px; margin:8px -2px -4px; padding:10px 2px 2px; background:linear-gradient(to bottom, transparent, var(--card) 20%); }
-.sheet .activity-compose textarea { flex:1; min-width:0; min-height:44px; height:44px; max-height:120px; margin:0; padding:11px 12px; }
+.sheet .activity-compose textarea { flex:1; min-width:0; min-height:36px; height:36px; max-height:120px; margin:0; padding:7px 10px; }
 .activity-compose .send { flex:none; width:44px; height:44px; border:0; border-radius:999px; background:var(--primary); color:#fff; font-size:18px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
-.sheet textarea { width:100%; min-height:96px; margin-top:8px; padding:11px 12px; border-radius:var(--radius-md); border:1px solid var(--input); background:var(--background); color:var(--foreground); font:400 16px/1.45 var(--font); resize:none; }
+.sheet textarea { width:100%; min-height:72px; margin-top:8px; padding:8px 12px; border-radius:var(--radius-input); border:1px solid var(--input); background:var(--background); color:var(--foreground); font:400 var(--text-body)/var(--leading-body) var(--font); resize:vertical; box-shadow:var(--shadow-xs); }
 .sheet textarea:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
 .sheet label:not(.fld) { display:block; font:600 13px/1.2 var(--font); color:var(--muted-foreground); }
 .sheet .note { margin:8px 10px 0; padding:11px 12px; border-radius:var(--radius-md); background:var(--muted); font:500 13px/1.45 var(--font); color:var(--muted-foreground); text-wrap:pretty; }
@@ -745,8 +750,8 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 @media (prefers-reduced-motion: reduce) {
   .screen[data-sheet-style="skiper22"] .sheet { transition:none; }
 }
-.sfield { position:relative; display:flex; align-items:center; gap:8px; margin:6px 10px 4px; padding:0 12px; min-height:44px; border-radius:var(--radius-lg); background:var(--muted); box-shadow:inset 0 0 0 1px var(--border); }
-.sfield > i { flex:none; font-size:17px; color:var(--muted-foreground); }
+.sfield { position:relative; display:flex; align-items:center; gap:8px; margin:6px 10px 4px; padding:0 8px; min-height:32px; border-radius:var(--radius-input); }
+.sfield > i { flex:none; font-size:15px; color:var(--muted-foreground); }
 .sfield input { flex:1; min-width:0; border:0; background:transparent; color:var(--foreground); font:400 16px/1.3 var(--font); caret-color:var(--primary); -webkit-appearance:none; appearance:none; }
 .sfield input::placeholder { color:var(--muted-foreground); }
 .sfield input::-webkit-search-cancel-button { display:none; }
@@ -761,53 +766,46 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .picked button:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
 .sheet .act .ini { flex:none; width:28px; height:28px; border-radius:999px; background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); font:600 12px/1 var(--font); display:inline-flex; align-items:center; justify-content:center; }
 .sheet .prim:disabled { opacity:.45; }
-.fields { display:flex; flex-direction:column; gap:26px; padding:12px 10px 2px; }
+.fields { display:flex; flex-direction:column; gap:16px; padding:12px 10px 2px; }
 .fld { display:flex; flex-direction:column; align-items:stretch; gap:6px; }
 .fld > span:first-child { width:auto; padding-left:2px; font:600 13px/1.2 var(--font); letter-spacing:.005em; color:var(--muted-foreground); }
-.fld input { width:100%; min-height:52px; padding:0 16px; border:0; border-radius:var(--radius-lg); background:var(--muted); box-shadow:inset 0 0 0 1px var(--input-stroke); color:var(--foreground); font:500 17px/normal var(--font); text-align:left; caret-color:var(--primary); -webkit-appearance:none; appearance:none; box-sizing:border-box; transition:box-shadow 140ms var(--ease-out); }
-.fld input::placeholder { color:var(--input-placeholder); font-weight:400; }
-.fld input:hover { box-shadow:inset 0 0 0 1px var(--input-stroke-hover); }
-.fld input:focus { outline:none; box-shadow:inset 0 0 0 2px var(--ring); }
+.fld .rds-input { caret-color:var(--primary); text-align:left; }
 .fld .amt { position:relative; display:block; }
-.fld .amt i { position:absolute; left:16px; top:50%; transform:translateY(-50%); font-style:normal; font:600 18px/1 var(--font); color:var(--input-placeholder); pointer-events:none; transition:color 140ms var(--ease-out); }
+.fld .amt i { position:absolute; left:10px; top:50%; transform:translateY(-50%); font-style:normal; font:600 14px/1 var(--font); color:var(--input-placeholder); pointer-events:none; transition:color 140ms var(--ease-out); }
 /* a percentage reads as a suffix, a dollar sign as a prefix — same field, unit swaps sides */
-.fld .amt.suffix i { left:auto; right:16px; }
-.fld .amt.suffix input { padding-left:16px; padding-right:40px; }
-.fld .amt input { width:100%; padding-left:34px; font:700 22px/normal var(--font-hubot); letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
+.fld .amt.suffix i { left:auto; right:10px; }
+.fld .amt.suffix input { padding-left:12px; padding-right:28px; }
+.fld .amt input { width:100%; padding-left:28px; font:600 var(--text-body)/var(--leading-body) var(--font); font-variant-numeric:tabular-nums; }
 .fld .amt input:not(:placeholder-shown) + i, .fld .amt:focus-within i { color:var(--foreground); }
 .fld .amt:focus-within i { color:var(--foreground); }
-.toggle-group { display:flex; flex-direction:column; gap:8px; }
-.fld.row { flex-direction:row; align-items:center; justify-content:space-between; gap:12px; min-height:44px; padding:0 2px; }
-.fld.row > span:first-child { font:500 15px/1.3 var(--font); }
-.switch-hit { position:relative; width:51px; height:44px; flex:none; }
-.switch-hit input { position:absolute; inset:0; z-index:1; width:51px; min-height:44px; height:44px; margin:0; padding:0; border:0; border-radius:999px; opacity:0; cursor:pointer; }
-.switch-track { position:absolute; left:0; top:6px; width:51px; height:32px; border-radius:999px; background:var(--muted); box-shadow:inset 0 0 0 1px var(--input-stroke); pointer-events:none; transition:background 140ms var(--ease-out), box-shadow 140ms var(--ease-out); }
-.switch-track::after { content:''; position:absolute; left:3px; top:3px; width:26px; height:26px; border-radius:50%; background:var(--foreground); box-shadow:0 1px 3px rgba(0,0,0,.35); transition:transform 140ms var(--ease-out); }
-.switch-hit input:checked + .switch-track { background:var(--primary); box-shadow:inset 0 0 0 1px rgba(255,255,255,.12); }
-.switch-hit input:checked + .switch-track::after { transform:translateX(19px); background:#fff; }
-.switch-hit input:focus-visible + .switch-track { outline:2px solid var(--ring); outline-offset:2px; }
-.switch-hit input:active + .switch-track::after { width:29px; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.toggle-group { display:none; flex-direction:column; gap:0; margin:0; padding:0 12px; border:1px solid var(--border); border-radius:var(--radius-card); background:var(--background); }
+.toggle-group:has(.fld.row:not([hidden])) { display:flex; }
+.fld.row { flex-direction:row; align-items:center; justify-content:flex-start; gap:10px; min-height:44px; padding:0; cursor:pointer; }
+.fld.row + .fld.row { border-top:1px solid var(--border); }
+.fld.row > span { order:2; padding:0; color:var(--foreground); font:500 14px/1.3 var(--font); }
+.fld.row .rds-checkbox { order:1; }
 #dedKindNote { margin:12px 12px 0 12px; padding:0; background:transparent; font:500 13px/1.45 var(--font); color:var(--muted-foreground); }
-.seg.kind { margin:0; padding:5px; }
-.seg.kind button { height:42px; font-size:15px; transition:background 140ms var(--ease-out), color 140ms var(--ease-out), transform 140ms var(--ease-out); }
+.seg.kind { margin:0; padding:2px; }
+.seg.kind button { height:32px; font-size:13px; transition:background 140ms var(--ease-out), color 140ms var(--ease-out), transform 140ms var(--ease-out); }
 .seg.kind button:active { transform:scale(.98); }
 .fld .err, .fld .hintl { padding-left:2px; font:500 13px/1.4 var(--font); text-wrap:pretty; }
 .fld .hintl { color:var(--muted-foreground); }
 .fld .err { display:none; color:var(--tint-red-fg); }
 .fld.bad .err { display:block; }
 .fld.bad .hintl { display:none; }
-.fld.bad input { box-shadow:inset 0 0 0 2px var(--tint-red-fg); }
+.fld.bad .rds-input { border-color:var(--destructive); box-shadow:0 0 0 3px color-mix(in srgb,var(--destructive) 18%,transparent); }
 .fld.bad .seg { box-shadow:inset 0 0 0 2px var(--tint-red-fg); }
 .fld.bad .ddbtn { box-shadow:inset 0 0 0 2px var(--tint-red-fg); }
 .dd { position:relative; }
-.ddbtn { width:100%; min-height:52px; padding:0 16px; border:0; border-radius:var(--radius-lg); background:var(--muted); box-shadow:inset 0 0 0 1px var(--input-stroke); color:var(--foreground); font:500 17px/1 var(--font); display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
-.ddbtn:hover { box-shadow:inset 0 0 0 1px var(--input-stroke-hover); }
-.ddbtn i { color:var(--input-placeholder); font-size:18px; }
-.dd.open .ddbtn { box-shadow:inset 0 0 0 2px var(--ring); }
-.ddlist { position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:5; background:var(--elevated); border-radius:var(--radius-lg); box-shadow:0 8px 24px rgba(0,0,0,.45), inset 0 0 0 1px var(--elevated-border); overflow:hidden; padding:5px; }
-.ddlist button { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:44px; padding:0 12px; border:0; border-radius:var(--radius-md); background:transparent; color:var(--foreground); font:500 15px/1 var(--font); cursor:pointer; }
+.ddbtn { min-height:32px; }
+.ddbtn i { color:var(--muted-foreground); font-size:16px; }
+.dd.open .ddbtn { border-color:var(--ring); box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 18%,transparent); }
+.ddlist { padding:4px; }
+.ddlist button { justify-content:space-between; width:100%; min-height:36px; border:0; background:transparent; }
 .ddlist button:hover { background:var(--glass-hover); }
 .ddlist button i { opacity:0; color:var(--ring); font-size:16px; }
+.ddlist button[aria-selected="true"] { background:var(--accent); }
 .ddlist button[aria-selected="true"] i { opacity:1; }
 .infob { position:relative; display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; margin:-11px -9px -11px -7px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer; vertical-align:-16px; }
 .infob i { font-size:16px; }
@@ -830,7 +828,7 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 /* Allocation values are presets, not navigation tabs. Each option is a
    discrete radio chip; only the chosen split receives the primary treatment. */
 .seg.alloc-presets { gap:8px; margin-top:4px; padding:0; background:transparent; border-radius:0; }
-.seg.alloc-presets button { height:40px; border:1px solid var(--border); border-radius:12px;
+.seg.alloc-presets button { height:32px; border:1px solid var(--border); border-radius:var(--radius-input);
   background:var(--glass-fill); color:var(--muted-foreground); box-shadow:none;
   transition:background 140ms var(--ease-out), border-color 140ms var(--ease-out), color 140ms var(--ease-out), transform 140ms var(--ease-out); }
 .seg.alloc-presets button[aria-checked="true"] { border-color:var(--primary); background:var(--tint-indigo-bg);
@@ -969,17 +967,17 @@ button.ybd-r:active { opacity:.7; }
 .screen.light .ybd-r .v.txt.plan-static-value { border-color:rgba(10,10,10,.09); background:rgba(10,10,10,.035); }
 .plan-static-value strong { flex:none; font:700 14px/1 var(--font-hubot); color:var(--foreground); letter-spacing:-.01em; }
 .plan-static-value span { min-width:0; overflow:hidden; text-overflow:ellipsis; font:500 12px/1.2 var(--font); color:var(--muted-foreground); }
-.plan-drop { position:absolute; top:auto; bottom:calc(100% + 6px); right:-6px; z-index:12; width:min(272px,calc(100vw - 64px));
-  padding:6px; overflow:hidden; border:1px solid var(--elevated-border); border-radius:16px;
-  background:rgba(28,28,32,.985); box-shadow:0 16px 38px rgba(0,0,0,.48),0 3px 10px rgba(0,0,0,.24);
+.plan-drop { position:absolute; top:auto; left:auto; bottom:calc(100% + 6px); right:-6px; z-index:12; width:min(272px,calc(100vw - 64px));
+  padding:6px; overflow:hidden; border:1px solid var(--border); border-radius:var(--radius-dropdown);
+  background:var(--popover); box-shadow:var(--shadow-md);
   backdrop-filter:blur(24px) saturate(170%); -webkit-backdrop-filter:blur(24px) saturate(170%);
   opacity:0; transform:translate3d(8px,-2px,0) scaleX(.18) scaleY(.94);
   transform-origin:100% 100%; will-change:transform,opacity; }
-.screen.light .plan-drop { background:rgba(255,255,255,.97); border-color:rgba(10,10,10,.12); box-shadow:0 16px 38px rgba(20,20,28,.16),0 3px 10px rgba(20,20,28,.08); }
+.screen.light .plan-drop { background:var(--popover); border-color:var(--border); box-shadow:var(--shadow-md); }
 .plan-drop.closing { pointer-events:none; }
-.plan-drop-search { display:flex; align-items:center; gap:8px; min-height:42px; margin:0 0 5px; padding:0 10px;
-  border:1px solid rgba(255,255,255,.11); border-radius:11px; background:rgba(255,255,255,.055); }
-.screen.light .plan-drop-search { border-color:rgba(10,10,10,.11); background:rgba(10,10,10,.045); }
+.plan-drop-search { display:flex; align-items:center; gap:8px; min-height:var(--control-h-sm); margin:0 0 5px; padding:0 10px;
+  border:1px solid var(--input); border-radius:var(--radius-input); background:var(--background); }
+.screen.light .plan-drop-search { border-color:var(--input); background:var(--background); }
 .plan-drop-search > i { flex:none; font-size:15px; color:var(--muted-foreground); }
 .plan-drop-search input { min-width:0; width:100%; border:0; outline:0; background:transparent; color:var(--foreground);
   font:500 14px/1.2 var(--font); -webkit-appearance:none; appearance:none; }
@@ -999,8 +997,8 @@ button.ybd-r:active { opacity:.7; }
 .plan-drop-scroll span { position:absolute; left:0; top:0; width:100%; min-height:24px; border-radius:999px;
   background:rgba(176,176,188,.72); transform:translateY(0); }
 .screen.light .plan-drop-scroll span { background:rgba(74,74,86,.48); }
-.plan-drop-list button { display:flex; align-items:center; gap:10px; width:100%; min-height:44px; padding:0 8px;
-  border:0; border-radius:11px; background:transparent; color:var(--foreground); text-align:left;
+.plan-drop-list button { display:flex; align-items:center; gap:10px; width:100%; height:36px; min-height:36px; padding:0 8px;
+  border:0; border-radius:var(--radius-sm); background:transparent; color:var(--foreground); text-align:left;
   font:500 14px/1.25 var(--font); cursor:pointer; }
 .plan-drop-list button:focus-visible { outline:0; background:var(--glass-hover); }
 @media (hover:hover) and (pointer:fine) { .plan-drop-list button:hover { background:var(--glass-hover); } }
@@ -1331,7 +1329,7 @@ button.ybd-r:active { opacity:.7; }
   transform:translate3d(0,-2px,0) scale(.98); transform-origin:50% 0; transition:opacity 150ms var(--ease-out),transform 180ms var(--ease-out); }
 .post-cap-picker.open .plan-drop { opacity:1; transform:none; }
 .post-cap-picker .plan-drop-list button { align-items:flex-start; padding-top:8px; padding-bottom:8px; }
-.post-cap-add { display:flex; align-items:center; gap:8px; width:100%; min-height:42px; margin-top:4px; padding:0 9px;
+.post-cap-add { display:flex; align-items:center; gap:8px; width:100%; min-height:36px; margin-top:4px; padding:0 9px;
   border:0; border-top:1px solid var(--border); background:transparent; color:var(--primary); font:600 13px/1.2 var(--font); text-align:left; cursor:pointer; }
 .post-cap-add i { flex:none; font-size:16px; }
 .post-cap-add:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; border-radius:9px; }
@@ -1350,8 +1348,8 @@ button.ybd-r:active { opacity:.7; }
 .allocation-editor { display:grid; gap:10px; margin:8px 10px 2px; }
 .allocation-line { display:grid; grid-template-columns:minmax(0,1fr) 92px; align-items:center; gap:10px; }
 .allocation-line span { min-width:0; font:500 14px/1.3 var(--font); }
-.allocation-line label { display:flex; align-items:center; gap:4px; min-height:44px; padding:0 10px; border:1px solid var(--input-stroke); border-radius:12px; background:var(--muted); }
-.allocation-line input { min-width:0; width:100%; border:0; outline:0; background:transparent; color:var(--foreground); text-align:right; font:600 15px/1 var(--font-hubot); }
+.allocation-line label { display:flex; align-items:center; gap:4px; min-height:32px; padding:0; border:0; background:transparent; }
+.allocation-line input { min-width:0; width:100%; text-align:right; font-variant-numeric:tabular-nums; }
 .wire-form-grid { display:grid; gap:10px; margin:10px; }
 .wire-form-grid .fld { padding:0; }
 .wire-form-grid .two { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
@@ -1742,10 +1740,10 @@ Thanks</textarea></div>
     <div class="sheet" id="allocSheet" role="dialog" aria-modal="true" aria-labelledby="allocSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="allocSheetT">Commission allocation<span class="sh-sub" id="allocSub">Listing side</span></div>
-      <div class="seg alloc-presets" role="radiogroup" aria-label="Allocation preset">
-        <button type="button" role="radio" data-allocset="50" aria-checked="true" aria-selected="true">50 / 50</button>
-        <button type="button" role="radio" data-allocset="60" aria-checked="false" aria-selected="false">60 / 40</button>
-        <button type="button" role="radio" data-allocset="70" aria-checked="false" aria-selected="false">70 / 30</button>
+      <div class="seg alloc-presets rds-toggle-group" role="radiogroup" aria-label="Allocation preset">
+        <button class="rds-toggle" type="button" role="radio" data-allocset="50" aria-checked="true" aria-selected="true">50 / 50</button>
+        <button class="rds-toggle" type="button" role="radio" data-allocset="60" aria-checked="false" aria-selected="false">60 / 40</button>
+        <button class="rds-toggle" type="button" role="radio" data-allocset="70" aria-checked="false" aria-selected="false">70 / 30</button>
       </div>
       <div class="stepper">
         <span class="stk"><b>This side’s share</b><em id="allocOf">Of $99,000 gross</em></span>
@@ -1775,8 +1773,8 @@ Thanks</textarea></div>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="awardSheetT" tabindex="-1">Award distribution<span class="sh-sub" id="awardSub">Listing side</span></div>
       <div class="fields">
-        <label class="fld"><span>Award percentage</span><span class="amt suffix"><input type="text" inputmode="decimal" id="awardPct" placeholder="0"><i aria-hidden="true">%</i></span></label>
-        <label class="fld"><span>Fixed award</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="awardFlat" placeholder="0"></span></label>
+        <label class="fld rds-field"><span>Award percentage</span><span class="amt suffix"><input class="rds-input" type="text" inputmode="decimal" id="awardPct" placeholder="0"><i aria-hidden="true">%</i></span></label>
+        <label class="fld rds-field"><span>Fixed award</span><span class="amt"><i aria-hidden="true">$</i><input class="rds-input" type="text" inputmode="decimal" id="awardFlat" placeholder="0"></span></label>
       </div>
       <div class="note">Award applies before side participants receive their allocated commission.</div>
       <div class="foot"><button class="prim" type="button" id="awardSave">Save award</button></div>
@@ -1787,42 +1785,43 @@ Thanks</textarea></div>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="dedSheetT" tabindex="-1">Add credit or referral<span class="sh-sub" id="dedSub">Listing side</span><button class="infob" type="button" id="dedInfoBtn" aria-label="What's this?" aria-controls="dedInfoPop" aria-expanded="false" hidden><i class="ph ph-info" aria-hidden="true"></i></button><div class="infopop" id="dedInfoPop" role="note" hidden></div></div>
       <div class="fields">
-        <div class="fld" id="fType" hidden><span id="dedTypeLbl">Fee type</span>
-          <div class="seg kind" role="radiogroup" aria-labelledby="dedTypeLbl">
-            <button type="button" role="radio" data-dedtype="credit" aria-checked="false">Credit</button>
-            <button type="button" role="radio" data-dedtype="referral" aria-checked="false">Referral</button>
+        <div class="fld rds-field" id="fType" hidden><span id="dedTypeLbl">Fee type</span>
+          <div class="seg kind rds-toggle-group" role="radiogroup" aria-labelledby="dedTypeLbl">
+            <button class="rds-toggle" type="button" role="radio" data-dedtype="credit" aria-checked="false">Credit</button>
+            <button class="rds-toggle" type="button" role="radio" data-dedtype="referral" aria-checked="false">Referral</button>
           </div>
           <span class="err" id="eType">Pick credit or referral.</span>
         </div>
-        <label class="fld" id="fName"><span>Name</span><input type="text" id="dedName" placeholder="E&amp;O, TC, title fee" autocomplete="off" aria-describedby="eName"><span class="err" id="eName" aria-live="polite">Give the deduction a name.</span></label>
-        <label class="fld" id="fAmt"><span>Amount</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="dedAmt" placeholder="0" aria-describedby="eAmt"></span><span class="err" id="eAmt" aria-live="polite">Enter an amount above $0.</span></label>
-        <div class="fld" id="fFeePayer" hidden><span id="dedFeePayerLbl">Fee payer</span>
+        <label class="fld rds-field" id="fName"><span>Name</span><input class="rds-input" type="text" id="dedName" placeholder="E&amp;O, TC, title fee" autocomplete="off" aria-describedby="eName"><span class="err" id="eName" aria-live="polite">Give the deduction a name.</span></label>
+        <label class="fld rds-field" id="fAmt"><span>Amount</span><span class="amt"><i aria-hidden="true">$</i><input class="rds-input" type="text" inputmode="decimal" id="dedAmt" placeholder="0" aria-describedby="eAmt"></span><span class="err" id="eAmt" aria-live="polite">Enter an amount above $0.</span></label>
+        <div class="fld rds-field" id="fFeePayer" hidden><span id="dedFeePayerLbl">Fee payer</span>
           <div class="dd" id="ddFeePayer">
-            <button type="button" class="ddbtn" id="ddFeePayerBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="ddFeePayerList" aria-labelledby="dedFeePayerLbl"><span id="ddFeePayerVal">Agent</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
-            <div class="ddlist" id="ddFeePayerList" role="listbox" aria-labelledby="dedFeePayerLbl" hidden>
-              <button type="button" role="option" data-feepayer="Agent" aria-selected="true">Agent<i class="ph ph-check" aria-hidden="true"></i></button>
-              <button type="button" role="option" data-feepayer="Both" aria-selected="false">Both agents<i class="ph ph-check" aria-hidden="true"></i></button>
-              <button type="button" role="option" data-feepayer="Team" aria-selected="false">Team<i class="ph ph-check" aria-hidden="true"></i></button>
+            <button type="button" class="ddbtn rds-combobox__trigger" id="ddFeePayerBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="ddFeePayerList" aria-labelledby="dedFeePayerLbl"><span id="ddFeePayerVal">Agent</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
+            <div class="ddlist rds-combobox__panel" id="ddFeePayerList" role="listbox" aria-labelledby="dedFeePayerLbl" hidden>
+              <button class="rds-command__item" type="button" role="option" data-feepayer="Agent" aria-selected="true">Agent<i class="ph ph-check" aria-hidden="true"></i></button>
+              <button class="rds-command__item" type="button" role="option" data-feepayer="Both" aria-selected="false">Both agents<i class="ph ph-check" aria-hidden="true"></i></button>
+              <button class="rds-command__item" type="button" role="option" data-feepayer="Team" aria-selected="false">Team<i class="ph ph-check" aria-hidden="true"></i></button>
             </div>
           </div>
         </div>
-        <div class="fld" id="fPayTo"><span id="dedPayToLbl">Payable to</span>
+        <div class="fld rds-field" id="fPayTo"><span id="dedPayToLbl">Payable to</span>
           <div class="dd" id="ddPayTo">
-            <button type="button" class="ddbtn" id="ddPayToBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="ddPayToList" aria-labelledby="dedPayToLbl"><span id="ddPayToVal">Select</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
-            <div class="ddlist" id="ddPayToList" role="listbox" aria-labelledby="dedPayToLbl" hidden>
-              <button type="button" role="option" data-dedpayto="radius" aria-selected="false">Radius<i class="ph ph-check" aria-hidden="true"></i></button>
-              <button type="button" role="option" data-dedpayto="team" aria-selected="false">Team<i class="ph ph-check" aria-hidden="true"></i></button>
-              <button type="button" role="option" data-dedpayto="external" aria-selected="false">External / Referral<i class="ph ph-check" aria-hidden="true"></i></button>
+            <button type="button" class="ddbtn rds-combobox__trigger" id="ddPayToBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="ddPayToList" aria-labelledby="dedPayToLbl"><span id="ddPayToVal">Select</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
+            <div class="ddlist rds-combobox__panel" id="ddPayToList" role="listbox" aria-labelledby="dedPayToLbl" hidden>
+              <button class="rds-command__item" type="button" role="option" data-dedpayto="radius" aria-selected="false">Radius<i class="ph ph-check" aria-hidden="true"></i></button>
+              <button class="rds-command__item" type="button" role="option" data-dedpayto="team" aria-selected="false">Team<i class="ph ph-check" aria-hidden="true"></i></button>
+              <button class="rds-command__item" type="button" role="option" data-dedpayto="external" aria-selected="false">External / Referral<i class="ph ph-check" aria-hidden="true"></i></button>
             </div>
           </div>
           <span class="hintl" id="payToHint">Who the money is disbursed to at closing.</span>
           <span class="err" id="ePayTo">Pick who this is payable to.</span>
         </div>
-        <label class="fld" id="fPayee" hidden><span>Payable name</span><input type="text" id="dedPayee" placeholder="e.g. Harbor Realty Group" autocomplete="off" aria-describedby="ePayee"><span class="err" id="ePayee" aria-live="polite">Name the brokerage or company being paid.</span></label>
-        <div class="toggle-group" aria-label="Fee settings">
-          <label class="fld row" id="fContributes" hidden><span>Contributes to cap</span><span class="switch-hit"><input type="checkbox" id="dedContributes"><span class="switch-track" aria-hidden="true"></span></span></label>
-          <label class="fld row" id="fPrivate" hidden><span>Private fee</span><span class="switch-hit"><input type="checkbox" id="dedPrivate"><span class="switch-track" aria-hidden="true"></span></span></label>
-        </div>
+        <label class="fld rds-field" id="fPayee" hidden><span>Payable name</span><input class="rds-input" type="text" id="dedPayee" placeholder="e.g. Harbor Realty Group" autocomplete="off" aria-describedby="ePayee"><span class="err" id="ePayee" aria-live="polite">Name the brokerage or company being paid.</span></label>
+        <fieldset class="toggle-group rds-fieldset">
+          <legend class="sr-only">Fee settings</legend>
+          <label class="fld row rds-choice" id="fContributes" hidden><input class="rds-checkbox" type="checkbox" id="dedContributes"><span>Contributes to cap</span></label>
+          <label class="fld row rds-choice" id="fPrivate" hidden><input class="rds-checkbox" type="checkbox" id="dedPrivate"><span>Private fee</span></label>
+        </fieldset>
       </div>
       <div class="note" id="dedKindNote">Credits and referrals come off the side gross before any split, so both sides feel them.</div>
       <div class="foot">
@@ -1835,7 +1834,7 @@ Thanks</textarea></div>
     <div class="sheet" id="agentSheet" role="dialog" aria-modal="true" aria-labelledby="agentSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="agentSheetT" tabindex="-1">Add agents<span class="sh-sub" id="agentSub">Listing side</span></div>
-      <div class="sfield">
+      <div class="sfield rds-input-group">
         <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
         <input type="search" id="agentQ" placeholder="Search agents" aria-label="Search agents" autocomplete="off">
         <button class="sclear" type="button" id="agentQClear" aria-label="Clear search" hidden><i class="ph ph-x-circle" aria-hidden="true"></i></button>
@@ -1844,9 +1843,9 @@ Thanks</textarea></div>
       <div class="cms" id="agentList" role="group" aria-label="Agents"></div>
       <button class="act" type="button" id="agentExternalToggle"><i class="ph ph-user-plus" aria-hidden="true"></i><span class="lbl"><b>Add external agent</b><span>Agent outside Radius</span></span></button>
       <div class="fields" id="agentExternalFields" hidden>
-        <label class="fld"><span>Agent name</span><input type="text" id="externalAgentName" autocomplete="name"></label>
-        <label class="fld"><span>Brokerage</span><input type="text" id="externalBrokerage"></label>
-        <label class="fld"><span>License number</span><input type="text" id="externalLicense"></label>
+        <label class="fld rds-field"><span>Agent name</span><input class="rds-input" type="text" id="externalAgentName" placeholder="Full name" autocomplete="name"></label>
+        <label class="fld rds-field"><span>Brokerage</span><input class="rds-input" type="text" id="externalBrokerage" placeholder="Brokerage name"></label>
+        <label class="fld rds-field"><span>License number</span><input class="rds-input" type="text" id="externalLicense" placeholder="License number"></label>
       </div>
       <div class="note" id="agentNone" hidden>No agent matches that search.</div>
       <div class="note">Adding agents splits this side’s commission. Radius auditing recalculates the breakdown.</div>
@@ -1858,7 +1857,7 @@ Thanks</textarea></div>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="feeSheetT" tabindex="-1">Radius fee<span class="sh-sub" id="feeSub">Mark Perez</span></div>
       <div class="fields">
-        <label class="fld" id="fFeeAmt"><span>Amount</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="feeAmt" placeholder="0" aria-describedby="eFeeAmt"></span><span class="err" id="eFeeAmt" aria-live="polite">Enter an amount of $0 or more.</span></label>
+        <label class="fld rds-field" id="fFeeAmt"><span>Amount</span><span class="amt"><i aria-hidden="true">$</i><input class="rds-input" type="text" inputmode="decimal" id="feeAmt" placeholder="0" aria-describedby="eFeeAmt"></span><span class="err" id="eFeeAmt" aria-live="polite">Enter an amount of $0 or more.</span></label>
       </div>
       <div class="note" id="feeNote"></div>
       <div class="foot"><button class="prim" type="button" id="feeSave">Save</button></div>
@@ -1875,14 +1874,14 @@ Thanks</textarea></div>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="postCapPlanSheetT" tabindex="-1">Add post-cap plan<span class="sh-sub" id="postCapPlanSub">Mark Perez</span></div>
       <div class="fields">
-        <label class="fld" id="fPostCapPlanName"><span>Plan name</span><input type="text" id="postCapPlanName" placeholder="e.g. Team post-cap 1%" aria-describedby="ePostCapPlanName"><span class="err" id="ePostCapPlanName" aria-live="polite">Enter a plan name.</span></label>
-        <div class="fld"><span id="postCapPlanKindLabel">Charge type</span>
-          <div class="seg kind" role="radiogroup" aria-labelledby="postCapPlanKindLabel">
-            <button type="button" role="radio" data-postcap-new-kind="flat" aria-checked="true">Flat amount</button>
-            <button type="button" role="radio" data-postcap-new-kind="pct" aria-checked="false">Percentage</button>
+        <label class="fld rds-field" id="fPostCapPlanName"><span>Plan name</span><input class="rds-input" type="text" id="postCapPlanName" placeholder="e.g. Team post-cap 1%" aria-describedby="ePostCapPlanName"><span class="err" id="ePostCapPlanName" aria-live="polite">Enter a plan name.</span></label>
+        <div class="fld rds-field"><span id="postCapPlanKindLabel">Charge type</span>
+          <div class="seg kind rds-toggle-group" role="radiogroup" aria-labelledby="postCapPlanKindLabel">
+            <button class="rds-toggle" type="button" role="radio" data-postcap-new-kind="flat" aria-checked="true">Flat amount</button>
+            <button class="rds-toggle" type="button" role="radio" data-postcap-new-kind="pct" aria-checked="false">Percentage</button>
           </div>
         </div>
-        <label class="fld" id="fPostCapPlanAmount"><span id="postCapPlanAmountLabel">Flat amount</span><span class="amt"><i aria-hidden="true" id="postCapPlanUnit">$</i><input type="text" inputmode="decimal" id="postCapPlanAmount" placeholder="0" aria-describedby="ePostCapPlanAmount"></span><span class="err" id="ePostCapPlanAmount" aria-live="polite">Enter an amount of $0 or more.</span></label>
+        <label class="fld rds-field" id="fPostCapPlanAmount"><span id="postCapPlanAmountLabel">Flat amount</span><span class="amt"><i aria-hidden="true" id="postCapPlanUnit">$</i><input class="rds-input" type="text" inputmode="decimal" id="postCapPlanAmount" placeholder="0" aria-describedby="ePostCapPlanAmount"></span><span class="err" id="ePostCapPlanAmount" aria-live="polite">Enter an amount of $0 or more.</span></label>
       </div>
       <div class="foot"><button class="prim" type="button" id="postCapPlanSave">Add plan</button></div>
     </div>
@@ -1892,13 +1891,13 @@ Thanks</textarea></div>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="splitSheetT" tabindex="-1">Custom plan<span class="sh-sub" id="splitSub">Mark Perez</span></div>
       <div class="fields">
-        <div class="fld" id="fSplitKind"><span id="splitKindLbl">How you are paid</span>
-          <div class="seg kind" role="radiogroup" aria-labelledby="splitKindLbl">
-            <button type="button" role="radio" data-splitkind="pct" aria-checked="true">Split %</button>
-            <button type="button" role="radio" data-splitkind="flat" aria-checked="false">Flat amount</button>
+        <div class="fld rds-field" id="fSplitKind"><span id="splitKindLbl">How you are paid</span>
+          <div class="seg kind rds-toggle-group" role="radiogroup" aria-labelledby="splitKindLbl">
+            <button class="rds-toggle" type="button" role="radio" data-splitkind="pct" aria-checked="true">Split %</button>
+            <button class="rds-toggle" type="button" role="radio" data-splitkind="flat" aria-checked="false">Flat amount</button>
           </div>
         </div>
-        <label class="fld" id="fSplitAmt"><span id="splitAmtLbl">Your share</span><span class="amt"><i aria-hidden="true" id="splitUnit">%</i><input type="text" inputmode="decimal" id="splitAmt" placeholder="0" aria-describedby="eSplitAmt"></span><span class="err" id="eSplitAmt" aria-live="polite">Enter a split between 0 and 100.</span></label>
+        <label class="fld rds-field" id="fSplitAmt"><span id="splitAmtLbl">Your share</span><span class="amt"><i aria-hidden="true" id="splitUnit">%</i><input class="rds-input" type="text" inputmode="decimal" id="splitAmt" placeholder="0" aria-describedby="eSplitAmt"></span><span class="err" id="eSplitAmt" aria-live="polite">Enter a split between 0 and 100.</span></label>
       </div>
       <div class="note" id="splitNote"></div>
       <div class="foot"><button class="prim" type="button" id="splitSave">Save</button></div>
@@ -1914,15 +1913,15 @@ Thanks</textarea></div>
         <div class="kv"><span class="k"><b>Wire instructions</b><em id="wireHint">Needed before this can be disbursed</em></span><span class="pill" id="wirePill">—</span></div>
       </div>
       <div class="wire-form-grid" id="wireForm" hidden>
-        <label class="fld"><span>Wire type</span><input type="text" id="wireType" value="External" readonly></label>
-        <label class="fld"><span>Recipient / account holder</span><input type="text" id="wireRecipient" autocomplete="name"></label>
-        <div class="two"><label class="fld"><span>Email</span><input type="email" id="wireEmail" autocomplete="email"></label><label class="fld"><span>Phone</span><input type="tel" id="wirePhone" autocomplete="tel"></label></div>
-        <label class="fld"><span>Street address</span><input type="text" id="wireStreet" autocomplete="street-address"></label>
-        <div class="two"><label class="fld"><span>City</span><input type="text" id="wireCity" autocomplete="address-level2"></label><label class="fld"><span>State</span><input type="text" id="wireState" autocomplete="address-level1"></label></div>
-        <label class="fld"><span>ZIP</span><input type="text" id="wireZip" inputmode="numeric" autocomplete="postal-code"></label>
-        <label class="fld"><span>Bank name</span><input type="text" id="wireBank"></label>
-        <div class="two"><label class="fld"><span>Routing number</span><input type="text" id="wireRouting" inputmode="numeric"></label><label class="fld"><span>Account number</span><input type="text" id="wireAccount"></label></div>
-        <label class="fld"><span>Special instructions</span><textarea id="wireMemo" rows="3"></textarea></label>
+        <label class="fld rds-field"><span>Wire type</span><input class="rds-input" type="text" id="wireType" value="External" readonly></label>
+        <label class="fld rds-field"><span>Recipient / account holder</span><input class="rds-input" type="text" id="wireRecipient" placeholder="Full name or company" autocomplete="name"></label>
+        <div class="two"><label class="fld rds-field"><span>Email</span><input class="rds-input" type="email" id="wireEmail" placeholder="name@example.com" autocomplete="email"></label><label class="fld rds-field"><span>Phone</span><input class="rds-input" type="tel" id="wirePhone" placeholder="(555) 555-5555" autocomplete="tel"></label></div>
+        <label class="fld rds-field"><span>Street address</span><input class="rds-input" type="text" id="wireStreet" placeholder="123 Main St" autocomplete="street-address"></label>
+        <div class="two"><label class="fld rds-field"><span>City</span><input class="rds-input" type="text" id="wireCity" placeholder="City" autocomplete="address-level2"></label><label class="fld rds-field"><span>State</span><input class="rds-input" type="text" id="wireState" placeholder="CA" autocomplete="address-level1"></label></div>
+        <label class="fld rds-field"><span>ZIP</span><input class="rds-input" type="text" id="wireZip" placeholder="94105" inputmode="numeric" autocomplete="postal-code"></label>
+        <label class="fld rds-field"><span>Bank name</span><input class="rds-input" type="text" id="wireBank" placeholder="Bank name"></label>
+        <div class="two"><label class="fld rds-field"><span>Routing number</span><input class="rds-input" type="text" id="wireRouting" placeholder="9 digits" inputmode="numeric"></label><label class="fld rds-field"><span>Account number</span><input class="rds-input" type="text" id="wireAccount" placeholder="Account number"></label></div>
+        <label class="fld rds-field"><span>Special instructions</span><textarea class="rds-input rds-textarea" id="wireMemo" rows="3" placeholder="Optional instructions"></textarea></label>
       </div>
       <div class="foot"><button class="prim" type="button" id="wireAdd">Add wire instructions</button></div>
     </div>
@@ -1971,7 +1970,7 @@ Thanks</textarea></div>
       <div class="sh-name" id="activitySheetT" tabindex="-1">Activity &amp; comments<span class="sh-sub" id="activitySub">118 Maple St</span></div>
       <div class="cms"><ul class="feedlist" id="actFeed"></ul></div>
       <div class="activity-compose">
-        <textarea id="cmInput" rows="1" placeholder="Add a comment" aria-label="Add a comment"></textarea>
+        <textarea class="rds-input rds-textarea" id="cmInput" rows="1" placeholder="Add a comment" aria-label="Add a comment"></textarea>
         <button class="send" type="button" id="cmSend" aria-label="Post comment"><i class="ph ph-arrow-up" aria-hidden="true"></i></button>
       </div>
     </div>
@@ -1981,8 +1980,8 @@ Thanks</textarea></div>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="financeSheetT" tabindex="-1">Edit financials<span class="sh-sub">Changes recalculate every split and fee</span></div>
       <div class="fields">
-        <label class="fld" id="fSalePrice"><span>Sale price</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="salePriceInput" placeholder="0" aria-describedby="eSalePrice"></span><span class="err" id="eSalePrice" aria-live="polite">Enter a sale price above $0.</span></label>
-        <label class="fld" id="fGrossCommission"><span>Gross commission</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="grossCommissionInput" placeholder="0" aria-describedby="grossCommissionHint eGrossCommission"></span><span class="hintl" id="grossCommissionHint">Total commission before side allocation.</span><span class="err" id="eGrossCommission" aria-live="polite">Enter gross commission of $0 or more.</span></label>
+        <label class="fld rds-field" id="fSalePrice"><span>Sale price</span><span class="amt"><i aria-hidden="true">$</i><input class="rds-input" type="text" inputmode="decimal" id="salePriceInput" placeholder="0" aria-describedby="eSalePrice"></span><span class="err" id="eSalePrice" aria-live="polite">Enter a sale price above $0.</span></label>
+        <label class="fld rds-field" id="fGrossCommission"><span>Gross commission</span><span class="amt"><i aria-hidden="true">$</i><input class="rds-input" type="text" inputmode="decimal" id="grossCommissionInput" placeholder="0" aria-describedby="grossCommissionHint eGrossCommission"></span><span class="hintl" id="grossCommissionHint">Total commission before side allocation.</span><span class="err" id="eGrossCommission" aria-live="polite">Enter gross commission of $0 or more.</span></label>
       </div>
       <div class="foot"><button class="prim" type="button" id="financeSave">Save</button></div>
     </div>
@@ -2012,7 +2011,7 @@ Thanks</textarea></div>
       <div class="sh-name" id="returnSheetT">Return for edits<span class="sh-sub" id="returnSheetSub">It goes back so the numbers can be edited. Confirmations given so far are cleared.</span></div>
       <div class="body">
         <label for="retNote">What needs to change? <span style="font-weight:400;color:var(--muted-foreground)">Optional</span></label>
-        <textarea id="retNote" placeholder="E&amp;O should be $200 — same as the last closing."></textarea>
+        <textarea class="rds-input rds-textarea" id="retNote" placeholder="E&amp;O should be $200 — same as the last closing."></textarea>
       </div>
       <div class="foot"><button class="danger-secondary" type="button" id="returnGo">Return</button></div>
     </div>
@@ -2864,18 +2863,18 @@ Thanks</textarea></div>
     var formula = document.createElement('span'); formula.textContent = plan.formula;
     var caret = document.createElement('i'); caret.className = 'ph ph-caret-down'; caret.setAttribute('aria-hidden', 'true');
     current.appendChild(type); current.appendChild(name); current.appendChild(formula); change.appendChild(current); change.appendChild(caret);
-    var menu = document.createElement('div'); menu.className = 'plan-drop'; menu.hidden = true;
+    var menu = document.createElement('div'); menu.className = 'plan-drop rds-combobox__panel'; menu.hidden = true;
     menu.setAttribute('data-postcap-menu', kind); menu.setAttribute('role', 'dialog');
     menu.setAttribute('aria-label', 'Choose ' + kind + ' post-cap plan');
     var search = document.createElement('label'); search.className = 'plan-drop-search';
     var si = document.createElement('i'); si.className = 'ph ph-magnifying-glass'; si.setAttribute('aria-hidden', 'true');
-    var input = document.createElement('input'); input.type = 'search'; input.placeholder = 'Search post-cap plans';
+    var input = document.createElement('input'); input.className = 'rds-input'; input.type = 'search'; input.placeholder = 'Search post-cap plans';
     input.setAttribute('data-postcap-search', kind); input.setAttribute('aria-label', 'Search post-cap plans');
     search.appendChild(si); search.appendChild(input); menu.appendChild(search);
     var list = document.createElement('div'); list.className = 'plan-drop-list';
     list.setAttribute('role', 'listbox'); list.setAttribute('aria-label', kind + ' post-cap plans');
     POST_CAP_PLANS[kind].forEach(function (p, index) {
-      var option = document.createElement('button'); option.type = 'button'; option.setAttribute('role', 'option');
+      var option = document.createElement('button'); option.className = 'rds-command__item'; option.type = 'button'; option.setAttribute('role', 'option');
       option.setAttribute('data-postcap-option', kind + '|' + index);
       option.setAttribute('aria-selected', String(index === postCapSelection[kind]));
       var check = document.createElement('i'); check.className = 'ph-fill ph-check-circle plan-check'; check.setAttribute('aria-hidden', 'true');
@@ -3497,18 +3496,18 @@ Thanks</textarea></div>
       row.setAttribute('aria-expanded', 'false');
       row.setAttribute('aria-controls', 'ybdPlanDrop');
       var menu = document.createElement('div');
-      menu.className = 'plan-drop up'; menu.id = 'ybdPlanDrop'; menu.hidden = true;
+      menu.className = 'plan-drop up rds-combobox__panel'; menu.id = 'ybdPlanDrop'; menu.hidden = true;
       menu.setAttribute('role', 'dialog'); menu.setAttribute('aria-label', 'Choose commission plan');
       var search = document.createElement('label'); search.className = 'plan-drop-search';
       var searchIcon = document.createElement('i'); searchIcon.className = 'ph ph-magnifying-glass'; searchIcon.setAttribute('aria-hidden', 'true');
-      var searchInput = document.createElement('input'); searchInput.type = 'search'; searchInput.placeholder = 'Search plans';
+      var searchInput = document.createElement('input'); searchInput.className = 'rds-input'; searchInput.type = 'search'; searchInput.placeholder = 'Search plans';
       searchInput.setAttribute('aria-label', 'Search commission plans'); searchInput.setAttribute('autocomplete', 'off');
       search.appendChild(searchIcon); search.appendChild(searchInput); menu.appendChild(search);
       var planList = document.createElement('div'); planList.className = 'plan-drop-list'; planList.id = 'ybdPlanList';
       planList.setAttribute('role', 'listbox'); planList.setAttribute('aria-label', 'Commission plans');
       PLANS.forEach(function (p) {
         var opt = document.createElement('button');
-        opt.type = 'button'; opt.setAttribute('role', 'option');
+        opt.className = 'rds-command__item'; opt.type = 'button'; opt.setAttribute('role', 'option');
         opt.setAttribute('data-plan-option', p.name);
         opt.setAttribute('aria-selected', String(p.name === SCHED['Mark Perez'].plan));
         var check = document.createElement('i');
@@ -4663,7 +4662,7 @@ Thanks</textarea></div>
       var row = document.createElement('div'); row.className = 'allocation-line';
       var name = document.createElement('span'); name.textContent = a.name + (i === 0 ? ' · primary' : '');
       var lab = document.createElement('label');
-      var inp = document.createElement('input'); inp.type = 'text'; inp.inputMode = 'decimal'; inp.value = String(a.allocation == null ? (100 / list.length) : a.allocation); inp.setAttribute('data-agentallocinput', String(i)); inp.setAttribute('aria-label', a.name + ' allocation percentage');
+      var inp = document.createElement('input'); inp.className = 'rds-input'; inp.type = 'text'; inp.inputMode = 'decimal'; inp.value = String(a.allocation == null ? (100 / list.length) : a.allocation); inp.setAttribute('data-agentallocinput', String(i)); inp.setAttribute('aria-label', a.name + ' allocation percentage');
       var unit = document.createElement('b'); unit.textContent = '%';
       lab.appendChild(inp); lab.appendChild(unit); row.appendChild(name); row.appendChild(lab); host.appendChild(row);
     });
