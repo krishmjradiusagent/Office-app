@@ -1199,8 +1199,7 @@ button.ybd-r:active { opacity:.7; }
 .detail-page { position:absolute; inset:calc(44px + env(safe-area-inset-top)) 0 0; z-index:24;
   display:flex; flex-direction:column; min-height:0; background:transparent; color:var(--foreground); }
 .agent-detail-page { z-index:25; background:var(--background); }
-.agent-detail-page .ybd-card { margin:0; }
-.agent-detail-page .ybd-det { padding:8px 14px 14px; }
+.agent-detail-page .ybd-det { padding:8px 0 14px; }
 .agent-detail-page .agent-detail-net { font-weight:700; border-top:1px solid var(--border); margin-top:8px; padding-top:16px; }
 .agent-detail-page .paybody { padding:16px 0; }
 .detail-head { flex:none; display:grid; grid-template-columns:44px minmax(0,1fr) 44px; align-items:center;
@@ -4232,7 +4231,7 @@ Thanks</textarea></div>
   agentDetailPage.id = 'agentDetailPage'; agentDetailPage.className = 'detail-page agent-detail-page';
   agentDetailPage.hidden = true; agentDetailPage.setAttribute('role', 'dialog');
   agentDetailPage.setAttribute('aria-modal', 'true'); agentDetailPage.setAttribute('aria-labelledby', 'agentDetailTitle');
-  agentDetailPage.innerHTML = '<div class="detail-head"><button class="detail-control" type="button" id="agentDetailBack" aria-label="Back to detailed breakdown"><i class="ph ph-caret-left" aria-hidden="true"></i></button><h2 class="detail-title" id="agentDetailTitle"></h2><button class="detail-control" type="button" id="agentDetailEdit" aria-label="Edit agent breakdown"><i class="ph ph-pencil-simple" aria-hidden="true"></i></button></div><div class="detail-scroll"><p class="ybd-note" id="agentDetailContext"></p><div class="ybd-card"><div class="ybd-det" id="agentDetailRows"></div></div><div id="agentDetailPlans"></div></div>';
+  agentDetailPage.innerHTML = '<div class="detail-head"><button class="detail-control" type="button" id="agentDetailBack" aria-label="Back to detailed breakdown"><i class="ph ph-caret-left" aria-hidden="true"></i></button><h2 class="detail-title" id="agentDetailTitle"></h2><button class="detail-control" type="button" id="agentDetailEdit" aria-label="Edit agent breakdown"><i class="ph ph-pencil-simple" aria-hidden="true"></i></button></div><div class="detail-scroll"><p class="ybd-note" id="agentDetailContext"></p><div class="agent-breakdown-content"><div class="ybd-det" id="agentDetailRows"></div></div><div id="agentDetailPlans"></div></div>';
   screenEl.appendChild(agentDetailPage);
   function agentDetailLine(host, label, value, badge) {
     var row = document.createElement('div'); row.className = 'd';
@@ -4282,7 +4281,8 @@ Thanks</textarea></div>
     if (isMine) {
       var agent = AG.mine[o.index], chain = MINE[o.index], schedule = SCHED[o.name],
           share = Math.max(0, Number(agent.allocation == null ? 100 / AG.mine.length : agent.allocation)) / 100;
-      var planLine = agentDetailLine(host, 'Commission plan', schedule ? schedule.plan : '80/20 Standard');
+      var planLine = ybdRowEl({ k:'Commission plan', v:schedule ? schedule.plan : '80/20 Standard', txt:true, planStatic:true }).firstChild;
+      host.appendChild(planLine);
       if (agentDetailEditing && schedule) {
         var planButton = document.createElement('button'); planButton.type = 'button'; planButton.className = planLine.className; planButton.setAttribute('data-plan', o.name);
         while (planLine.firstChild) planButton.appendChild(planLine.firstChild); planLine.replaceWith(planButton);
