@@ -18,6 +18,7 @@
 .required { color:#ff8080; }
 .control-wrap { position:relative; }
 .control { width:100%; min-height:50px; border:1px solid rgba(255,255,255,.09); border-radius:16px; background:rgba(255,255,255,.07); color:var(--foreground); padding:0 15px; font:500 16px/1.2 var(--font); outline:none; box-shadow:inset 0 1px 0 rgba(255,255,255,.04); }
+.control::placeholder { color:var(--muted-foreground); opacity:.78; font-weight:400; }
 textarea.control { min-height:88px; padding:13px 14px; resize:vertical; }
 .control:focus { border-color:rgba(123,127,245,.72); background:rgba(255,255,255,.095); box-shadow:0 0 0 3px rgba(90,95,242,.18), inset 0 1px 0 rgba(255,255,255,.06); }
 select.control { appearance:none; -webkit-appearance:none; padding-right:42px; cursor:pointer; }
@@ -44,16 +45,16 @@ select.control { appearance:none; -webkit-appearance:none; padding-right:42px; c
     <main class="scroll wire-scroll">
       <form class="wire-card wire-form" id="wireForm">
         <div class="field"><label for="wireType">Wire Type</label><div class="control-wrap"><select class="control" id="wireType"><option value="radius" selected>Radius</option><option value="external">External</option><option value="team">Team</option><option value="agent">Agent</option></select><i class="ph ph-caret-down select-icon" aria-hidden="true"></i></div></div>
-        <div class="field"><label for="recipient">Recipient / Account Holder Name <span class="required">*</span></label><input class="control" id="recipient" autocomplete="name" required></div>
-        <div class="grid"><div class="field"><label for="email">Email</label><input class="control" id="email" type="email" autocomplete="email"></div><div class="field"><label for="phone">Phone</label><input class="control" id="phone" type="tel" autocomplete="tel"></div></div>
-        <div class="field"><label for="street">Street Address</label><input class="control" id="street" autocomplete="street-address"></div>
-        <div class="grid"><div class="field"><label for="city">City</label><input class="control" id="city" autocomplete="address-level2"></div><div class="field"><label for="state">State</label><input class="control" id="state" autocomplete="address-level1"></div></div>
-        <div class="field"><label for="zip">ZIP</label><input class="control" id="zip" inputmode="numeric" autocomplete="postal-code"></div>
+        <div class="field"><label for="recipient">Recipient / Account Holder Name <span class="required">*</span></label><input class="control" id="recipient" placeholder="e.g. Radius Agent Realty" autocomplete="name" required></div>
+        <div class="grid"><div class="field"><label for="email">Email</label><input class="control" id="email" type="email" placeholder="name@example.com" autocomplete="email"></div><div class="field"><label for="phone">Phone</label><input class="control" id="phone" type="tel" placeholder="(555) 123-4567" autocomplete="tel"></div></div>
+        <div class="field"><label for="street">Street Address</label><input class="control" id="street" placeholder="123 Main St" autocomplete="street-address"></div>
+        <div class="grid"><div class="field"><label for="city">City</label><input class="control" id="city" placeholder="Austin" autocomplete="address-level2"></div><div class="field"><label for="state">State</label><input class="control" id="state" placeholder="TX" autocomplete="address-level1"></div></div>
+        <div class="field"><label for="zip">ZIP</label><input class="control" id="zip" inputmode="numeric" placeholder="78701" autocomplete="postal-code"></div>
         <div class="section-line" aria-hidden="true"></div>
-        <div class="field"><label for="bank">Bank Name</label><input class="control" id="bank"></div>
-        <div class="grid"><div class="field"><label for="routing">Routing Number (ABA)</label><input class="control" id="routing" inputmode="numeric" maxlength="9"></div><div class="field"><label for="account">Account Number</label><input class="control" id="account" inputmode="numeric"></div></div>
+        <div class="field"><label for="bank">Bank Name</label><input class="control" id="bank" placeholder="e.g. Chase Bank"></div>
+        <div class="grid"><div class="field"><label for="routing">Routing Number (ABA)</label><input class="control" id="routing" inputmode="numeric" placeholder="123456789" maxlength="9"></div><div class="field"><label for="account">Account Number</label><input class="control" id="account" inputmode="numeric" placeholder="1234567890"></div></div>
         <div class="field"><label for="accountType">Account Type</label><div class="control-wrap"><select class="control" id="accountType"><option value="checking">Checking</option><option value="savings">Savings</option></select><i class="ph ph-caret-down select-icon" aria-hidden="true"></i></div></div>
-        <div class="field"><label for="memo">Special Instructions / Memo</label><textarea class="control" id="memo"></textarea></div>
+        <div class="field"><label for="memo">Special Instructions / Memo</label><textarea class="control" id="memo" placeholder="e.g. Include property address"></textarea></div>
         <div class="wire-actions"><button class="wire-btn" type="button" id="cancelBtn">Cancel</button><button class="wire-btn primary" type="submit">Save</button></div>
       </form>
     </main>
