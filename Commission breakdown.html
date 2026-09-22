@@ -1575,12 +1575,6 @@ body { position:relative; gap:0; }
               <button class="side-metric-toggle" type="button" aria-expanded="false" aria-controls="metricList1"><span>View all</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
             </div>
           </div>
-        <div class="ssub">Agents on this side</div>
-        <div class="agentlist" id="agentList1"></div>
-        <button class="addrow" type="button" aria-haspopup="dialog" data-addagent="Listing side" data-agent-side="mine">
-          <i class="ph ph-plus-circle lead" aria-hidden="true"></i>
-          <span class="ab"><b>Add agent</b></span>
-        </button>
           <div id="deds1"></div>
           <button class="addrow" type="button" aria-haspopup="dialog" data-addded="mine|credit">
             <i class="ph ph-plus-circle lead" aria-hidden="true"></i>
@@ -1594,6 +1588,12 @@ body { position:relative; gap:0; }
             <span class="sk"><b>Gross after deductions</b><em>What the splits are taken from</em></span>
             <span class="svv" id="x1Basis">$49,430</span>
           </div>
+        <div class="ssub">Agents on this side</div>
+        <div class="agentlist" id="agentList1"></div>
+        <button class="addrow" type="button" aria-haspopup="dialog" data-addagent="Listing side" data-agent-side="mine">
+          <i class="ph ph-plus-circle lead" aria-hidden="true"></i>
+          <span class="ab"><b>Add agent</b></span>
+        </button>
         <div id="leadDetailBreakdown" hidden></div>
         <div class="side-metrics rest-metrics" data-expanded="false">
           <div class="side-metric-list" id="restMetricList1" aria-label="Where the rest goes totals">
@@ -5551,11 +5551,13 @@ Thanks</textarea></div>
       var host = document.getElementById(k === 'mine' ? 'deds1' : 'deds2');
       if (!host) return;
       host.textContent = '';
-      [['credit', 'Off the top of this side'], ['presplit', 'Before the split']].forEach(function (grp) {
+      [['credit', ''], ['presplit', 'Before the split']].forEach(function (grp) {
         var items = DEDS[k].filter(function (d) { return d.kind === grp[0]; });
         if (!items.length) return;
-        var h = document.createElement('div'); h.className = 'ssub'; h.textContent = grp[1];
-        host.appendChild(h);
+        if (grp[1]) {
+          var h = document.createElement('div'); h.className = 'ssub'; h.textContent = grp[1];
+          host.appendChild(h);
+        }
         items.forEach(function (d) { host.appendChild(dedRow(k, d)); });
       });
     });
