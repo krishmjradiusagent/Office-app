@@ -18,7 +18,7 @@
    same vocabulary as Campaigns.html. */
 /* Clamp the mock frame to the visible window so the sheet's max-height:86%
    measures against on-screen space, not 844px that runs past the fold. */
-.phone { --background:var(--neutral-900); --card:#1f1f22; --muted:var(--neutral-800); overflow:hidden; max-height:calc(100vh - 48px); max-height:calc(100dvh - 48px); background:var(--neutral-900); }
+.phone { --background:var(--neutral-900); --card:#1f1f22; --muted:var(--neutral-800); --accent:var(--neutral-700); --accent-foreground:var(--neutral-50); overflow:hidden; max-height:calc(100vh - 48px); max-height:calc(100dvh - 48px); background:var(--neutral-900); }
 .screen { position:relative; overflow:hidden;
   --control-surface:var(--neutral-800);
   --ease-out:cubic-bezier(.23,1,.32,1);
@@ -817,7 +817,7 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .srow.flash { animation:rowflash 1400ms var(--ease-out); }
 @keyframes rowflash { 0%, 45% { background:rgba(122,126,255,.15); } 100% { background:transparent; } }
 .sheet #dedSheetT { margin-bottom:2px; }
-#dedSheet .foot .prim, #dedSheet .foot .rds-btn { flex:1 1 0; }
+#dedSheet .foot .rds-btn { flex:1 1 0; min-width:0; border-radius:var(--radius-full); }
 .danger-secondary { flex:1; min-height:46px; border:1px solid color-mix(in srgb,var(--tint-red-fg) 48%,transparent); border-radius:999px; background:transparent; color:var(--tint-red-fg); font:600 15px/1 var(--font); cursor:pointer; }
 .danger-secondary:focus-visible { outline:2px solid var(--ring); outline-offset:3px; }
 .seg { display:flex; gap:var(--space-1); margin:2px 10px 8px; padding:var(--space-1); background:var(--muted); border-radius:var(--radius-lg); }
@@ -1825,7 +1825,7 @@ Thanks</textarea></div>
       </div>
       <div class="note" id="dedKindNote">Credits and referrals come off the side gross before any split, so both sides feel them.</div>
       <div class="foot">
-        <button class="prim" type="button" id="dedSave">Add</button>
+        <button class="rds-btn rds-btn--block" type="button" id="dedSave">Add</button>
         <button class="rds-btn rds-btn--destructive rds-btn--block" type="button" id="dedRemove">Remove</button>
       </div>
     </div>
