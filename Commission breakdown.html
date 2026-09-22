@@ -1493,6 +1493,7 @@ body { position:relative; gap:0; }
 .allocation-total { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:16px 0; font:500 13px/1.4 var(--font); }
 .allocation-actions { display:flex; gap:12px; }
 .allocation-actions > button { flex:1; }
+#agentAllocSheet .allocation-values label.allocation-remainder { border-style:dashed; opacity:.7; }
 #agentAllocCancel { background:var(--muted); color:var(--foreground); border:1px solid var(--border); }
 
 </style>
@@ -1863,7 +1864,7 @@ Thanks</textarea></div>
         <label class="fld rds-field"><span>License number</span><input class="rds-input" type="text" id="externalLicense" placeholder="License number"></label>
       </div>
       <div class="note" id="agentNone" hidden>No agent matches that search.</div>
-      <div class="note">Adding agents splits this side’s commission. Radius auditing recalculates the breakdown.</div>
+      <div class="note">Next, set each co-agent’s share. Agents are added when you save the allocation.</div>
       <div class="foot"><button class="prim" type="button" id="agentAdd" disabled>Add agents</button></div>
     </div>
 
@@ -4839,7 +4840,7 @@ Thanks</textarea></div>
   });
 
   /* per-agent allocation: supports arbitrary precision; total must equal 100 */
-  var agentAllocSide = 'mine', agentAllocDraft = [], agentAllocGross = 0;
+  var agentAllocSide = 'mine', agentAllocDraft = [], agentAllocGross = 0, pendingAgentAddition = null;
   function allocationMoney(amount) { return amount.toLocaleString('en-US', { style:'currency', currency:'USD', minimumFractionDigits:2, maximumFractionDigits:2 }); }
   function syncAgentAllocation(active) {
     var total = agentAllocDraft.reduce(function (sum, n) { return sum + n; }, 0),
@@ -4863,22 +4864,25 @@ Thanks</textarea></div>
     document.getElementById('agentAllocError').hidden = valid;
     return valid;
   }
-  function openAgentAllocation(side, trigger) {
+  function openAgentAllocation(side, trigger, pending) {
+    pendingAgentAddition = pending || null;
     agentAllocSide = side; agentAllocGross = side === 'mine' ? sideGross : otherGross;
-    var list = AG[side], host = document.getElementById('agentAllocEditor'); host.textContent = '';
+    var list = pending ? pending.agents : AG[side], host = document.getElementById('agentAllocEditor'); host.textContent = '';
     agentAllocDraft = list.map(function (a) { return a.allocation == null ? 100 / list.length : a.allocation; });
     document.getElementById('agentAllocSub').textContent = 'Allocation of ' + (side === 'mine' ? myTitle : coopTitle).toLowerCase() + ' gross commission between agents.';
-    document.getElementById('agentAllocHint').textContent = list.length === 2 ? 'Enter either agent’s percentage or amount. The other receives the remainder of ' + allocationMoney(agentAllocGross) + '.' : 'Set each agent’s percentage or amount. Shares must total ' + allocationMoney(agentAllocGross) + ' (100%).';
+    document.getElementById('agentAllocCancel').textContent = pending ? 'Back' : 'Cancel';
+    document.getElementById('agentAllocHint').textContent = pending ? 'Enter each co-agent’s percentage or amount. The primary agent receives the remaining balance of ' + allocationMoney(agentAllocGross) + '.' : list.length === 2 ? 'Enter either agent’s percentage or amount. The other receives the remainder of ' + allocationMoney(agentAllocGross) + '.' : 'Set each agent’s percentage or amount. Shares must total ' + allocationMoney(agentAllocGross) + ' (100%).';
     list.forEach(function (a, i) {
       var row = document.createElement('div'); row.className = 'allocation-line';
       var name = document.createElement('div'); name.className = 'allocation-person';
       var title = document.createElement('b'); title.textContent = a.name;
-      var roleLabel = document.createElement('span'); roleLabel.textContent = i === 0 ? 'Primary agent' : 'Co-agent'; name.appendChild(title); name.appendChild(roleLabel); row.appendChild(name);
+      var roleLabel = document.createElement('span'); roleLabel.textContent = i === 0 ? (pending ? 'Primary agent · remaining balance' : 'Primary agent') : pending && pending.names.indexOf(a.name) !== -1 ? 'New allocation' : 'Co-agent'; name.appendChild(title); name.appendChild(roleLabel); row.appendChild(name);
       var fields = document.createElement('div'); fields.className = 'allocation-values';
       ['percentage', 'amount'].forEach(function (kind) {
         var label = document.createElement('label'), input = document.createElement('input'), unit = document.createElement('b');
         input.type = 'number'; input.inputMode = 'decimal'; input.min = '0'; input.step = 'any'; input.max = String(kind === 'percentage' ? 100 : agentAllocGross);
         input.setAttribute(kind === 'percentage' ? 'data-agentallocinput' : 'data-agentallocamount', String(i)); input.setAttribute('aria-label', a.name + ' allocation ' + kind);
+        if (pending && i === 0) { input.readOnly = true; label.classList.add('allocation-remainder'); }
         unit.textContent = kind === 'percentage' ? '%' : '$';
         if (kind === 'amount') { label.appendChild(unit); input.disabled = agentAllocGross === 0; }
         label.appendChild(input); if (kind === 'percentage') label.appendChild(unit); fields.appendChild(label);
@@ -4898,14 +4902,28 @@ Thanks</textarea></div>
         value = input.value.trim() === '' ? NaN : Number(input.value),
         pct = percentage ? value : (agentAllocGross > 0 ? value / agentAllocGross * 100 : NaN);
     agentAllocDraft[index] = pct;
-    if (agentAllocDraft.length === 2 && Number.isFinite(pct) && pct >= 0 && pct <= 100) agentAllocDraft[1 - index] = 100 - pct;
+    if (pendingAgentAddition) agentAllocDraft[0] = 100 - agentAllocDraft.slice(1).reduce(function (sum, n) { return sum + n; }, 0);
+    else if (agentAllocDraft.length === 2 && Number.isFinite(pct) && pct >= 0 && pct <= 100) agentAllocDraft[1 - index] = 100 - pct;
     sheetDirty = true; syncAgentAllocation(input);
   });
-  document.getElementById('agentAllocCancel').addEventListener('click', function () { close(); });
+  document.getElementById('agentAllocCancel').addEventListener('click', function () {
+    if (pendingAgentAddition) { pendingAgentAddition = null; open(document.getElementById('agentSheet'), agentTriggerRow); } else close();
+  });
   document.getElementById('agentAllocSave').addEventListener('click', function () {
     if (!syncAgentAllocation()) return;
+    var pending = pendingAgentAddition;
+    if (pending) {
+      AG[agentAllocSide] = pending.agents;
+      pending.names.forEach(function (name) {
+        if (CO[agentAllocSide].indexOf(name) === -1) CO[agentAllocSide].push(name);
+        if (pending.external && !SCHED[name]) SCHED[name] = { split:100, capped:false, team:false, plan:'External · no Radius plan' };
+      });
+    }
     AG[agentAllocSide].forEach(function (a, i) { a.allocation = agentAllocDraft[i]; });
-    applyNumbers(); close(); toast('Agent allocation saved — payouts recalculated.');
+    pendingAgentAddition = null;
+    applyNumbers(); close();
+    if (pending) logActivity('Jessica Hall', 'aud', pending.names.join(', ') + ' added to the ' + (agentAllocSide === 'mine' ? myTitle : coopTitle).toLowerCase() + ' with saved agent allocations.', true);
+    toast(pending ? 'Agents added and allocation saved.' : 'Agent allocation saved — payouts recalculated.');
   });
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-addagent]'); if (!b) return;
@@ -4937,20 +4955,6 @@ Thanks</textarea></div>
   }
   /* the picked agents land on the side and are paid on their own schedule —
      the side re-derives immediately, so every total still reconciles */
-  function insertAgentRows(names) {
-    var host = agentTriggerRow;
-    if (!host || !host.parentNode) return;
-    var card = host.closest('.card.sides');
-    var sideKey = card === document.querySelector('.card.sides') ? 'mine' : 'other';
-    var already = agentsOnSide();
-    names.filter(function (n) { return already.indexOf(n) === -1; }).forEach(function (n) {
-      AG[sideKey].push({ name: n, role: sideKey === 'mine' ? 'Co-agent' : 'Co-op agent', allocation: 0 });
-      CO[sideKey].push(n);
-    });
-    var equal = 100 / Math.max(1, AG[sideKey].length);
-    AG[sideKey].forEach(function (a) { a.allocation = equal; });
-    applyNumbers();
-  }
   /* ── commission plan picker ─────────────────────────── */
   var planAgent = null, planRelationship = 'agent_team';
   function planRelationshipLabel(key) {
@@ -5419,7 +5423,7 @@ Thanks</textarea></div>
     });
     var add = document.getElementById('agentAdd');
     add.disabled = externalAgentMode ? !document.getElementById('externalAgentName').value.trim() : !agentPick.length;
-    add.textContent = externalAgentMode ? 'Add external agent' : (agentPick.length < 2 ? 'Add agent' : 'Add ' + agentPick.length + ' agents');
+    add.textContent = 'Next: allocation';
   }
   document.getElementById('agentExternalToggle').addEventListener('click', function () {
     sheetDirty = true;
@@ -5458,18 +5462,13 @@ Thanks</textarea></div>
     (next || document.getElementById('agentQ')).focus();
   });
   document.getElementById('agentAdd').addEventListener('click', function () {
-    var names = externalAgentMode ? [document.getElementById('externalAgentName').value.trim()] : agentPick.slice(), side = document.getElementById('agentSub').textContent;
+    var side = agentTriggerRow.getAttribute('data-agent-side'),
+        names = (externalAgentMode ? [document.getElementById('externalAgentName').value.trim()] : agentPick.slice()).filter(function (name) { return name && !AG[side].some(function (a) { return a.name === name; }); });
     if (!names.length) return;
-    if (externalAgentMode && names[0]) {
-      SCHED[names[0]] = { split: 100, capped: false, team: false, plan: 'External · no Radius plan' };
-    }
-    close();
-    insertAgentRows(names);
-    var list = names.length === 1 ? names[0]
-      : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
-    logActivity('Jessica Hall', 'aud', list + (names.length === 1 ? ' added' : ' added') + ' to the ' + side.toLowerCase() + '. Breakdown recalculating.', true);
-    toast(names.length === 1 ? names[0] + ' added to the ' + side.toLowerCase() + '.'
-      : names.length + ' agents added to the ' + side.toLowerCase() + '.');
+    var agents = AG[side].map(function (a) { return Object.assign({}, a); });
+    names.forEach(function (name) { agents.push({ name:name, role:side === 'mine' ? 'Co-agent' : 'Co-op agent', allocation:0 }); });
+    agents[0].allocation = 100 - agents.slice(1).reduce(function (sum, a) { return sum + Number(a.allocation || 0); }, 0);
+    openAgentAllocation(side, agentTriggerRow, { agents:agents, names:names, external:externalAgentMode });
   });
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-removeagent]'); if (!b) return;
