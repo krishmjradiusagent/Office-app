@@ -2350,7 +2350,6 @@ Thanks</textarea></div>
     var basisDetails = DEDS.mine.filter(function (d) { return d.kind === 'credit'; }).map(function (d) {
       return { k: d.name, v: neg(d.amt * share) };
     });
-    rows.push({ k: 'Gross commission after deduction', sub2: 'After credits and pre-split deductions', v: cur(commissionBeforeSplit) });
     rows.push({ k: 'Commission basis', sub2: n > 1 ? pctLbl(share) + ' of this side' : 'This side before deductions', v: cur(aGross), det: basisDetails });
     /* `ed` marks the rows a person actually sets. It is inert everywhere the
        chain is read-only — only the card's edit mode turns it into a target,
