@@ -340,7 +340,8 @@ button.side { cursor:pointer; text-align:left; }
 @keyframes sbin { from { opacity:0; transform:translateY(-4px); } }
 .srow { display:flex; align-items:center; gap:10px; width:100%; min-height:44px; padding:9px 0 9px 2px; border:0; border-top:1px solid var(--border); background:transparent; color:var(--foreground); font-family:inherit; text-align:left; transition:background 140ms var(--ease-out); }
 .srow .sk { min-width:0; flex:1; display:flex; flex-direction:column; gap:2px; }
-.srow .sk b { font:500 15px/1.25 var(--font); }
+.srow .sk b { display:inline-flex; align-items:center; gap:6px; font:500 15px/1.25 var(--font); }
+.srow .sk b .fee-missing { flex:none; font-size:15px; color:var(--tint-amber-fg); }
 .srow .sk em { font:500 13px/1.3 var(--font); font-style:normal; color:var(--muted-foreground); }
 .srow .svv { flex:none; min-width:84px; text-align:right; font:600 15px/1.2 var(--font); font-variant-numeric:tabular-nums; }
 .srow .chev { flex:none; width:15px; font-size:15px; color:var(--muted-foreground); transition:transform 160ms var(--ease-out), color 140ms var(--ease-out); }
@@ -389,7 +390,7 @@ button.agentrow[aria-expanded="true"] .achev { transform:rotate(90deg); }
 .prow.ptot { margin-top:4px; padding-top:9px; border-top:1px solid var(--border); }
 .prow.ptot .pk { color:var(--foreground); font-weight:600; font-size:15px; }
 .prow.ptot .pv { font:600 15px/1.2 var(--font); color:var(--tint-green-fg); }
-.agentrow { display:flex; align-items:center; gap:10px; padding:11px 25px 11px 2px; border-top:1px solid var(--border); color:var(--foreground); text-decoration:none; }
+.agentrow { display:flex; align-items:center; gap:10px; padding:11px 0 11px 2px; border-top:1px solid var(--border); color:var(--foreground); text-decoration:none; }
 a.agentrow:active { background:var(--overlay-press); }
 a.agentrow:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; border-radius:var(--radius-sm); }
 .agentrow .ini { width:28px; height:28px; font:600 12px/1 var(--font); background:var(--tint-indigo-bg); color:var(--tint-indigo-fg); }
@@ -5572,15 +5573,11 @@ Thanks</textarea></div>
     var sk = document.createElement('span'); sk.className = 'sk';
     var nb = document.createElement('b'); nb.textContent = d.name;
     if (d.kind === 'credit' && d.payTo && d.payTo !== 'external') onFile = true, to = PAYTO[d.payTo].to;
-    var em = document.createElement('em');
-    if (onFile) { em.textContent = 'To ' + to; }
-    else {
-      em.className = 'miss';
-      var ic = document.createElement('i'); ic.className = 'ph-fill ph-warning-circle'; ic.setAttribute('aria-hidden', 'true');
-      em.appendChild(ic);
-      em.appendChild(document.createTextNode(to ? 'Wire instructions missing' : 'No payee or wire yet'));
+    if (!onFile) {
+      var ic = document.createElement('i'); ic.className = 'ph ph-prohibit fee-missing'; ic.setAttribute('aria-hidden', 'true');
+      nb.appendChild(ic);
     }
-    sk.appendChild(nb); sk.appendChild(em);
+    sk.appendChild(nb);
     var v = document.createElement('span'); v.className = 'svv neg'; v.textContent = neg(d.amt);
     var chev = document.createElement('i'); chev.className = 'ph ph-caret-right chev'; chev.setAttribute('aria-hidden', 'true');
     b.appendChild(sk); b.appendChild(v); b.appendChild(chev);
