@@ -1219,7 +1219,7 @@ button.ybd-r:active { opacity:.7; }
 .detail-fin-card { margin:0 0 12px; }
 .detail-scroll #sec-sides { padding:2px 0 10px; }
 .detail-scroll .card.sides { margin:0; }
-.detail-page:not(.editing) .addrow { display:none; }
+.detail-page:not(.editing) .addrow:not([data-addagent]) { display:none; }
 .detail-actions { flex:none; display:flex; align-items:center; gap:8px; padding:8px 16px calc(12px + env(safe-area-inset-bottom));
   border-top:0; background:transparent; backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%); }
 .detail-actions .detail-prim { flex:1; min-height:46px; border:0; border-radius:999px; background:var(--primary); color:#fff;
@@ -1565,7 +1565,7 @@ body { position:relative; gap:0; }
         <button class="addrow" type="button" data-agentalloc="mine">
           <i class="ph ph-percent lead" aria-hidden="true"></i><span class="ab"><b>Edit agent allocation</b></span>
         </button>
-        <button class="addrow" type="button" aria-haspopup="dialog" data-addagent="Listing side">
+        <button class="addrow" type="button" aria-haspopup="dialog" data-addagent="Listing side" data-agent-side="mine">
           <i class="ph ph-plus-circle lead" aria-hidden="true"></i>
           <span class="ab"><b>Add agent</b></span>
         </button>
@@ -1631,6 +1631,7 @@ body { position:relative; gap:0; }
         <div class="ssub">Agents on this side</div>
         <div class="noagent" id="noAgent2">No Radius agent here — the co-op brokerage pays its own agent.</div>
         <div class="agentlist" id="agentList2"></div>
+        <button class="addrow" type="button" aria-haspopup="dialog" data-addagent="Buying side" data-agent-side="other"><i class="ph ph-plus-circle lead" aria-hidden="true"></i><span class="ab"><b>Add agent</b></span></button>
         <button class="addrow" type="button" data-agentalloc="other">
           <i class="ph ph-percent lead" aria-hidden="true"></i><span class="ab"><b>Edit agent allocation</b></span>
         </button>
@@ -4363,7 +4364,8 @@ Thanks</textarea></div>
     btn.setAttribute('aria-label', detailEditing ? 'Done editing detailed breakdown' : 'Edit detailed breakdown');
     ico.className = detailEditing ? 'ph ph-check' : 'ph ph-pencil-simple';
     Array.prototype.forEach.call(detailPage.querySelectorAll('[data-addded], [data-addagent]'), function (el) {
-      el.disabled = !detailEditing;
+      el.disabled = el.hasAttribute('data-addagent') ? isFinalizedStatus(status) : !detailEditing;
+      if (el.hasAttribute('data-addagent')) el.setAttribute('data-addagent', el.getAttribute('data-agent-side') === 'other' ? coopTitle : myTitle);
     });
   }
   function openDetailed(trigger) {
