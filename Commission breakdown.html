@@ -3678,7 +3678,12 @@ Thanks</textarea></div>
         if (r.post && r.post.flag) flagged.push(r);
         if (cur_) cur_.rows.push(r); else loose.push(r);
       });
-      loose.forEach(function (r) { ybdFeeEl(r, det); });
+      var agentSplitRow = null;
+      loose.forEach(function (r) {
+        var rowIndex = det.children.length;
+        ybdFeeEl(r, det);
+        if (r.k === 'Agent split') agentSplitRow = det.children[rowIndex];
+      });
       /* Commission ownership and Radius-payable fees are different concepts.
          Give each the same compact disclosure treatment and keep them adjacent. */
       var radiusGroup = groups.filter(function (g) { return g.key === 'radius'; })[0],
@@ -3749,7 +3754,12 @@ Thanks</textarea></div>
           ybdGrp[g.key] = now;
           toggleYbdInner(gb, box, now);
         });
-        det.appendChild(gb); det.appendChild(box);
+        if (g.key === 'pre' && agentSplitRow) {
+          det.insertBefore(gb, agentSplitRow);
+          det.insertBefore(box, agentSplitRow);
+        } else {
+          det.appendChild(gb); det.appendChild(box);
+        }
       });
       var completeBtn = document.createElement('button');
       completeBtn.type = 'button'; completeBtn.className = 'ybd-sep'; completeBtn.id = 'addDetBtn';
