@@ -18,8 +18,9 @@
    same vocabulary as Campaigns.html. */
 /* Clamp the mock frame to the visible window so the sheet's max-height:86%
    measures against on-screen space, not 844px that runs past the fold. */
-.phone { overflow:hidden; max-height:calc(100vh - 48px); max-height:calc(100dvh - 48px); }
+.phone { --background:var(--neutral-900); --card:#1f1f22; --muted:var(--neutral-800); overflow:hidden; max-height:calc(100vh - 48px); max-height:calc(100dvh - 48px); background:var(--neutral-900); }
 .screen { position:relative; overflow:hidden;
+  --control-surface:var(--neutral-800);
   --ease-out:cubic-bezier(.23,1,.32,1);
   --shadow-md:0 2px 6px rgba(0,0,0,.45);
   --tint-amber-bg:rgba(234,88,12,.16); --tint-amber-fg:#f2a678; --tint-amber-strong:#f6c8a5;
@@ -45,6 +46,7 @@
   --folder-shadow-1:rgba(0,0,0,.55); --folder-shadow-2:rgba(0,0,0,.4); }
 
 .screen.light {
+  --control-surface:var(--white);
   --background:#ffffff; --foreground:#0a0a0a; --card:#ffffff; --muted:#f5f5f5; --muted-foreground:#737373; --border:#e5e5e5; --input:#e5e5e5; --ring:#a3a3a3; --destructive:#dc2626;
   --shadow-md:0 2px 6px rgba(0,0,0,.10);
   --tint-amber-bg:#fef9c3; --tint-amber-fg:#854d0e; --tint-amber-strong:#854d0e;
@@ -66,6 +68,8 @@
   --toast-bg:#171717; --toast-fg:#ffffff;
   --folder-shadow-1:rgba(10,10,10,.10); --folder-shadow-2:rgba(10,10,10,.08);
 }
+/* Mobile controls use Radius neutral-800, never the page's near-black surface. */
+.screen:not(.light) :is(.rds-input,.rds-input-group,.rds-combobox__trigger,.toggle-group,.plan-drop-search) { background:var(--control-surface); }
 .statusbar { position:absolute; top:0; left:0; right:0; z-index:14; }
 
 /* ── head ───────────────────────────────────────────────────
