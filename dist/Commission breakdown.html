@@ -30,12 +30,12 @@
   --lux-card-surface:#211f1b; --lux-card-surface-alt:#24211c; --lux-card-border:rgba(218,190,128,.18);
   --lux-label:#bdb5a7; --lux-value:#f3eee4; --lux-accent:#cdb16d;
   --lux-texture:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
-  --overlay-press:var(--overlay-press); --glass-fill:var(--glass-fill); --glass-border:var(--glass-border); --glass-border-strong:rgba(255,255,255,.14); --glass-hover:rgba(255,255,255,.14);
+  --overlay-press:rgba(255,255,255,.08); --glass-fill:rgba(255,255,255,.08); --glass-border:rgba(255,255,255,.10); --glass-border-strong:rgba(255,255,255,.14); --glass-hover:rgba(255,255,255,.14);
   /* the head is a scrim over the hero wash, not a bar — light enough that the
      blurred photo reads through it, dark enough to hold white 17px title */
   --chrome-1:rgba(10,10,10,.30); --chrome-2:rgba(10,10,10,.10); --chrome-3:rgba(10,10,10,.92); --chrome-4:rgba(10,10,10,.72); --chrome-solid:rgba(14,14,16,.97); --chrome-hairline:rgba(255,255,255,.07); --hero-fade:rgba(255,255,255,.02);
-  --input-stroke:var(--input-stroke); --input-stroke-hover:var(--input-stroke-hover); --input-placeholder:var(--input-placeholder);
-  --elevated:var(--elevated); --elevated-border:rgba(255,255,255,.07); --folder-bg:var(--folder-bg);
+  --input-stroke:#34343a; --input-stroke-hover:#505058; --input-placeholder:#85858d;
+  --elevated:#242428; --elevated-border:rgba(255,255,255,.10); --folder-bg:#101012;
   --toast-bg:#26262A; --toast-fg:#FAFAFA;
   --folder-shadow-1:rgba(0,0,0,.55); --folder-shadow-2:rgba(0,0,0,.4); }
 
@@ -646,8 +646,7 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 /* sheets */
 .scrim { position:absolute; inset:0; background:rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity 240ms ease; z-index:30; }
 .scrim.on { opacity:1; pointer-events:auto; }
-.sheet { position:absolute; left:0; right:0; bottom:0; z-index:31; max-height:86%; overflow-y:auto; scrollbar-width:none; background:var(--card); border:1px solid var(--border); border-bottom:0; border-radius:22px 22px 0 0; padding:8px 12px calc(20px + env(safe-area-inset-bottom)); transform:translateY(103%); transition:transform 300ms cubic-bezier(.32,.72,0,1); box-shadow:0 -12px 40px rgba(0,0,0,.45); }
-.sheet::-webkit-scrollbar { display:none; }
+.sheet { position:absolute; left:0; right:0; bottom:0; z-index:31; max-height:86%; overflow:hidden; display:flex; flex-direction:column; background:var(--card); border:1px solid var(--border); border-bottom:0; border-radius:22px 22px 0 0; padding:8px 12px calc(20px + env(safe-area-inset-bottom)); transform:translateY(103%); transition:transform 300ms cubic-bezier(.32,.72,0,1); box-shadow:0 -12px 40px rgba(0,0,0,.45); }
 .sheet.on { transform:none; }
 .sheet .grab { width:38px; height:4px; border-radius:999px; background:var(--muted-foreground); opacity:.4; margin:0 auto 10px; }
 .sheet .sh-name { position:relative; padding:6px 52px 12px 10px; font:700 17px/1.2 var(--font); letter-spacing:-.01em; border-bottom:1px solid var(--border); margin-bottom:6px; }
@@ -657,6 +656,10 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .sheet .grab { cursor:grab; touch-action:none; }
 .sheet.drag { transition:none; }
 .sheet .sh-sub { display:block; font:500 13px/1.35 var(--font); color:var(--muted-foreground); margin-top:4px; font-variant-numeric:tabular-nums; }
+.sheet-scroll { min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--muted-foreground) transparent; }
+.sheet-scroll::-webkit-scrollbar { width:4px; }
+.sheet-scroll::-webkit-scrollbar-track { background:transparent; }
+.sheet-scroll::-webkit-scrollbar-thumb { background:var(--muted-foreground); border-radius:999px; }
 .sheet .act { display:flex; align-items:center; gap:12px; width:100%; min-height:48px; padding:0 10px; border:0; background:transparent; color:var(--foreground); font:500 15px/1.3 var(--font); text-align:left; text-decoration:none; border-radius:var(--radius-lg); cursor:pointer; }
 .sheet .act i { font-size:20px; color:var(--muted-foreground); width:24px; text-align:center; flex:none; }
 .sheet .act:active { background:var(--muted); }
@@ -672,16 +675,15 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .sheet .sep { height:1px; background:var(--border); margin:6px 10px; }
 .sheet .body { padding:2px 10px 4px; }
 .sheet .rows, .sheet .cms { padding:0 10px; }
-.sheet .foot { display:flex; gap:10px; padding:12px 10px 4px; }
+.sheet .foot { flex:none; display:flex; gap:10px; padding:12px 10px 4px; background:linear-gradient(to bottom, transparent, var(--card) 18%); }
 .sheet .foot .prim { flex:1; min-height:46px; border:0; border-radius:999px; background:var(--primary); color:#fff; font:600 15px/1 var(--font); cursor:pointer; }
 .sheet .foot .prim:active { transform:scale(.98); }
 .sheet .foot .prim.danger { background:var(--destructive); }
 .sheet .foot .prim:focus-visible { outline:2px solid var(--ring); outline-offset:3px; }
 .sheet .foot .full-link { flex:none; min-height:46px; padding:0 14px; border-radius:999px; border:1px solid var(--border); color:var(--foreground); text-decoration:none; display:inline-flex; align-items:center; justify-content:center; font:600 14px/1 var(--font); }
-.activity-compose { position:sticky; bottom:0; display:flex; align-items:flex-end; gap:8px; margin:8px -2px -4px; padding:10px 2px 2px; background:linear-gradient(to bottom, transparent, var(--card) 20%); }
+.activity-compose { flex:none; position:relative; display:flex; align-items:flex-end; gap:8px; margin:8px -2px -4px; padding:10px 2px 2px; background:linear-gradient(to bottom, transparent, var(--card) 20%); }
 .sheet .activity-compose textarea { flex:1; min-width:0; min-height:44px; height:44px; max-height:120px; margin:0; padding:11px 12px; }
 .activity-compose .send { flex:none; width:44px; height:44px; border:0; border-radius:999px; background:var(--primary); color:#fff; font-size:18px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
-.sheet-expand { display:inline-flex; margin:0 10px 6px; padding:7px 0; color:var(--tint-indigo-fg); text-decoration:none; font:600 13px/1.2 var(--font); }
 .sheet textarea { width:100%; min-height:96px; margin-top:8px; padding:11px 12px; border-radius:var(--radius-md); border:1px solid var(--input); background:var(--background); color:var(--foreground); font:400 16px/1.45 var(--font); resize:none; }
 .sheet textarea:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
 .sheet label:not(.fld) { display:block; font:600 13px/1.2 var(--font); color:var(--muted-foreground); }
@@ -774,7 +776,8 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .fld .amt input { width:100%; padding-left:34px; font:700 22px/normal var(--font-hubot); letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
 .fld .amt input:not(:placeholder-shown) + i, .fld .amt:focus-within i { color:var(--foreground); }
 .fld .amt:focus-within i { color:var(--foreground); }
-.fld.row { flex-direction:column; align-items:stretch; justify-content:flex-start; gap:2px; min-height:65px; padding-top:2px; }
+.toggle-group { display:flex; flex-direction:column; gap:14px; }
+.fld.row { flex-direction:column; align-items:stretch; justify-content:flex-start; gap:4px; min-height:0; padding-top:0; }
 .fld.row > span:first-child { font:500 15px/1.3 var(--font); }
 .switch-hit { position:relative; align-self:flex-end; width:51px; height:44px; flex:none; }
 .switch-hit input { position:absolute; inset:0; z-index:1; width:51px; min-height:44px; height:44px; margin:0; padding:0; border:0; border-radius:999px; opacity:0; cursor:pointer; }
@@ -806,7 +809,7 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .ddlist button:hover { background:var(--glass-hover); }
 .ddlist button i { opacity:0; color:var(--ring); font-size:16px; }
 .ddlist button[aria-selected="true"] i { opacity:1; }
-.infob { position:relative; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; margin-left:2px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer; vertical-align:-6px; }
+.infob { position:relative; display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; margin:-11px -9px -11px -7px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer; vertical-align:-16px; }
 .infob i { font-size:16px; }
 .infopop { position:absolute; left:10px; right:10px; top:100%; z-index:6; margin-top:4px; padding:10px 12px; background:var(--elevated); border-radius:var(--radius-md); box-shadow:0 8px 24px rgba(0,0,0,.45), inset 0 0 0 1px var(--elevated-border); color:var(--foreground); font:500 13px/1.4 var(--font); }
 .srow.flash { animation:rowflash 1400ms var(--ease-out); }
@@ -814,6 +817,9 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .ghostbtn.armed { background:var(--destructive); box-shadow:none; color:#fff; }
 .sheet #dedSheetT { margin-bottom:2px; }
 .ghostbtn { position:relative; flex:none; min-height:46px; padding:0 18px; border:0; border-radius:999px; background:var(--glass-fill); box-shadow:inset 0 0 0 1px var(--glass-border-strong); color:var(--tint-red-fg); font:600 15px/1 var(--font); cursor:pointer; }
+#dedSheet .foot .prim, #dedSheet .foot .ghostbtn { flex:1 1 0; }
+.danger-secondary { flex:1; min-height:46px; border:1px solid color-mix(in srgb,var(--tint-red-fg) 48%,transparent); border-radius:999px; background:transparent; color:var(--tint-red-fg); font:600 15px/1 var(--font); cursor:pointer; }
+.danger-secondary:focus-visible { outline:2px solid var(--ring); outline-offset:3px; }
 .ghostbtn:active { transform:scale(.97); }
 .ghostbtn:focus-visible { outline:2px solid var(--ring); outline-offset:3px; }
 .seg { display:flex; gap:var(--space-1); margin:2px 10px 8px; padding:var(--space-1); background:var(--muted); border-radius:var(--radius-lg); }
@@ -1733,7 +1739,7 @@ Thanks</textarea></div>
     </div>
 
     <!-- allocation sheet -->
-    <div class="sheet" id="allocSheet" role="dialog" aria-modal="true" aria-labelledby="allocSheetT" hidden>
+    <div class="sheet" id="allocSheet" role="dialog" aria-modal="true" aria-labelledby="allocSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="allocSheetT">Commission allocation<span class="sh-sub" id="allocSub">Listing side</span></div>
       <div class="seg alloc-presets" role="radiogroup" aria-label="Allocation preset">
@@ -1756,7 +1762,7 @@ Thanks</textarea></div>
     </div>
 
     <!-- exact per-agent allocation, matching web remainder behavior -->
-    <div class="sheet" id="agentAllocSheet" role="dialog" aria-modal="true" aria-labelledby="agentAllocSheetT" hidden>
+    <div class="sheet" id="agentAllocSheet" role="dialog" aria-modal="true" aria-labelledby="agentAllocSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="agentAllocSheetT" tabindex="-1">Agent allocation<span class="sh-sub" id="agentAllocSub">Listing side · must total 100%</span></div>
       <div class="allocation-editor" id="agentAllocEditor"></div>
@@ -1765,7 +1771,7 @@ Thanks</textarea></div>
     </div>
 
     <!-- side award distribution -->
-    <div class="sheet" id="awardSheet" role="dialog" aria-modal="true" aria-labelledby="awardSheetT" hidden>
+    <div class="sheet" id="awardSheet" role="dialog" aria-modal="true" aria-labelledby="awardSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="awardSheetT" tabindex="-1">Award distribution<span class="sh-sub" id="awardSub">Listing side</span></div>
       <div class="fields">
@@ -1777,9 +1783,9 @@ Thanks</textarea></div>
     </div>
 
     <!-- deduction editor -->
-    <div class="sheet" id="dedSheet" role="dialog" aria-modal="true" aria-labelledby="dedSheetT" hidden>
+    <div class="sheet" id="dedSheet" role="dialog" aria-modal="true" aria-labelledby="dedSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
-      <div class="sh-name" id="dedSheetT" tabindex="-1">Add credit or referral<span class="sh-sub" id="dedSub">Listing side</span><button class="infob" type="button" id="dedInfoBtn" aria-label="What's this?" hidden><i class="ph ph-info" aria-hidden="true"></i></button><div class="infopop" id="dedInfoPop" hidden></div></div>
+      <div class="sh-name" id="dedSheetT" tabindex="-1">Add credit or referral<span class="sh-sub" id="dedSub">Listing side</span><button class="infob" type="button" id="dedInfoBtn" aria-label="What's this?" aria-controls="dedInfoPop" aria-expanded="false" hidden><i class="ph ph-info" aria-hidden="true"></i></button><div class="infopop" id="dedInfoPop" role="note" hidden></div></div>
       <div class="fields">
         <div class="fld" id="fType" hidden><span id="dedTypeLbl">Fee type</span>
           <div class="seg kind" role="radiogroup" aria-labelledby="dedTypeLbl">
@@ -1788,11 +1794,11 @@ Thanks</textarea></div>
           </div>
           <span class="err" id="eType">Pick credit or referral.</span>
         </div>
-        <label class="fld" id="fName"><span>Name</span><input type="text" id="dedName" placeholder="E&amp;O, TC, title fee" autocomplete="off"><span class="err" id="eName">Give the deduction a name.</span></label>
-        <label class="fld" id="fAmt"><span>Amount</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="dedAmt" placeholder="0"></span><span class="err" id="eAmt">Enter an amount above $0.</span></label>
+        <label class="fld" id="fName"><span>Name</span><input type="text" id="dedName" placeholder="E&amp;O, TC, title fee" autocomplete="off" aria-describedby="eName"><span class="err" id="eName" aria-live="polite">Give the deduction a name.</span></label>
+        <label class="fld" id="fAmt"><span>Amount</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="dedAmt" placeholder="0" aria-describedby="eAmt"></span><span class="err" id="eAmt" aria-live="polite">Enter an amount above $0.</span></label>
         <div class="fld" id="fFeePayer" hidden><span id="dedFeePayerLbl">Fee payer</span>
           <div class="dd" id="ddFeePayer">
-            <button type="button" class="ddbtn" id="ddFeePayerBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="dedFeePayerLbl"><span id="ddFeePayerVal">Agent</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
+            <button type="button" class="ddbtn" id="ddFeePayerBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="ddFeePayerList" aria-labelledby="dedFeePayerLbl"><span id="ddFeePayerVal">Agent</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
             <div class="ddlist" id="ddFeePayerList" role="listbox" aria-labelledby="dedFeePayerLbl" hidden>
               <button type="button" role="option" data-feepayer="Agent" aria-selected="true">Agent<i class="ph ph-check" aria-hidden="true"></i></button>
               <button type="button" role="option" data-feepayer="Both" aria-selected="false">Both agents<i class="ph ph-check" aria-hidden="true"></i></button>
@@ -1802,7 +1808,7 @@ Thanks</textarea></div>
         </div>
         <div class="fld" id="fPayTo"><span id="dedPayToLbl">Payable to</span>
           <div class="dd" id="ddPayTo">
-            <button type="button" class="ddbtn" id="ddPayToBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="dedPayToLbl"><span id="ddPayToVal">Select</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
+            <button type="button" class="ddbtn" id="ddPayToBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="ddPayToList" aria-labelledby="dedPayToLbl"><span id="ddPayToVal">Select</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
             <div class="ddlist" id="ddPayToList" role="listbox" aria-labelledby="dedPayToLbl" hidden>
               <button type="button" role="option" data-dedpayto="radius" aria-selected="false">Radius<i class="ph ph-check" aria-hidden="true"></i></button>
               <button type="button" role="option" data-dedpayto="team" aria-selected="false">Team<i class="ph ph-check" aria-hidden="true"></i></button>
@@ -1812,9 +1818,11 @@ Thanks</textarea></div>
           <span class="hintl" id="payToHint">Who the money is disbursed to at closing.</span>
           <span class="err" id="ePayTo">Pick who this is payable to.</span>
         </div>
-        <label class="fld" id="fPayee" hidden><span>Payable name</span><input type="text" id="dedPayee" placeholder="e.g. Harbor Realty Group" autocomplete="off"><span class="err" id="ePayee">Name the brokerage or company being paid.</span></label>
-        <label class="fld row" id="fContributes" hidden><span>Contributes to cap</span><span class="switch-hit"><input type="checkbox" id="dedContributes"><span class="switch-track" aria-hidden="true"></span></span></label>
-        <label class="fld row" id="fPrivate" hidden><span>Private fee</span><span class="switch-hit"><input type="checkbox" id="dedPrivate"><span class="switch-track" aria-hidden="true"></span></span></label>
+        <label class="fld" id="fPayee" hidden><span>Payable name</span><input type="text" id="dedPayee" placeholder="e.g. Harbor Realty Group" autocomplete="off" aria-describedby="ePayee"><span class="err" id="ePayee" aria-live="polite">Name the brokerage or company being paid.</span></label>
+        <div class="toggle-group" aria-label="Fee settings">
+          <label class="fld row" id="fContributes" hidden><span>Contributes to cap</span><span class="switch-hit"><input type="checkbox" id="dedContributes"><span class="switch-track" aria-hidden="true"></span></span></label>
+          <label class="fld row" id="fPrivate" hidden><span>Private fee</span><span class="switch-hit"><input type="checkbox" id="dedPrivate"><span class="switch-track" aria-hidden="true"></span></span></label>
+        </div>
       </div>
       <div class="note" id="dedKindNote">Credits and referrals come off the side gross before any split, so both sides feel them.</div>
       <div class="foot">
@@ -1824,7 +1832,7 @@ Thanks</textarea></div>
     </div>
 
     <!-- add agent sheet -->
-    <div class="sheet" id="agentSheet" role="dialog" aria-modal="true" aria-labelledby="agentSheetT" hidden>
+    <div class="sheet" id="agentSheet" role="dialog" aria-modal="true" aria-labelledby="agentSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="agentSheetT" tabindex="-1">Add agents<span class="sh-sub" id="agentSub">Listing side</span></div>
       <div class="sfield">
@@ -1846,11 +1854,11 @@ Thanks</textarea></div>
     </div>
 
     <!-- flat fee editor — the two fees that are a set amount, not a formula -->
-    <div class="sheet" id="feeSheet" role="dialog" aria-modal="true" aria-labelledby="feeSheetT" hidden>
+    <div class="sheet" id="feeSheet" role="dialog" aria-modal="true" aria-labelledby="feeSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="feeSheetT" tabindex="-1">Radius fee<span class="sh-sub" id="feeSub">Mark Perez</span></div>
       <div class="fields">
-        <label class="fld" id="fFeeAmt"><span>Amount</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="feeAmt" placeholder="0"></span><span class="err" id="eFeeAmt">Enter an amount of $0 or more.</span></label>
+        <label class="fld" id="fFeeAmt"><span>Amount</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="feeAmt" placeholder="0" aria-describedby="eFeeAmt"></span><span class="err" id="eFeeAmt" aria-live="polite">Enter an amount of $0 or more.</span></label>
       </div>
       <div class="note" id="feeNote"></div>
       <div class="foot"><button class="prim" type="button" id="feeSave">Save</button></div>
@@ -1863,24 +1871,24 @@ Thanks</textarea></div>
       <div id="planList"></div>
     </div>
 
-    <div class="sheet" id="postCapPlanSheet" role="dialog" aria-modal="true" aria-labelledby="postCapPlanSheetT" hidden>
+    <div class="sheet" id="postCapPlanSheet" role="dialog" aria-modal="true" aria-labelledby="postCapPlanSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="postCapPlanSheetT" tabindex="-1">Add post-cap plan<span class="sh-sub" id="postCapPlanSub">Mark Perez</span></div>
       <div class="fields">
-        <label class="fld" id="fPostCapPlanName"><span>Plan name</span><input type="text" id="postCapPlanName" placeholder="e.g. Team post-cap 1%"><span class="err">Enter a plan name.</span></label>
+        <label class="fld" id="fPostCapPlanName"><span>Plan name</span><input type="text" id="postCapPlanName" placeholder="e.g. Team post-cap 1%" aria-describedby="ePostCapPlanName"><span class="err" id="ePostCapPlanName" aria-live="polite">Enter a plan name.</span></label>
         <div class="fld"><span id="postCapPlanKindLabel">Charge type</span>
           <div class="seg kind" role="radiogroup" aria-labelledby="postCapPlanKindLabel">
             <button type="button" role="radio" data-postcap-new-kind="flat" aria-checked="true">Flat amount</button>
             <button type="button" role="radio" data-postcap-new-kind="pct" aria-checked="false">Percentage</button>
           </div>
         </div>
-        <label class="fld" id="fPostCapPlanAmount"><span id="postCapPlanAmountLabel">Flat amount</span><span class="amt"><i aria-hidden="true" id="postCapPlanUnit">$</i><input type="text" inputmode="decimal" id="postCapPlanAmount" placeholder="0"></span><span class="err" id="ePostCapPlanAmount">Enter an amount of $0 or more.</span></label>
+        <label class="fld" id="fPostCapPlanAmount"><span id="postCapPlanAmountLabel">Flat amount</span><span class="amt"><i aria-hidden="true" id="postCapPlanUnit">$</i><input type="text" inputmode="decimal" id="postCapPlanAmount" placeholder="0" aria-describedby="ePostCapPlanAmount"></span><span class="err" id="ePostCapPlanAmount" aria-live="polite">Enter an amount of $0 or more.</span></label>
       </div>
       <div class="foot"><button class="prim" type="button" id="postCapPlanSave">Add plan</button></div>
     </div>
 
     <!-- custom split sheet — the plan set by hand -->
-    <div class="sheet" id="splitSheet" role="dialog" aria-modal="true" aria-labelledby="splitSheetT" hidden>
+    <div class="sheet" id="splitSheet" role="dialog" aria-modal="true" aria-labelledby="splitSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="splitSheetT" tabindex="-1">Custom plan<span class="sh-sub" id="splitSub">Mark Perez</span></div>
       <div class="fields">
@@ -1890,14 +1898,14 @@ Thanks</textarea></div>
             <button type="button" role="radio" data-splitkind="flat" aria-checked="false">Flat amount</button>
           </div>
         </div>
-        <label class="fld" id="fSplitAmt"><span id="splitAmtLbl">Your share</span><span class="amt"><i aria-hidden="true" id="splitUnit">%</i><input type="text" inputmode="decimal" id="splitAmt" placeholder="0"></span><span class="err" id="eSplitAmt">Enter a split between 0 and 100.</span></label>
+        <label class="fld" id="fSplitAmt"><span id="splitAmtLbl">Your share</span><span class="amt"><i aria-hidden="true" id="splitUnit">%</i><input type="text" inputmode="decimal" id="splitAmt" placeholder="0" aria-describedby="eSplitAmt"></span><span class="err" id="eSplitAmt" aria-live="polite">Enter a split between 0 and 100.</span></label>
       </div>
       <div class="note" id="splitNote"></div>
       <div class="foot"><button class="prim" type="button" id="splitSave">Save</button></div>
     </div>
 
     <!-- wire sheet -->
-    <div class="sheet" id="wireSheet" role="dialog" aria-modal="true" aria-labelledby="wireSheetT" hidden>
+    <div class="sheet" id="wireSheet" role="dialog" aria-modal="true" aria-labelledby="wireSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="wireSheetT">Deduction<span class="sh-sub" id="wireSub"></span></div>
       <div class="rows">
@@ -1958,10 +1966,9 @@ Thanks</textarea></div>
     <!-- side sheet -->
 
     <!-- activity and comments sheet -->
-    <div class="sheet" id="activitySheet" role="dialog" aria-modal="true" aria-labelledby="activitySheetT" hidden>
+    <div class="sheet" id="activitySheet" role="dialog" aria-modal="true" aria-labelledby="activitySheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="activitySheetT" tabindex="-1">Activity &amp; comments<span class="sh-sub" id="activitySub">118 Maple St</span></div>
-      <span class="sheet-expand" id="activityFullLink">Activity &amp; comments</span>
       <div class="cms"><ul class="feedlist" id="actFeed"></ul></div>
       <div class="activity-compose">
         <textarea id="cmInput" rows="1" placeholder="Add a comment" aria-label="Add a comment"></textarea>
@@ -1970,12 +1977,12 @@ Thanks</textarea></div>
     </div>
 
     <!-- top-level financial editor -->
-    <div class="sheet" id="financeSheet" role="dialog" aria-modal="true" aria-labelledby="financeSheetT" hidden>
+    <div class="sheet" id="financeSheet" role="dialog" aria-modal="true" aria-labelledby="financeSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="financeSheetT" tabindex="-1">Edit financials<span class="sh-sub">Changes recalculate every split and fee</span></div>
       <div class="fields">
-        <label class="fld" id="fSalePrice"><span>Sale price</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="salePriceInput" placeholder="0"></span><span class="err">Enter a sale price above $0.</span></label>
-        <label class="fld" id="fGrossCommission"><span>Gross commission</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="grossCommissionInput" placeholder="0"></span><span class="hintl">Total commission before side allocation.</span><span class="err">Enter gross commission of $0 or more.</span></label>
+        <label class="fld" id="fSalePrice"><span>Sale price</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="salePriceInput" placeholder="0" aria-describedby="eSalePrice"></span><span class="err" id="eSalePrice" aria-live="polite">Enter a sale price above $0.</span></label>
+        <label class="fld" id="fGrossCommission"><span>Gross commission</span><span class="amt"><i aria-hidden="true">$</i><input type="text" inputmode="decimal" id="grossCommissionInput" placeholder="0" aria-describedby="grossCommissionHint eGrossCommission"></span><span class="hintl" id="grossCommissionHint">Total commission before side allocation.</span><span class="err" id="eGrossCommission" aria-live="polite">Enter gross commission of $0 or more.</span></label>
       </div>
       <div class="foot"><button class="prim" type="button" id="financeSave">Save</button></div>
     </div>
@@ -2000,14 +2007,14 @@ Thanks</textarea></div>
     </div>
 
     <!-- return / reinitiate sheet — same shape, two different actions -->
-    <div class="sheet" id="returnSheet" role="dialog" aria-modal="true" aria-labelledby="returnSheetT" hidden>
+    <div class="sheet" id="returnSheet" role="dialog" aria-modal="true" aria-labelledby="returnSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="returnSheetT">Return for edits<span class="sh-sub" id="returnSheetSub">It goes back so the numbers can be edited. Confirmations given so far are cleared.</span></div>
       <div class="body">
         <label for="retNote">What needs to change? <span style="font-weight:400;color:var(--muted-foreground)">Optional</span></label>
         <textarea id="retNote" placeholder="E&amp;O should be $200 — same as the last closing."></textarea>
       </div>
-      <div class="foot"><button class="prim danger" type="button" id="returnGo">Return</button></div>
+      <div class="foot"><button class="danger-secondary" type="button" id="returnGo">Return</button></div>
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -3029,21 +3036,40 @@ Thanks</textarea></div>
   function toast(m) { toastEl.textContent = m; toastEl.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove('on'); }, 2600); }
 
   /* ── sheets ─────────────────────────────────────────── */
+  /* Keep each sheet's title and actions visible while only its content scrolls. */
+  Array.prototype.forEach.call(document.querySelectorAll('.sheet'), function (sheet) {
+    var head = sheet.querySelector('.sh-name'), footer = null;
+    Array.prototype.forEach.call(sheet.children, function (child) {
+      if (!footer && (child.classList.contains('foot') || child.classList.contains('activity-compose'))) footer = child;
+    });
+    if (!head) return;
+    var scroller = document.createElement('div');
+    scroller.className = 'sheet-scroll';
+    var node = head.nextSibling;
+    while (node && node !== footer) {
+      var next = node.nextSibling;
+      scroller.appendChild(node);
+      node = next;
+    }
+    sheet.insertBefore(scroller, footer);
+  });
+
   /* every sheet gets a real close control — the grabber is an accelerator, not the only way out */
   Array.prototype.forEach.call(document.querySelectorAll('.sheet .sh-name'), function (h) {
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'sh-close'; b.setAttribute('aria-label', 'Close');
     b.innerHTML = '<i class="ph ph-x" aria-hidden="true"></i>';
-    b.addEventListener('click', function () { close(); });
+    b.addEventListener('click', requestClose);
     h.appendChild(b);
   });
 
   var FOCUSABLE = 'button:not([disabled]), a[href], textarea, input, select, [tabindex]:not([tabindex="-1"])';
   var bgEls = [document.getElementById('scroll'), document.querySelector('.pg-head'), document.getElementById('abar')];
+  var sheetDirty = false;
   function open(el, trigger) {
     if (openSheetEl) close(true);
     lastFocus = trigger || document.activeElement;
-    openSheetEl = el; el.hidden = false;
+    openSheetEl = el; sheetDirty = false; el.hidden = false;
     /* modal means modal: background is inert, unscrollable and hidden from AT */
     scrollEl.style.overflow = 'hidden';
     bgEls.forEach(function (n) { if (n) n.setAttribute('aria-hidden', 'true'); });
@@ -3058,7 +3084,7 @@ Thanks</textarea></div>
   }
   function close(silent) {
     var el = openSheetEl; if (!el) return;
-    openSheetEl = null;
+    openSheetEl = null; sheetDirty = false;
     el.classList.remove('on'); scrim.classList.remove('on');
     el.style.transform = '';
     scrollEl.style.overflow = '';
@@ -3072,12 +3098,30 @@ Thanks</textarea></div>
     setTimeout(function () { el.hidden = true; }, 300);
     if (!silent && lastFocus) lastFocus.focus();
   }
-  scrim.addEventListener('click', function () { close(); });
+  function requestClose() {
+    if (openSheetEl && sheetDirty && !window.confirm('Discard your unsaved changes?')) {
+      openSheetEl.style.transform = '';
+      return false;
+    }
+    close();
+    return true;
+  }
+  document.addEventListener('input', function (e) {
+    if (openSheetEl && openSheetEl.hasAttribute('data-dirty-guard') && openSheetEl.contains(e.target) && e.target.type !== 'search') sheetDirty = true;
+  });
+  document.addEventListener('change', function (e) {
+    if (openSheetEl && openSheetEl.hasAttribute('data-dirty-guard') && openSheetEl.contains(e.target) && e.target.type !== 'search') sheetDirty = true;
+  });
+  document.addEventListener('click', function (e) {
+    if (openSheetEl && openSheetEl.hasAttribute('data-dirty-guard') && openSheetEl.contains(e.target)
+        && e.target.closest('[role="radio"], [role="option"], .stb')) sheetDirty = true;
+  });
+  scrim.addEventListener('click', requestClose);
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && openSheetEl) {
       e.preventDefault();
       e.stopImmediatePropagation();
-      close();
+      requestClose();
       return;
     }
     if (e.key !== 'Tab' || !openSheetEl) return;
@@ -3106,7 +3150,7 @@ Thanks</textarea></div>
       if (y0 === null) return;
       var dy = Math.max(0, e.clientY - y0);
       y0 = null; sheet.classList.remove('drag');
-      if (dy > 90) { close(); } else { sheet.style.transform = ''; }
+      if (dy > 90) { requestClose(); } else { sheet.style.transform = ''; }
     });
   });
   document.addEventListener('click', function (e) {
@@ -5152,6 +5196,7 @@ Thanks</textarea></div>
     add.textContent = externalAgentMode ? 'Add external agent' : (agentPick.length < 2 ? 'Add agent' : 'Add ' + agentPick.length + ' agents');
   }
   document.getElementById('agentExternalToggle').addEventListener('click', function () {
+    sheetDirty = true;
     externalAgentMode = !externalAgentMode;
     document.getElementById('agentExternalFields').hidden = !externalAgentMode;
     document.getElementById('agentList').hidden = externalAgentMode;
@@ -5167,6 +5212,7 @@ Thanks</textarea></div>
   });
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-pickagent]'); if (!b) return;
+    sheetDirty = true;
     var n = b.getAttribute('data-pickagent'), i = agentPick.indexOf(n);
     if (i > -1) agentPick.splice(i, 1); else agentPick.push(n);
     /* mutate in place so the pressed row keeps focus through several picks */
@@ -5175,6 +5221,7 @@ Thanks</textarea></div>
   });
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-unpick]'); if (!b) return;
+    sheetDirty = true;
     var n = b.getAttribute('data-unpick'), i = agentPick.indexOf(n);
     if (i > -1) agentPick.splice(i, 1);
     var row = document.querySelector('#agentList [data-pickagent="' + n.replace(/"/g, '\\"') + '"]');
@@ -5332,24 +5379,56 @@ Thanks</textarea></div>
     dd.querySelector('.ddbtn').setAttribute('aria-expanded', 'false');
     dd.querySelector('.ddlist').hidden = true;
   }
+  function openDD(dd, focusOption) {
+    Array.prototype.forEach.call(document.querySelectorAll('.dd.open'), closeDD);
+    dd.classList.add('open');
+    dd.querySelector('.ddbtn').setAttribute('aria-expanded', 'true');
+    dd.querySelector('.ddlist').hidden = false;
+    if (focusOption) {
+      var selected = dd.querySelector('[role="option"][aria-selected="true"]') || dd.querySelector('[role="option"]');
+      if (selected) selected.focus();
+    }
+  }
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('.ddbtn');
     if (btn) {
       var dd = btn.closest('.dd'), willOpen = !dd.classList.contains('open');
       Array.prototype.forEach.call(document.querySelectorAll('.dd.open'), closeDD);
-      if (willOpen) { dd.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); dd.querySelector('.ddlist').hidden = false; }
+      if (willOpen) openDD(dd, false);
       return;
     }
     if (!e.target.closest('.dd')) Array.prototype.forEach.call(document.querySelectorAll('.dd.open'), closeDD);
   });
+  document.addEventListener('keydown', function (e) {
+    var btn = e.target.closest('.ddbtn'), option = e.target.closest('[role="option"]');
+    if (btn && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      e.preventDefault(); openDD(btn.closest('.dd'), true); return;
+    }
+    if (!option) return;
+    var dd = option.closest('.dd'), options = Array.prototype.slice.call(dd.querySelectorAll('[role="option"]')),
+        index = options.indexOf(option), next = null;
+    if (e.key === 'ArrowDown') next = options[(index + 1) % options.length];
+    else if (e.key === 'ArrowUp') next = options[(index - 1 + options.length) % options.length];
+    else if (e.key === 'Home') next = options[0];
+    else if (e.key === 'End') next = options[options.length - 1];
+    else if (e.key === 'Escape') {
+      e.preventDefault(); closeDD(dd); dd.querySelector('.ddbtn').focus(); return;
+    }
+    if (next) { e.preventDefault(); next.focus(); }
+  });
   var dedInfoBtnEl = document.getElementById('dedInfoBtn');
   if (dedInfoBtnEl) dedInfoBtnEl.addEventListener('click', function (e) {
     e.stopPropagation();
-    document.getElementById('dedInfoPop').hidden = !document.getElementById('dedInfoPop').hidden;
+    var pop = document.getElementById('dedInfoPop'), willOpen = pop.hidden;
+    pop.hidden = !willOpen;
+    dedInfoBtnEl.setAttribute('aria-expanded', String(willOpen));
   });
   document.addEventListener('click', function (e) {
     var pop = document.getElementById('dedInfoPop');
-    if (pop && !pop.hidden && !e.target.closest('#dedInfoPop') && !e.target.closest('#dedInfoBtn')) pop.hidden = true;
+    if (pop && !pop.hidden && !e.target.closest('#dedInfoPop') && !e.target.closest('#dedInfoBtn')) {
+      pop.hidden = true;
+      dedInfoBtnEl.setAttribute('aria-expanded', 'false');
+    }
   });
   function clearDedErrors() {
     ['fType', 'fName', 'fAmt', 'fPayTo', 'fPayee'].forEach(function (id) {
@@ -6003,7 +6082,7 @@ Thanks</textarea></div>
     var input = document.getElementById('cmInput'), v = input.value.trim(); if (!v) { input.focus(); return; }
     var me = role === 'agent' ? ['Mark Perez', 'ag'] : role === 'team_lead' ? ['Andy Martin', 'lead'] : ['Jessica Hall', 'aud'];
     logActivity(me[0], me[1], v, false);
-    input.value = ''; input.style.height = 'auto'; toast('Comment posted.');
+    input.value = ''; input.style.height = 'auto'; sheetDirty = false; toast('Comment posted.');
   });
   document.getElementById('cmInput').addEventListener('input', function () {
     this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 120) + 'px';
