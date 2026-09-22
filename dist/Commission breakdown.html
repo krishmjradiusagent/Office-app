@@ -776,10 +776,10 @@ button.pv.edit:focus-visible { outline:2px solid var(--ring); outline-offset:3px
 .fld .amt input { width:100%; padding-left:34px; font:700 22px/normal var(--font-hubot); letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
 .fld .amt input:not(:placeholder-shown) + i, .fld .amt:focus-within i { color:var(--foreground); }
 .fld .amt:focus-within i { color:var(--foreground); }
-.toggle-group { display:flex; flex-direction:column; gap:14px; }
-.fld.row { flex-direction:column; align-items:stretch; justify-content:flex-start; gap:4px; min-height:0; padding-top:0; }
+.toggle-group { display:flex; flex-direction:column; gap:8px; }
+.fld.row { flex-direction:row; align-items:center; justify-content:space-between; gap:12px; min-height:44px; padding:0 2px; }
 .fld.row > span:first-child { font:500 15px/1.3 var(--font); }
-.switch-hit { position:relative; align-self:flex-end; width:51px; height:44px; flex:none; }
+.switch-hit { position:relative; width:51px; height:44px; flex:none; }
 .switch-hit input { position:absolute; inset:0; z-index:1; width:51px; min-height:44px; height:44px; margin:0; padding:0; border:0; border-radius:999px; opacity:0; cursor:pointer; }
 .switch-track { position:absolute; left:0; top:6px; width:51px; height:32px; border-radius:999px; background:var(--muted); box-shadow:inset 0 0 0 1px var(--input-stroke); pointer-events:none; transition:background 140ms var(--ease-out), box-shadow 140ms var(--ease-out); }
 .switch-track::after { content:''; position:absolute; left:3px; top:3px; width:26px; height:26px; border-radius:50%; background:var(--foreground); box-shadow:0 1px 3px rgba(0,0,0,.35); transition:transform 140ms var(--ease-out); }
