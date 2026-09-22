@@ -1068,7 +1068,7 @@ button.ybd-r:active { opacity:.7; }
 .ybd-det button.d .chev { order:-1; margin-right:-2px; font-size:13px; }
 .ybd-det button.d .expand-mark { order:-1; flex:none; width:18px; margin-right:-2px;
   color:var(--muted-foreground); display:inline-flex; align-items:center; justify-content:center;
-  font-size:13px; line-height:1; }
+  font-size:17px; line-height:1; }
 .ybd-det button.d.grp { gap:6px; }
 .ybd-det button.d.grp .expand-mark { width:18px; margin-right:0; text-align:left; }
 .ybd-det button.d.grp > span { gap:4px; flex-wrap:nowrap; white-space:nowrap; }
@@ -3325,6 +3325,11 @@ Thanks</textarea></div>
     state.frame = requestAnimationFrame(frame);
   }
   function toggleYbdInner(button, body, open) {
+    var mark = button.querySelector('.expand-mark');
+    if (mark) {
+      mark.classList.toggle('ph-plus', !open);
+      mark.classList.toggle('ph-minus', open);
+    }
     var state = ybdInnerState(body), continuing = !!state.frame,
         liveHeight = body.hidden ? 0 : body.getBoundingClientRect().height,
         liveRotation = continuing ? state.rot : (button.getAttribute('aria-expanded') === 'true' ? 90 : 0),
@@ -3648,7 +3653,7 @@ Thanks</textarea></div>
         l.setAttribute('aria-expanded', 'false');
         l.setAttribute('aria-controls', did);
         var cc = document.createElement('i');
-        cc.className = basisDisclosure ? 'ph ph-caret-right chev expand-mark' : 'ph ph-caret-right chev';
+        cc.className = basisDisclosure ? 'ph ph-plus expand-mark' : 'ph ph-caret-right chev';
         cc.setAttribute('aria-hidden', 'true');
         l.appendChild(cc);
         host.appendChild(blk);
@@ -3735,7 +3740,7 @@ Thanks</textarea></div>
         ge.textContent = g.rows.length + (g.itemLabel ? ' ' + g.itemLabel : (g.rows.length === 1 ? ' fee' : ' fees'));
         gs.appendChild(ge);
         var gv = document.createElement('b'); gv.textContent = cur(g.amt);
-        var gm = document.createElement('i'); gm.className = 'ph ph-caret-right chev expand-mark'; gm.style.transform = 'rotate(' + (open ? 90 : 0) + 'deg)'; gm.setAttribute('aria-hidden', 'true');
+        var gm = document.createElement('i'); gm.className = 'ph ' + (open ? 'ph-minus' : 'ph-plus') + ' expand-mark'; gm.setAttribute('aria-hidden', 'true');
         gb.appendChild(gs); if (!g.hideTotal) gb.appendChild(gv); gb.appendChild(gm);
         gb.setAttribute('aria-expanded', String(open));
         gb.setAttribute('aria-controls', gid);
