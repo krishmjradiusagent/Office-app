@@ -1314,9 +1314,11 @@ button.ybd-r:active { opacity:.7; }
 .agentrow .ab { min-width:0; }
 .agentrow .meta-line { display:flex; align-items:center; gap:6px; min-width:0; }
 .agentrow .meta-line > b { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.agent-alloc { flex:none; display:inline-flex; align-items:center; justify-content:center; min-width:40px; height:20px; padding:0 8px;
-  border:1px solid var(--border); border-radius:999px; background:var(--muted); color:var(--muted-foreground);
-  white-space:nowrap; font:600 11px/1 var(--font); font-variant-numeric:tabular-nums; cursor:default; }
+.agentrow { position:relative; }
+.agent-open { position:absolute; inset:0; width:100%; height:100%; border:0; background:transparent; border-radius:8px; cursor:pointer; }
+.agent-open:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
+.agentrow .ab, .agentrow .ini, .agentrow .ap, .agentrow .achev { pointer-events:none; }
+.agentrow .agent-alloc { position:relative; z-index:1; pointer-events:auto; min-width:42px; font-variant-numeric:tabular-nums; }
 .relationship-stack { display:grid; min-width:0; padding:4px 0; }
 .relationship-plan-row { position:relative; min-height:44px; align-items:center; }
 .relationship-plan-row .pk { display:flex; align-items:center; gap:5px; color:var(--muted-foreground); }
@@ -1476,6 +1478,23 @@ body { position:relative; gap:0; }
   .tweaks-popover { left:auto; right:0; width:min(286px,calc(100vw - 24px)); }
 }
 @media (prefers-reduced-motion:reduce) { .tweaks-popover { animation:none; } }
+
+#agentAllocSheet .allocation-line { display:block; padding:12px 0; border-bottom:1px solid var(--border); }
+.allocation-person { display:flex; flex-direction:column; gap:3px; margin-bottom:10px; }
+.allocation-person b { font:600 15px/1.3 var(--font); }
+.allocation-person span { color:var(--muted-foreground); font-size:12px; }
+.allocation-values { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:12px; }
+#agentAllocSheet .allocation-values label { display:flex; align-items:center; gap:6px; min-height:40px; padding:0 12px; border:1px solid var(--border); border-radius:999px; background:var(--muted); }
+#agentAllocSheet .allocation-values input { width:100%; min-width:0; height:38px; padding:0; border:0; background:transparent; color:var(--foreground); font:600 15px/1 var(--font); text-align:right; appearance:textfield; }
+#agentAllocSheet .allocation-values label:focus-within { outline:2px solid var(--ring); outline-offset:2px; }
+#agentAllocSheet .allocation-values input:focus { outline:none; }
+#agentAllocSheet input::-webkit-inner-spin-button { appearance:none; }
+.allocation-values label > b { color:var(--muted-foreground); font:500 14px/1 var(--font); }
+.allocation-total { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:16px 0; font:500 13px/1.4 var(--font); }
+.allocation-actions { display:flex; gap:12px; }
+.allocation-actions > button { flex:1; }
+#agentAllocCancel { background:var(--muted); color:var(--foreground); border:1px solid var(--border); }
+
 </style>
 </head>
 <body>
@@ -1555,16 +1574,8 @@ body { position:relative; gap:0; }
               <button class="side-metric-toggle" type="button" aria-expanded="false" aria-controls="metricList1"><span>View all</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
             </div>
           </div>
-          <button class="srow" type="button" aria-haspopup="dialog" data-alloc="mine">
-            <span class="sk"><b>Commission allocation</b><em id="x1AllocSub">50% of $99,000 · both sides</em></span>
-            <span class="svv" id="x1Alloc">50%</span>
-            <i class="ph ph-caret-right chev" aria-hidden="true"></i>
-          </button>
         <div class="ssub">Agents on this side</div>
         <div class="agentlist" id="agentList1"></div>
-        <button class="addrow" type="button" data-agentalloc="mine">
-          <i class="ph ph-percent lead" aria-hidden="true"></i><span class="ab"><b>Edit agent allocation</b></span>
-        </button>
         <button class="addrow" type="button" aria-haspopup="dialog" data-addagent="Listing side" data-agent-side="mine">
           <i class="ph ph-plus-circle lead" aria-hidden="true"></i>
           <span class="ab"><b>Add agent</b></span>
@@ -1619,10 +1630,6 @@ body { position:relative; gap:0; }
               <button class="side-metric-toggle" type="button" aria-expanded="false" aria-controls="metricList2"><span>View all</span><i class="ph ph-caret-down" aria-hidden="true"></i></button>
             </div>
           </div>
-          <div class="srow">
-            <span class="sk"><b>Commission allocation</b><em id="x2AllocSub">50% of $99,000 · both sides</em></span>
-            <span class="svv" id="x2Alloc">50%</span>
-          </div>
           <div id="deds2"></div>
           <div class="srow tot plain">
             <span class="sk"><b>Gross after deductions</b><em>What the splits are taken from</em></span>
@@ -1632,9 +1639,6 @@ body { position:relative; gap:0; }
         <div class="noagent" id="noAgent2">No Radius agent here — the co-op brokerage pays its own agent.</div>
         <div class="agentlist" id="agentList2"></div>
         <button class="addrow" type="button" aria-haspopup="dialog" data-addagent="Buying side" data-agent-side="other"><i class="ph ph-plus-circle lead" aria-hidden="true"></i><span class="ab"><b>Add agent</b></span></button>
-        <button class="addrow" type="button" data-agentalloc="other">
-          <i class="ph ph-percent lead" aria-hidden="true"></i><span class="ab"><b>Edit agent allocation</b></span>
-        </button>
         </div>
       </div>
       </div>
@@ -1774,9 +1778,9 @@ Thanks</textarea></div>
     <div class="sheet" id="agentAllocSheet" role="dialog" aria-modal="true" aria-labelledby="agentAllocSheetT" data-dirty-guard hidden>
       <div class="grab" aria-hidden="true"></div>
       <div class="sh-name" id="agentAllocSheetT" tabindex="-1">Agent allocation<span class="sh-sub" id="agentAllocSub">Listing side · must total 100%</span></div>
-      <div class="allocation-editor" id="agentAllocEditor"></div>
+      <p class="note" id="agentAllocHint"></p><div class="allocation-editor" id="agentAllocEditor"></div><div class="allocation-total"><span>Total allocation</span><b id="agentAllocTotal" aria-live="polite"></b></div>
       <div class="note" id="agentAllocError" hidden>Allocations must total exactly 100%.</div>
-      <div class="foot"><button class="prim" type="button" id="agentAllocSave">Save allocation</button></div>
+      <div class="foot allocation-actions"><button class="prim" type="button" id="agentAllocCancel">Cancel</button><button class="prim" type="button" id="agentAllocSave">Save</button></div>
     </div>
 
     <!-- side award distribution -->
@@ -2414,13 +2418,12 @@ Thanks</textarea></div>
   function teamLeadTakeHome() { return Math.max(0, teamNet - groupNet - teamLeadFees()); }
   function groupLeadTakeHome() { return groupNet; }
   function agentRowEl(o, isFirst) {
-    var row = document.createElement(o.rows ? 'button' : 'div');
+    var row = document.createElement('div');
     row.className = 'agentrow' + (isFirst ? ' first' : '');
     if (o.rows) {
-      row.type = 'button';
-      row.setAttribute('aria-haspopup', 'dialog');
-      row.setAttribute('aria-controls', 'agentDetailPage');
-      row.setAttribute('aria-label', 'View breakdown for ' + o.name);
+      var navigate = document.createElement('button'); navigate.type = 'button'; navigate.className = 'agent-open'; navigate.setAttribute('data-agent-open', '');
+      navigate.setAttribute('aria-haspopup', 'dialog'); navigate.setAttribute('aria-controls', 'agentDetailPage');
+      navigate.setAttribute('aria-label', 'View breakdown for ' + o.name); row.appendChild(navigate);
       row.agentBreakdown = o;
     }
     if (o.only) row.setAttribute('data-only', o.only);
@@ -2433,7 +2436,9 @@ Thanks</textarea></div>
     var em = document.createElement('em'); em.textContent = o.role;
     var ml = document.createElement('span'); ml.className = 'meta-line'; ml.appendChild(b);
     if (o.allocation != null) {
-      var al = document.createElement('span'); al.className = 'agent-alloc';
+      var al = document.createElement('button'); al.type = 'button'; al.className = 'side-award agent-alloc';
+      al.setAttribute('data-agentalloc', o.side); al.setAttribute('aria-haspopup', 'dialog');
+      al.setAttribute('aria-label', 'Edit allocation for ' + o.name); al.disabled = isFinalizedStatus(status);
       al.textContent = Number(o.allocation).toFixed(Number(o.allocation) % 1 ? 2 : 0) + '%';
       ml.appendChild(al);
     }
@@ -3010,12 +3015,8 @@ Thanks</textarea></div>
     document.getElementById('s2Val').textContent = cur(otherGross);
     renderAgents();
     renderLeadDetailBreakdown();
-    document.getElementById('x1AllocSub').textContent = allocPct + '% of ' + cur(gross) + ' · both sides';
-    document.getElementById('x2AllocSub').textContent = other + '% of ' + cur(gross) + ' · both sides';
     document.getElementById('s1Sub').textContent = TEAM;
     document.getElementById('s2Sub').textContent = COOP[mySide];
-    document.getElementById('x1Alloc').textContent = allocPct + '%';
-    document.getElementById('x2Alloc').textContent = other + '%';
     document.getElementById('x1Basis').textContent = cur(basis);
     document.getElementById('x2Basis').textContent = cur(otherGross - otherDed);
     document.getElementById('r1Net').textContent = cur(net);
@@ -3118,7 +3119,7 @@ Thanks</textarea></div>
       agentDetailPage.removeAttribute('inert'); agentDetailPage.removeAttribute('aria-hidden');
       detailPage.setAttribute('inert', ''); detailPage.setAttribute('aria-hidden', 'true');
     }
-    setTimeout(function () { el.hidden = true; }, 300);
+    setTimeout(function () { if (openSheetEl !== el) el.hidden = true; }, 300);
     if (!silent && lastFocus) lastFocus.focus();
   }
   function requestClose() {
@@ -4337,7 +4338,7 @@ Thanks</textarea></div>
     if (agentDetailTrigger && agentDetailTrigger.isConnected) agentDetailTrigger.focus();
     else if (agentDetailSelection) {
       var returnRow = Array.prototype.find.call(detailPage.querySelectorAll('.agentrow'), function (row) { return row.agentBreakdown && row.agentBreakdown.id === agentDetailSelection.id; });
-      if (returnRow) returnRow.focus();
+      if (returnRow) returnRow.querySelector('[data-agent-open]').focus();
     }
   }
   document.getElementById('agentDetailBack').addEventListener('click', closeAgentDetail);
@@ -4838,31 +4839,72 @@ Thanks</textarea></div>
   });
 
   /* per-agent allocation: supports arbitrary precision; total must equal 100 */
-  var agentAllocSide = 'mine';
+  var agentAllocSide = 'mine', agentAllocDraft = [], agentAllocGross = 0;
+  function allocationMoney(amount) { return amount.toLocaleString('en-US', { style:'currency', currency:'USD', minimumFractionDigits:2, maximumFractionDigits:2 }); }
+  function syncAgentAllocation(active) {
+    var total = agentAllocDraft.reduce(function (sum, n) { return sum + n; }, 0),
+        valid = agentAllocDraft.length > 0 && agentAllocDraft.every(function (n) { return Number.isFinite(n) && n >= 0 && n <= 100; }) && Math.abs(total - 100) < .000001;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-agentallocinput]'), function (input) {
+      var pct = agentAllocDraft[Number(input.getAttribute('data-agentallocinput'))];
+      if (input !== active) input.value = Number.isFinite(pct) ? String(Number(pct.toFixed(6))) : '';
+    });
+    var displayedCents = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-agentallocamount]'), function (input, index) {
+      var pct = agentAllocDraft[Number(input.getAttribute('data-agentallocamount'))],
+          cents = Math.round(agentAllocGross * pct);
+      if (valid && index === agentAllocDraft.length - 1) cents = Math.round(agentAllocGross * 100) - displayedCents;
+      displayedCents += cents;
+      if (input !== active) input.value = Number.isFinite(pct) ? (cents / 100).toFixed(2) : '';
+    });
+    var summary = document.getElementById('agentAllocTotal');
+    summary.textContent = Number.isFinite(total) ? Number(total.toFixed(4)) + '% · ' + allocationMoney(agentAllocGross * total / 100) + (valid ? ' matched' : '') : 'Enter valid shares';
+    summary.style.color = valid ? 'var(--tint-green-fg)' : 'var(--tint-red-fg)';
+    document.getElementById('agentAllocSave').disabled = !valid;
+    document.getElementById('agentAllocError').hidden = valid;
+    return valid;
+  }
   function openAgentAllocation(side, trigger) {
-    agentAllocSide = side;
+    agentAllocSide = side; agentAllocGross = side === 'mine' ? sideGross : otherGross;
     var list = AG[side], host = document.getElementById('agentAllocEditor'); host.textContent = '';
-    document.getElementById('agentAllocSub').textContent = (side === 'mine' ? myTitle : coopTitle) + ' · must total 100%';
+    agentAllocDraft = list.map(function (a) { return a.allocation == null ? 100 / list.length : a.allocation; });
+    document.getElementById('agentAllocSub').textContent = 'Allocation of ' + (side === 'mine' ? myTitle : coopTitle).toLowerCase() + ' gross commission between agents.';
+    document.getElementById('agentAllocHint').textContent = list.length === 2 ? 'Enter either agent’s percentage or amount. The other receives the remainder of ' + allocationMoney(agentAllocGross) + '.' : 'Set each agent’s percentage or amount. Shares must total ' + allocationMoney(agentAllocGross) + ' (100%).';
     list.forEach(function (a, i) {
       var row = document.createElement('div'); row.className = 'allocation-line';
-      var name = document.createElement('span'); name.textContent = a.name + (i === 0 ? ' · primary' : '');
-      var lab = document.createElement('label');
-      var inp = document.createElement('input'); inp.className = 'rds-input'; inp.type = 'text'; inp.inputMode = 'decimal'; inp.value = String(a.allocation == null ? (100 / list.length) : a.allocation); inp.setAttribute('data-agentallocinput', String(i)); inp.setAttribute('aria-label', a.name + ' allocation percentage');
-      var unit = document.createElement('b'); unit.textContent = '%';
-      lab.appendChild(inp); lab.appendChild(unit); row.appendChild(name); row.appendChild(lab); host.appendChild(row);
+      var name = document.createElement('div'); name.className = 'allocation-person';
+      var title = document.createElement('b'); title.textContent = a.name;
+      var roleLabel = document.createElement('span'); roleLabel.textContent = i === 0 ? 'Primary agent' : 'Co-agent'; name.appendChild(title); name.appendChild(roleLabel); row.appendChild(name);
+      var fields = document.createElement('div'); fields.className = 'allocation-values';
+      ['percentage', 'amount'].forEach(function (kind) {
+        var label = document.createElement('label'), input = document.createElement('input'), unit = document.createElement('b');
+        input.type = 'number'; input.inputMode = 'decimal'; input.min = '0'; input.step = 'any'; input.max = String(kind === 'percentage' ? 100 : agentAllocGross);
+        input.setAttribute(kind === 'percentage' ? 'data-agentallocinput' : 'data-agentallocamount', String(i)); input.setAttribute('aria-label', a.name + ' allocation ' + kind);
+        unit.textContent = kind === 'percentage' ? '%' : '$';
+        if (kind === 'amount') { label.appendChild(unit); input.disabled = agentAllocGross === 0; }
+        label.appendChild(input); if (kind === 'percentage') label.appendChild(unit); fields.appendChild(label);
+      });
+      row.appendChild(fields); host.appendChild(row);
     });
-    document.getElementById('agentAllocError').hidden = true;
-    open(document.getElementById('agentAllocSheet'), trigger);
+    syncAgentAllocation(); open(document.getElementById('agentAllocSheet'), trigger);
   }
   document.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-agentalloc]'); if (!b) return;
+    var b = e.target.closest('[data-agentalloc]'); if (!b || b.disabled) return;
     e.stopPropagation(); openAgentAllocation(b.getAttribute('data-agentalloc'), b);
   });
+  document.getElementById('agentAllocEditor').addEventListener('input', function (e) {
+    var input = e.target, percentage = input.hasAttribute('data-agentallocinput');
+    if (!percentage && !input.hasAttribute('data-agentallocamount')) return;
+    var index = Number(input.getAttribute(percentage ? 'data-agentallocinput' : 'data-agentallocamount')),
+        value = input.value.trim() === '' ? NaN : Number(input.value),
+        pct = percentage ? value : (agentAllocGross > 0 ? value / agentAllocGross * 100 : NaN);
+    agentAllocDraft[index] = pct;
+    if (agentAllocDraft.length === 2 && Number.isFinite(pct) && pct >= 0 && pct <= 100) agentAllocDraft[1 - index] = 100 - pct;
+    sheetDirty = true; syncAgentAllocation(input);
+  });
+  document.getElementById('agentAllocCancel').addEventListener('click', function () { close(); });
   document.getElementById('agentAllocSave').addEventListener('click', function () {
-    var vals = Array.prototype.map.call(document.querySelectorAll('[data-agentallocinput]'), function (i) { return Math.max(0, Number(i.value) || 0); });
-    var total = vals.reduce(function (t, v) { return t + v; }, 0);
-    if (Math.abs(total - 100) > .000001) { document.getElementById('agentAllocError').hidden = false; return; }
-    AG[agentAllocSide].forEach(function (a, i) { a.allocation = vals[i]; });
+    if (!syncAgentAllocation()) return;
+    AG[agentAllocSide].forEach(function (a, i) { a.allocation = agentAllocDraft[i]; });
     applyNumbers(); close(); toast('Agent allocation saved — payouts recalculated.');
   });
   document.addEventListener('click', function (e) {
@@ -6056,8 +6098,9 @@ Thanks</textarea></div>
   /* ── comments & activity ────────────────────────────── */
   var TODAY = '2026-09-15';
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('button.agentrow[aria-controls]'); if (!t) return;
-    if (t.agentBreakdown) openAgentDetail(t.agentBreakdown, t);
+    var nav = e.target.closest('[data-agent-open]'); if (!nav) return;
+    var t = nav.closest('.agentrow');
+    if (t.agentBreakdown) openAgentDetail(t.agentBreakdown, nav);
   });
 
   /* Detail-row notes stay inline. The allocation totals use a bottom sheet so
