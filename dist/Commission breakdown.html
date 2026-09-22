@@ -1198,6 +1198,11 @@ button.ybd-r:active { opacity:.7; }
    panel fills the phone instead of inheriting the summary card's bounds. */
 .detail-page { position:absolute; inset:calc(44px + env(safe-area-inset-top)) 0 0; z-index:24;
   display:flex; flex-direction:column; min-height:0; background:transparent; color:var(--foreground); }
+.agent-detail-page { z-index:25; background:var(--background); }
+.agent-detail-page .ybd-card { margin:0; }
+.agent-detail-page .ybd-det { padding:8px 14px 14px; }
+.agent-detail-page .agent-detail-net { font-weight:700; border-top:1px solid var(--border); margin-top:8px; padding-top:16px; }
+.agent-detail-page .paybody { padding:16px 0; }
 .detail-head { flex:none; display:grid; grid-template-columns:44px minmax(0,1fr) 44px; align-items:center;
   min-height:56px; padding:0 12px; border-bottom:1px solid var(--border); background:rgba(18,18,20,.98); }
 .screen.light .detail-head { background:rgba(252,252,253,.98); }
@@ -2413,8 +2418,10 @@ Thanks</textarea></div>
     row.className = 'agentrow' + (isFirst ? ' first' : '');
     if (o.rows) {
       row.type = 'button';
-      row.setAttribute('aria-expanded', openPays[o.id] ? 'true' : 'false');
-      row.setAttribute('aria-controls', o.id);
+      row.setAttribute('aria-haspopup', 'dialog');
+      row.setAttribute('aria-controls', 'agentDetailPage');
+      row.setAttribute('aria-label', 'View breakdown for ' + o.name);
+      row.agentBreakdown = o;
     }
     if (o.only) row.setAttribute('data-only', o.only);
     var ini = document.createElement('span');
@@ -2503,10 +2510,12 @@ Thanks</textarea></div>
           pop.appendChild(assigned);
           row.appendChild(key); row.appendChild(value); row.appendChild(pop); el.appendChild(row);
         });
+        if (o.name === 'Mark Perez') {
         var postCapHost = document.createElement('div');
         postCapHost.className = 'post-cap-host'; postCapHost.id = o.id + '-post-cap';
         postCapHost.setAttribute('data-post-cap-host', '');
         el.appendChild(postCapHost); renderPostCapBanner(postCapHost);
+        }
         d.appendChild(el); return;
       }
       if (r.plan) {
@@ -2770,7 +2779,7 @@ Thanks</textarea></div>
     for (i = 0; i < AG.mine.length; i++) {
       o = { name: AG.mine[i].name, role: AG.mine[i].role, id: 'apay-m' + i, pay: cur(MINE[i].net), rows: MINE[i].rows, allocation: AG.mine[i].allocation, side: 'mine', index: i, removable: !AG.mine[i].me };
       h1.appendChild(agentRowEl(o, i === 0));
-      h1.appendChild(payBodyEl(o));
+
     }
     var gl = { name: 'Andy Martin', role: 'Group lead \u00b7 from the team share', id: 'apay-gl',
       pay: cur(groupLeadTakeHome()), only: 'lead', tint: 'gold', rows: [
@@ -2779,7 +2788,7 @@ Thanks</textarea></div>
         { k: 'Group commission', v: cur(groupNet), tot: true }
       ] };
     h1.appendChild(agentRowEl(gl, false));
-    h1.appendChild(payBodyEl(gl));
+
 
     var h2 = document.getElementById('agentList2');
     h2.textContent = '';
@@ -2795,7 +2804,7 @@ Thanks</textarea></div>
       o.rows.push({ k: 'Paid by ' + COOP[mySide], v: cur(amt), tot: true });
       o.rows.push({ note: 'Radius takes no fee on this side \u2014 the co-op brokerage pays its own agent.' });
       h2.appendChild(agentRowEl(o, i === 0));
-      h2.appendChild(payBodyEl(o));
+
     }
   }
   function renderLeadDetailBreakdown() {
@@ -2987,7 +2996,8 @@ Thanks</textarea></div>
     });
   });
   document.addEventListener('keydown', function (e) {
-    if (e.key !== 'Escape' || !e.target.closest('.post-cap-picker')) return;
+    if (e.key !== 'Escape' || !e.target.closest('.post-cap-picker.open')) return;
+    e.preventDefault(); e.stopImmediatePropagation();
     var anchor = e.target.closest('.post-cap-picker'), trigger = anchor.querySelector('[data-postcap-change]');
     closePostCapMenus(); if (trigger) trigger.focus();
   });
@@ -3030,6 +3040,10 @@ Thanks</textarea></div>
     renderDeds();
     renderYbd();
     renderPostCapBanners();
+    if (agentDetailPage && !agentDetailPage.hidden && agentDetailSelection) {
+      var selectedRow = Array.prototype.find.call(detailPage.querySelectorAll('.agentrow'), function (row) { return row.agentBreakdown && row.agentBreakdown.id === agentDetailSelection.id; });
+      if (selectedRow) openAgentDetail(selectedRow.agentBreakdown, null, true); else closeAgentDetail();
+    }
   }
   document.getElementById('moreSub').textContent = addr + ' \u00b7 ' + closeTxt.toLowerCase();
   var moreWireParams = new URLSearchParams(window.location.search);
@@ -3081,6 +3095,7 @@ Thanks</textarea></div>
       detailPage.setAttribute('inert', '');
       detailPage.setAttribute('aria-hidden', 'true');
     }
+    if (agentDetailPage && !agentDetailPage.hidden) { agentDetailPage.setAttribute('inert', ''); agentDetailPage.setAttribute('aria-hidden', 'true'); }
     requestAnimationFrame(function () { el.classList.add('on'); scrim.classList.add('on'); });
     /* a search field earns focus; otherwise park it on the title so no control lights up */
     var f = el.querySelector('input[type="search"], textarea') || el.querySelector('.sh-name[tabindex]') || el.querySelector(FOCUSABLE);
@@ -3098,6 +3113,10 @@ Thanks</textarea></div>
       setDetailBackground(true);
     } else {
       bgEls.forEach(function (n) { if (n) n.removeAttribute('aria-hidden'); });
+    }
+    if (agentDetailPage && !agentDetailPage.hidden) {
+      agentDetailPage.removeAttribute('inert'); agentDetailPage.removeAttribute('aria-hidden');
+      detailPage.setAttribute('inert', ''); detailPage.setAttribute('aria-hidden', 'true');
     }
     setTimeout(function () { el.hidden = true; }, 300);
     if (!silent && lastFocus) lastFocus.focus();
@@ -4209,6 +4228,126 @@ Thanks</textarea></div>
       detailTrigger = null,
       detailEditing = false;
   screenEl.appendChild(detailPage);
+  var agentDetailPage = document.createElement('div'), agentDetailTrigger = null, agentDetailSelection = null, agentDetailEditing = false, agentDetailSeq = 0;
+  agentDetailPage.id = 'agentDetailPage'; agentDetailPage.className = 'detail-page agent-detail-page';
+  agentDetailPage.hidden = true; agentDetailPage.setAttribute('role', 'dialog');
+  agentDetailPage.setAttribute('aria-modal', 'true'); agentDetailPage.setAttribute('aria-labelledby', 'agentDetailTitle');
+  agentDetailPage.innerHTML = '<div class="detail-head"><button class="detail-control" type="button" id="agentDetailBack" aria-label="Back to detailed breakdown"><i class="ph ph-caret-left" aria-hidden="true"></i></button><h2 class="detail-title" id="agentDetailTitle"></h2><button class="detail-control" type="button" id="agentDetailEdit" aria-label="Edit agent breakdown"><i class="ph ph-pencil-simple" aria-hidden="true"></i></button></div><div class="detail-scroll"><p class="ybd-note" id="agentDetailContext"></p><div class="ybd-card"><div class="ybd-det" id="agentDetailRows"></div></div><div id="agentDetailPlans"></div></div>';
+  screenEl.appendChild(agentDetailPage);
+  function agentDetailLine(host, label, value, badge) {
+    var row = document.createElement('div'); row.className = 'd';
+    var key = document.createElement('span'); key.textContent = label;
+    if (badge) { var chip = document.createElement('em'); chip.className = 'split-badge'; chip.textContent = badge; key.appendChild(chip); }
+    var amount = document.createElement('b'); amount.textContent = value;
+    row.appendChild(key); row.appendChild(amount); host.appendChild(row); return row;
+  }
+  function agentDetailDisclosure(host, label, rows, total, countLabel) {
+    var button = document.createElement('button'); button.type = 'button'; button.className = 'd grp neg';
+    var key = document.createElement('span'); key.textContent = label;
+    if (countLabel) { var count = document.createElement('em'); count.textContent = rows.length + ' ' + countLabel; key.appendChild(count); }
+    var amount = document.createElement('b'); amount.textContent = total;
+    var icon = document.createElement('i'); icon.className = 'ph ph-plus expand-mark'; icon.setAttribute('aria-hidden', 'true');
+    button.appendChild(key); button.appendChild(amount); button.appendChild(icon);
+    var body = document.createElement('div'); body.className = 'd-fees'; body.id = 'agentDetailSection' + (++agentDetailSeq); body.hidden = true;
+    button.setAttribute('aria-expanded', 'false'); button.setAttribute('aria-controls', body.id);
+    rows.forEach(function (r) {
+      var target = agentDetailEditing ? ybdFullTarget(r) : null;
+      if (target) {
+        var line = agentDetailLine(body, r.k, r.v, r.badge), edit = document.createElement('button'); edit.type = 'button'; edit.className = line.className;
+        while (line.firstChild) edit.appendChild(line.firstChild);
+        Object.keys(target).forEach(function (key) { edit.setAttribute(key, target[key]); });
+        edit.setAttribute('aria-label', 'Edit ' + r.k); line.replaceWith(edit);
+      } else if (r.det && r.det.length) agentDetailDisclosure(body, r.k, r.det, r.v);
+      else agentDetailLine(body, r.k, r.v, r.badge);
+    });
+    if (!rows.length) { var empty = document.createElement('p'); empty.className = 'ybd-note'; empty.textContent = 'No ' + label.toLowerCase(); body.appendChild(empty); }
+    button.addEventListener('click', function () { toggleYbdInner(button, body, button.getAttribute('aria-expanded') !== 'true'); });
+    host.appendChild(button); host.appendChild(body);
+  }
+  function openAgentDetail(o, trigger, refreshing) {
+    var savedScroll = refreshing ? agentDetailPage.querySelector('.detail-scroll').scrollTop : 0;
+    agentDetailSelection = o;
+    if (!refreshing) agentDetailEditing = false;
+    var canEditAgent = o.side === 'mine' && (AG.mine[o.index].me || role === 'team_lead' || role === 'group_lead' || role === 'group_lead_agent') && !isFinalizedStatus(status);
+    document.getElementById('agentDetailEdit').hidden = !canEditAgent;
+    document.getElementById('agentDetailEdit').setAttribute('aria-pressed', String(agentDetailEditing));
+    document.getElementById('agentDetailEdit').querySelector('i').className = agentDetailEditing ? 'ph ph-check' : 'ph ph-pencil-simple';
+    agentDetailPage.classList.toggle('editing', agentDetailEditing);
+    if (!refreshing) agentDetailTrigger = trigger;
+    document.getElementById('agentDetailTitle').textContent = o.name;
+    document.getElementById('agentDetailContext').textContent = (o.side === 'other' ? coopTitle : myTitle) + ' · ' + o.role;
+    var host = document.getElementById('agentDetailRows'), plans = document.getElementById('agentDetailPlans');
+    host.textContent = ''; plans.textContent = '';
+    var isMine = o.side === 'mine', isOther = o.side === 'other', groups = [], current = null;
+    if (isMine) {
+      var agent = AG.mine[o.index], chain = MINE[o.index], schedule = SCHED[o.name],
+          share = Math.max(0, Number(agent.allocation == null ? 100 / AG.mine.length : agent.allocation)) / 100;
+      var planLine = agentDetailLine(host, 'Commission plan', schedule ? schedule.plan : '80/20 Standard');
+      if (agentDetailEditing && schedule) {
+        var planButton = document.createElement('button'); planButton.type = 'button'; planButton.className = planLine.className; planButton.setAttribute('data-plan', o.name);
+        while (planLine.firstChild) planButton.appendChild(planLine.firstChild); planLine.replaceWith(planButton);
+      }
+      var basisRow = chain.rows.filter(function (r) { return r.k === 'Commission basis'; })[0];
+      agentDetailDisclosure(host, 'Commission basis', basisRow.det || [], basisRow.v);
+      var preRows = DEDS.mine.filter(function (d) { return d.kind === 'presplit'; }).map(function (d) { return { k:d.name, v:neg(d.amt * share), amt:d.amt * share, preDed:d.id }; });
+      agentDetailDisclosure(host, 'Pre-split deductions', preRows, cur(preSplit * share), preRows.length === 1 ? 'fee' : 'fees');
+      var splitRow = chain.rows.filter(function (r) { return r.badge && / split$/.test(r.k); })[0];
+      if (splitRow) agentDetailLine(host, 'Agent split', splitRow.v, splitRow.badge);
+      chain.rows.forEach(function (r) {
+        if (r.head) { current = r.grp ? { label:r.cardhead || r.head, rows:[] } : null; if (current) groups.push(current); return; }
+        if (current && r.k && !r.tot && !r.cardhide) current.rows.push(r);
+      });
+      groups.forEach(function (g) { agentDetailDisclosure(host, g.label, g.rows, cur(g.rows.reduce(function (sum, r) { return sum + (r.amt || 0); }, 0)), g.rows.length === 1 ? 'fee' : 'fees'); });
+      var agentRadius = chain.radius + PAYRADIUS.reduce(function (sum, d) { return sum + d.a * share; }, 0),
+          agentTeam = Math.max(0, (basis - preSplit) * share - chain.splitAmt) + chain.team + 250 * share;
+      var commissions = [{ k:'Agent payout', v:cur(chain.net) }, { k:'Radius commission', v:cur(agentRadius) }, { k:'Team commission', v:cur(agentTeam) }, { k:'Group commission', v:cur(agentTeam * groupSplitPct / 100) }];
+      agentDetailDisclosure(host, 'Commissions', commissions, cur(chain.net + agentRadius + agentTeam), 'totals');
+      agentDetailLine(host, 'Net commission', cur(chain.net)).classList.add('agent-detail-net');
+      var planRows = chain.rows.filter(function (r) { return r.relationships || Object.prototype.hasOwnProperty.call(r, 'caps'); });
+      var planBody = payBodyEl({ id:'agent-detail-plans', name:o.name, rows:planRows });
+      planBody.hidden = false; plans.appendChild(planBody);
+      if (agentDetailEditing) {
+        host.appendChild(ybdAddBtn('data-addded', 'mine|presplit', 'Add pre-split deduction'));
+        host.appendChild(ybdAddBtn('data-addpost', 'post', 'Add post-split deduction'));
+        if (o.removable) host.appendChild(ybdAddBtn('data-removeagent', o.side + '|' + o.index, 'Remove agent'));
+      }
+    } else if (isOther) {
+      var otherAgent = AG.other[o.index], count = AG.other.length || 1,
+          allocation = Math.max(0, Number(otherAgent.allocation == null ? 100 / count : otherAgent.allocation)) / 100;
+      agentDetailLine(host, 'Commission plan', 'Managed by ' + COOP[mySide]);
+      var credits = DEDS.other.filter(function (d) { return d.kind === 'credit'; }).map(function (d) { return { k:d.name, v:neg(d.amt * allocation) }; });
+      agentDetailDisclosure(host, 'Commission basis', credits, cur(otherGross * allocation));
+      var deductions = DEDS.other.filter(function (d) { return d.kind === 'presplit'; }).map(function (d) { return { k:d.name, v:neg(d.amt * allocation), amt:d.amt * allocation }; });
+      agentDetailDisclosure(host, 'Pre-split deductions', deductions, cur(deductions.reduce(function (sum, r) { return sum + r.amt; }, 0)), deductions.length === 1 ? 'fee' : 'fees');
+      agentDetailLine(host, 'Agent allocation', o.pay, pctLbl(allocation));
+      agentDetailLine(host, 'Payable to Radius', cur(0));
+      agentDetailLine(host, 'Co-op payout', o.pay).classList.add('agent-detail-net');
+      var note = document.createElement('p'); note.className = 'ybd-note';
+      note.textContent = 'Co-op plan splits and post-split fees are not provided. This is the allocation paid by ' + COOP[mySide] + ', before any co-op fees.'; host.appendChild(note);
+    } else {
+      o.rows.forEach(function (r) { if (r.k) agentDetailLine(host, r.k, r.v); });
+    }
+    detailPage.setAttribute('inert', ''); detailPage.setAttribute('aria-hidden', 'true');
+    agentDetailPage.hidden = false; agentDetailPage.querySelector('.detail-scroll').scrollTop = savedScroll;
+    if (!refreshing) document.getElementById('agentDetailBack').focus();
+  }
+  function closeAgentDetail() {
+    agentDetailPage.hidden = true; detailPage.removeAttribute('inert'); detailPage.removeAttribute('aria-hidden');
+    if (agentDetailTrigger && agentDetailTrigger.isConnected) agentDetailTrigger.focus();
+    else if (agentDetailSelection) {
+      var returnRow = Array.prototype.find.call(detailPage.querySelectorAll('.agentrow'), function (row) { return row.agentBreakdown && row.agentBreakdown.id === agentDetailSelection.id; });
+      if (returnRow) returnRow.focus();
+    }
+  }
+  document.getElementById('agentDetailBack').addEventListener('click', closeAgentDetail);
+  document.getElementById('agentDetailEdit').addEventListener('click', function () { agentDetailEditing = !agentDetailEditing; openAgentDetail(agentDetailSelection, null, true); this.focus(); });
+  agentDetailPage.addEventListener('keydown', function (e) {
+    if (e.key !== 'Tab') return;
+    var focusable = Array.prototype.filter.call(agentDetailPage.querySelectorAll(FOCUSABLE), function (el) { return el.getClientRects().length; });
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
   function setDetailBackground(hidden) {
     bgEls.forEach(function (el) {
       if (!el) return;
@@ -4240,6 +4379,7 @@ Thanks</textarea></div>
     document.getElementById('detailCloseBtn').focus();
   }
   function closeDetailed() {
+    if (agentDetailPage && !agentDetailPage.hidden) closeAgentDetail();
     detailPage.hidden = true;
     setDetailBackground(false);
     if (detailTrigger) detailTrigger.focus();
@@ -4255,7 +4395,10 @@ Thanks</textarea></div>
     if (openSheetEl) lastFocus = this;
   });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && !detailPage.hidden) { e.preventDefault(); closeDetailed(); }
+    if (e.key === 'Escape' && !detailPage.hidden && !openSheetEl) {
+      e.preventDefault();
+      if (!agentDetailPage.hidden) closeAgentDetail(); else closeDetailed();
+    }
   });
   document.getElementById('msgBtn').addEventListener('click', function () {
     renderFeed();
@@ -5288,6 +5431,7 @@ Thanks</textarea></div>
     var b = e.target.closest('[data-removeagent]'); if (!b) return;
     var p = b.getAttribute('data-removeagent').split('|'), side = p[0], index = Number(p[1]), gone = AG[side][index];
     if (!gone || gone.me) return;
+    if (agentDetailSelection && !agentDetailPage.hidden && agentDetailSelection.name === gone.name) closeAgentDetail();
     AG[side].splice(index, 1);
     var equal = 100 / Math.max(1, AG[side].length);
     AG[side].forEach(function (a) { a.allocation = equal; });
@@ -5911,12 +6055,7 @@ Thanks</textarea></div>
   var TODAY = '2026-09-15';
   document.addEventListener('click', function (e) {
     var t = e.target.closest('button.agentrow[aria-controls]'); if (!t) return;
-    var id = t.getAttribute('aria-controls');
-    var body = document.getElementById(id);
-    var isOpen = t.getAttribute('aria-expanded') === 'true';
-    t.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-    body.hidden = isOpen;
-    openPays[id] = !isOpen;
+    if (t.agentBreakdown) openAgentDetail(t.agentBreakdown, t);
   });
 
   /* Detail-row notes stay inline. The allocation totals use a bottom sheet so
